@@ -1,0 +1,25 @@
+[package]
+name = "egui_vnc"
+version = "0.1.0"
+edition = "2024"
+default-run = "egui_vnc"
+
+[dependencies]
+egui = "0.35.0"
+egui_extras = { version = "0.35.0", features = ["all_loaders", "svg", "image"] }
+egui_plot = "0.36.0"
+env_logger = "0.11.11"
+image = { version = "0.25", features = ["png"] }
+log = "0.4.33"
+rand = "0.8"
+eframe = "0.35.0"
+serde_json = "1"
+syntect = "5.3.0"
+railroad = "0.3"
+macro_railroad = "0.1"
+usvg = "0.48"
+resvg = "0.48"
+
+# Optimiza dependencias en desarrollo sin penalizar demasiado la compilación del código propio.
+[profile.dev.package."*"]
+opt-level = 3
