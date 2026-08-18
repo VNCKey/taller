@@ -3,6 +3,7 @@ use std::sync::Arc;
 use crate::app::PortfolioState;
 use crate::components::code_editor::mostrar_editor_interactivo;
 use crate::execution::ejecutar_codigo_rust;
+use crate::views::control_flujo::card_frame_tutorial;
 
 pub fn mostrar_categoria_enteros(ui: &mut egui::Ui) {
     ui.label("En Rust, los enteros se dividen según si admiten números negativos (signed `i`) o solo positivos y cero (unsigned `u`).");
@@ -988,5 +989,3 @@ fn mostrar_compuesto_comparar(
     );
 }
 
-
-/// Sesión unificada: Strings + Ownership (menú: 🧵 Strings & Ownership).

@@ -1,9 +1,14 @@
 use eframe::egui;
+use std::sync::atomic::Ordering;
 use std::sync::Arc;
 use crate::app::PortfolioState;
 use crate::components::code_editor::mostrar_editor_interactivo;
 use crate::execution::ejecutar_codigo_rust;
-use crate::views::pilares::mostrar_desglose_template_con_imagen;
+use crate::routes::AppRoute;
+use crate::views::tipos_datos::{
+    mostrar_categoria_booleanos, mostrar_categoria_caracteres, mostrar_categoria_enteros,
+    mostrar_categoria_flotantes,
+};
 
 pub fn mostrar_comenzando(ui: &mut egui::Ui, state: &mut PortfolioState) {
     mostrar_tutorial_conceptos_basicos(ui, state);
@@ -1550,4 +1555,3 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
     }
 }
 
-#[derive(Clone, Copy)]

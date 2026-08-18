@@ -4,6 +4,7 @@ use crate::app::PortfolioState;
 use crate::components::code_editor::mostrar_editor_interactivo;
 use crate::execution::ejecutar_codigo_rust;
 use crate::views::comenzando::mostrar_selector_proyectos_estandar;
+use crate::views::control_flujo::card_frame_tutorial;
 
 pub fn mostrar_tutorial_funciones(ui: &mut egui::Ui, state: &mut PortfolioState) {
     let naranja = egui::Color32::from_rgb(255, 160, 50);
