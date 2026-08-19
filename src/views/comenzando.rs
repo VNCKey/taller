@@ -1487,25 +1487,69 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
                     .striped(true)
                     .spacing([20.0, 8.0])
                     .show(ui, |ui| {
-                        ui.label(egui::RichText::new("Mecanismo").strong().color(egui::Color32::WHITE));
-                        ui.label(egui::RichText::new("Sintaxis").strong().color(egui::Color32::WHITE));
-                        ui.label(egui::RichText::new("¿Cambia Tipo?").strong().color(egui::Color32::WHITE));
-                        ui.label(egui::RichText::new("Memoria (Stack)").strong().color(egui::Color32::WHITE));
-                        ui.label(egui::RichText::new("Uso Ideal").strong().color(egui::Color32::WHITE));
+                        ui.label(
+                            egui::RichText::new("Mecanismo")
+                                .strong()
+                                .color(egui::Color32::WHITE),
+                        );
+                        ui.label(
+                            egui::RichText::new("Sintaxis")
+                                .strong()
+                                .color(egui::Color32::WHITE),
+                        );
+                        ui.label(
+                            egui::RichText::new("¿Cambia Tipo?")
+                                .strong()
+                                .color(egui::Color32::WHITE),
+                        );
+                        ui.label(
+                            egui::RichText::new("Memoria (Stack)")
+                                .strong()
+                                .color(egui::Color32::WHITE),
+                        );
+                        ui.label(
+                            egui::RichText::new("Uso Ideal")
+                                .strong()
+                                .color(egui::Color32::WHITE),
+                        );
                         ui.end_row();
 
                         // Fila 1: Mutabilidad
-                        ui.label(egui::RichText::new("Mutabilidad (mut)").strong().color(egui::Color32::from_rgb(255, 160, 50)));
-                        ui.label(egui::RichText::new("let mut x = 5;\nx = 10;").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
-                        ui.label(egui::RichText::new("No").strong().color(egui::Color32::from_rgb(248, 113, 113)));
+                        ui.label(
+                            egui::RichText::new("Mutabilidad")
+                                .strong()
+                                .color(egui::Color32::from_rgb(255, 160, 50)),
+                        );
+                        ui.label(
+                            egui::RichText::new("let mut x = 5;\nx = 10;")
+                                .monospace()
+                                .color(egui::Color32::from_rgb(100, 200, 255)),
+                        );
+                        ui.label(
+                            egui::RichText::new("No")
+                                .strong()
+                                .color(egui::Color32::from_rgb(180, 190, 205)),
+                        );
                         ui.label("Misma celda en Stack");
                         ui.label("Bucles y acumuladores");
                         ui.end_row();
 
                         // Fila 2: Shadowing
-                        ui.label(egui::RichText::new("Shadowing (let)").strong().color(egui::Color32::from_rgb(52, 211, 153)));
-                        ui.label(egui::RichText::new("let x = \"hola\";\nlet x = x.len();").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
-                        ui.label(egui::RichText::new("Sí (&str ➔ usize)").strong().color(egui::Color32::from_rgb(52, 211, 153)));
+                        ui.label(
+                            egui::RichText::new("Shadowing")
+                                .strong()
+                                .color(egui::Color32::from_rgb(255, 160, 50)),
+                        );
+                        ui.label(
+                            egui::RichText::new("let x = \"hola\";\nlet x = x.len();")
+                                .monospace()
+                                .color(egui::Color32::from_rgb(100, 200, 255)),
+                        );
+                        ui.label(
+                            egui::RichText::new("Sí")
+                                .strong()
+                                .color(egui::Color32::WHITE),
+                        );
                         ui.label("Nueva variable en Stack");
                         ui.label("Transformación de datos");
                         ui.end_row();
@@ -1514,36 +1558,36 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
 
             ui.add_space(14.0);
 
-            // Dos Columnas: Scope & Shadowing profundo
+            // Dos Columnas: Scope & Shadowing profundo con paleta unificada
             ui.columns(2, |cols| {
                 // Columna Izquierda: Scope (Ámbito Léxico)
                 let mut scope_frame = egui::Frame::new();
                 scope_frame.fill = egui::Color32::from_rgb(14, 18, 26);
                 scope_frame.inner_margin = egui::Margin::same(12);
                 scope_frame.corner_radius = egui::CornerRadius::same(8);
-                scope_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(56, 189, 248));
+                scope_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 60, 90));
 
                 scope_frame.show(&mut cols[0], |ui| {
                     ui.label(
-                        egui::RichText::new("📦 Ámbito Léxico (Scope { ... })")
+                        egui::RichText::new("Scope")
                             .strong()
                             .size(15.0)
-                            .color(egui::Color32::from_rgb(56, 189, 248)),
+                            .color(egui::Color32::from_rgb(255, 160, 50)),
                     );
                     ui.add_space(6.0);
                     ui.label(
                         "El bloque delimitado por llaves define el ciclo de vida estricto de las variables en la pila:",
                     );
                     ui.add_space(4.0);
-                    ui.label("• Al entrar a { se reserva espacio en el Stack Frame.");
-                    ui.label("• Al alcanzar la llave de cierre } la variable sale de scope y se destruye inmediatamente ejecutando drop() (RAII).");
-                    ui.label("• Las variables declaradas en un ámbito interno NO son accesibles desde el exterior.");
+                    ui.label("• Al entrar a '{' se reserva espacio en el Stack Frame.");
+                    ui.label("• Al alcanzar la llave de cierre '}' la variable sale de scope y se destruye inmediatamente ejecutando drop() (RAII).");
+                    ui.label("• Las variables declaradas en un ámbito interno no son accesibles desde el exterior.");
                     ui.add_space(6.0);
                     ui.label(
                         egui::RichText::new("let exterior = 10;\n{\n    let interior = 20;\n    println!(\"{interior}\"); // Válido\n}\n// println!(\"{interior}\"); ❌ Error: no existe")
                             .monospace()
                             .size(11.5)
-                            .color(egui::Color32::from_rgb(147, 197, 253)),
+                            .color(egui::Color32::from_rgb(100, 200, 255)),
                     );
                 });
 
@@ -1552,21 +1596,21 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
                 shadow_frame.fill = egui::Color32::from_rgb(14, 18, 26);
                 shadow_frame.inner_margin = egui::Margin::same(12);
                 shadow_frame.corner_radius = egui::CornerRadius::same(8);
-                shadow_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(52, 211, 153));
+                shadow_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 60, 90));
 
                 shadow_frame.show(&mut cols[1], |ui| {
                     ui.label(
-                        egui::RichText::new("👥 Ensombrecimiento (Shadowing)")
+                        egui::RichText::new("Shadowing")
                             .strong()
                             .size(15.0)
-                            .color(egui::Color32::from_rgb(52, 211, 153)),
+                            .color(egui::Color32::from_rgb(255, 160, 50)),
                     );
                     ui.add_space(6.0);
                     ui.label(
                         "Permite re-declarar una variable con 'let', creando una variable totalmente nueva:",
                     );
                     ui.add_space(4.0);
-                    ui.label("• Reutiliza el mismo nombre conceptual sin variables temporales como 'texto_str' o 'texto_num'.");
+                    ui.label("• Reutiliza el mismo nombre conceptual sin variables temporales.");
                     ui.label("• Permite cambiar el tipo de dato y devuelve inmutabilidad al valor resultante.");
                     ui.label("• Shadowing por Bloque: Dentro de { ... } oculta temporalmente la variable exterior sin alterarla.");
                     ui.add_space(6.0);
@@ -1574,7 +1618,7 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
                         egui::RichText::new("let x = 5;\n{\n    let x = x * 2; // x es 10 dentro del bloque\n}\nprintln!(\"{x}\"); // x vuelve a ser 5 (intacto)")
                             .monospace()
                             .size(11.5)
-                            .color(egui::Color32::from_rgb(167, 243, 208)),
+                            .color(egui::Color32::from_rgb(100, 200, 255)),
                     );
                 });
             });
