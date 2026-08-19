@@ -60,22 +60,39 @@ impl egui::load::ImageLoader for SystemFontSvgLoader {
         let svg_size = tree.size();
         let (mut width, mut height) = (svg_size.width(), svg_size.height());
 
-        // Ajustar al tamaño solicitado si existe size_hint
-        if let Some(target_size) = size_hint.as_vec2() {
-            if target_size.x > 0.0 && target_size.y > 0.0 {
-                width = target_size.x;
-                height = target_size.y;
+        // Ajustar al tamaño solicitado según size_hint
+        match size_hint {
+            egui::load::SizeHint::Size { width: target_w, height: target_h, .. } => {
+                if target_w > 0 && target_h > 0 {
+                    width = target_w as f32;
+                    height = target_h as f32;
+                }
             }
+            egui::load::SizeHint::Width(w) => {
+                if w > 0 {
+                    let ratio = w as f32 / svg_size.width();
+                    width = w as f32;
+                    height = svg_size.height() * ratio;
+                }
+            }
+            egui::load::SizeHint::Height(h) => {
+                if h > 0 {
+                    let ratio = h as f32 / svg_size.height();
+                    width = svg_size.width() * ratio;
+                    height = h as f32;
+                }
+            }
+            _ => {}
         }
 
         let pixmap_size = match resvg::tiny_skia::IntSize::from_wh(width.round() as u32, height.round() as u32) {
             Some(size) => size,
-            None => return Err(egui::load::LoadError::FormatError("Tamaño SVG inválido".into())),
+            None => return Err(egui::load::LoadError::Loading("Tamaño SVG inválido".into())),
         };
 
         let mut pixmap = match resvg::tiny_skia::Pixmap::new(pixmap_size.width(), pixmap_size.height()) {
             Some(pixmap) => pixmap,
-            None => return Err(egui::load::LoadError::FormatError("No se pudo crear pixmap".into())),
+            None => return Err(egui::load::LoadError::Loading("No se pudo crear pixmap".into())),
         };
 
         let transform = resvg::tiny_skia::Transform::from_scale(
