@@ -1,64 +1,25 @@
 %%{init: {'theme': 'dark', 'themeVariables': { 'darkMode': true, 'background': '#0f172a'}}}%%
 flowchart TD
     %% ===================================================
-    %% DIAGRAMA EXCLUSIVO: RUN TIME (TIEMPO DE EJECUCIÓN)
+    %% RUN TIME (RESUMIDO Y TÉCNICO)
     %% ===================================================
 
-    EXEC_BIN["Ejecutable Binario<br/><b>./programa (.exe / ELF)</b>"]
+    BIN["<b>Ejecutable Binario (./programa)</b>"]
 
-    subgraph R1["1. CARGA DEL PROCESO POR EL S.O."]
-        direction TB
-        OS["Kernel de Linux/Windows crea el Proceso"]
-        MAP["Mapeo en Memoria Virtual (Direcciones)"]
-        OS --> MAP
-    end
+    R1["<b>1. Carga del Proceso (Kernel SO)</b><br/>Mapeo a Memoria Virtual (.text instrucciones + .rodata estáticos)"]
+    R2["<b>2. Segmentación de Memoria</b><br/>Stack (rápido para frames/locales) + Heap (dinámico para Vec/String)"]
+    R3["<b>3. Ejecución Directa en CPU</b><br/>Instrucciones Nativas x86_64/ARM (Sin VM, Sin Intérprete, Sin Garbage Collector)"]
+    R4["<b>4. Gestión Automática RAII</b><br/>Llamada determinista a drop() al salir del Scope (Liberación instantánea)"]
 
-    subgraph R2["2. DISTRIBUCIÓN DE MEMORIA EN RAM"]
-        direction TB
-        TEXT["Segmento .text (Código Máquina / Instrucciones)"]
-        DATA["Segmento .rodata / .data (Literales estáticos)"]
-        STACK["Stack (Pila de llamadas, variables locales, punteros)"]
-        TEXT --- DATA --- STACK
-    end
+    EXIT(["<b>TERMINACIÓN DEL PROCESO<br/>Exit Code 0 (Cero Fugas)</b>"]):::targetNode
 
-    subgraph R3["3. EJECUCIÓN DIRECTA EN CPU (CERO INTERMEDIARIOS)"]
-        direction TB
-        CPU["CPU ejecuta instrucciones nativas (x86_64 / ARM)"]
-        NO_VM["Sin Intérprete / Sin Máquina Virtual / Sin JIT"]
-        NO_GC["Sin Garbage Collector (Cero pausas en la aplicación)"]
-        CPU --> NO_VM --> NO_GC
-    end
+    BIN --> R1 --> R2 --> R3 --> R4 --> EXIT
 
-    subgraph R4["4. GESTIÓN DINÁMICA & SEGURIDAD RUNTIME"]
-        direction TB
-        HEAP["Heap (Memoria dinámica según demanda: Vec, String, Box)"]
-        BOUNDS["Bounds Checking (Protección de desbordamiento en arrays)"]
-        HEAP --- BOUNDS
-    end
+    classDef targetNode fill:#059669,stroke:#34d399,stroke-width:2.5px,color:#ffffff;
+    classDef default fill:#1e293b,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
 
-    subgraph R5["5. LIBERACIÓN DETERMINISTA DE RECURSOS (RAII)"]
-        direction TB
-        SCOPE["Variable sale de su Ámbito (Scope)"]
-        DROP["Llamada automática e inmediata a drop()"]
-        FREE["Memoria del Heap y recursos liberados al instante"]
-        SCOPE --> DROP --> FREE
-    end
-
-    EXIT(["<b>TERMINACIÓN DEL PROGRAMA<br/>Exit Code 0 (Éxito)</b>"]):::exitNode
-
-    EXEC_BIN --> R1
-    R1 --> R2
-    R2 --> R3
-    R3 --> R4
-    R4 --> R5
-    R5 --> EXIT
-
-    classDef exitNode fill:#059669,stroke:#34d399,stroke-width:2.5px,color:#ffffff;
-    classDef default fill:#1e293b,stroke:#38bdf8,color:#f8fafc;
-
-    style R1 fill:#0f172a,stroke:#38bdf8,stroke-width:1.5px,color:#93c5fd
-    style R2 fill:#0f172a,stroke:#818cf8,stroke-width:1.5px,color:#c7d2fe
-    style R3 fill:#0f172a,stroke:#10b981,stroke-width:1.5px,color:#a7f3d0
-    style R4 fill:#0f172a,stroke:#eab308,stroke-width:1.5px,color:#fef08a
-    style R5 fill:#2d1508,stroke:#f97316,stroke-width:1.5px,color:#fed7aa
-    style EXEC_BIN fill:#1e1e38,stroke:#818cf8,stroke-width:2px,color:#c7d2fe
+    style BIN fill:#1e1e38,stroke:#818cf8,stroke-width:2px,color:#c7d2fe
+    style R1 fill:#1e293b,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc
+    style R2 fill:#1e293b,stroke:#818cf8,stroke-width:1.5px,color:#f8fafc
+    style R3 fill:#1e293b,stroke:#10b981,stroke-width:2px,color:#a7f3d0
+    style R4 fill:#2d1508,stroke:#f97316,stroke-width:1.5px,color:#fed7aa

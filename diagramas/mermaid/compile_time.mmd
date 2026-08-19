@@ -1,55 +1,25 @@
 %%{init: {'theme': 'dark', 'themeVariables': { 'darkMode': true, 'background': '#0f172a'}}}%%
 flowchart TD
     %% ===================================================
-    %% DIAGRAMA EXCLUSIVO: COMPILE TIME (TIEMPO DE COMPILACIÓN)
+    %% COMPILE TIME (RESUMIDO Y TÉCNICO)
     %% ===================================================
 
-    SRC["Código Fuente Rust<br/><b>archivo.rs</b>"]
+    SRC["<b>Código Fuente (.rs)</b>"]
 
-    subgraph F1["1. METAPROGRAMACIÓN & ANÁLISIS SINTÁCTICO"]
-        direction TB
-        LEX["Tokenizador & Parser (AST)"]
-        MACRO["Expansión de Macros & Derives<br/><i>macro_rules!, #[derive(...)]</i>"]
-        LEX --> MACRO
-    end
+    P1["<b>1. Frontend & Metaprogramación</b><br/>Parser (AST) + Expansión de Macros & Derives"]
+    P2["<b>2. Sistema de Tipos & Genéricos</b><br/>Inferencia Estática + Monomorfización a Tipos Concretos"]
+    P3["<b>3. Verificación de Seguridad</b><br/>Borrow Checker (Lifetimes, Ownership y Mutabilidad Única)"]
+    P4["<b>4. Backend & Optimización LLVM</b><br/>Optimizador -O3 (Inlining, SIMD) + Linker (ld/lld con libstd)"]
 
-    subgraph F2["2. SISTEMA DE TIPOS & MONOMORFIZACIÓN"]
-        direction TB
-        TYPE["Inferencia Estática de Tipos & Traits"]
-        MONO["Monomorfización de Genéricos<br/><i>Copia especializada por cada tipo T</i>"]
-        CONST["Evaluación Constante<br/><i>const fn calculadas en compilación</i>"]
-        TYPE --> MONO --> CONST
-    end
+    BIN(["<b>BINARIO NATIVO FINAL<br/>ELF / .EXE / WASM</b>"]):::targetNode
 
-    subgraph F3["3. ANÁLISIS DE SEGURIDAD (BORROW CHECKER)"]
-        direction TB
-        OWN["Verificación de Ownership (Propiedad)"]
-        LIFE["Validación de Lifetimes (Tiempos de Vida)"]
-        MUT["Reglas de Mutabilidad y No-Aliasing"]
-        OWN --> LIFE --> MUT
-    end
-
-    subgraph F4["4. OPTIMIZACIÓN & GENERACIÓN (LLVM)"]
-        direction TB
-        OPT["Optimizaciones Agresivas (-O3)<br/><i>Inlining + SIMD + Dead Code Elimination</i>"]
-        ASM["Emisión de Código Máquina (.s / .o)"]
-        LINK["Linker (ld/lld) con libstd y Crates"]
-        OPT --> ASM --> LINK
-    end
-
-    BIN(["<b>BINARIO FINAL NATIVO<br/>ELF / .EXE / WASM</b>"]):::targetNode
-
-    SRC --> F1
-    F1 --> F2
-    F2 --> F3
-    F3 ==>|"100% Seguro & Verificado"| F4
-    F4 --> BIN
+    SRC --> P1 --> P2 --> P3 ==>|"100% Seguro"| P4 --> BIN
 
     classDef targetNode fill:#059669,stroke:#34d399,stroke-width:2.5px,color:#ffffff;
-    classDef default fill:#1e293b,stroke:#38bdf8,color:#f8fafc;
+    classDef default fill:#1e293b,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
 
-    style F1 fill:#0f172a,stroke:#38bdf8,stroke-width:1.5px,color:#93c5fd
-    style F2 fill:#0f172a,stroke:#818cf8,stroke-width:1.5px,color:#c7d2fe
-    style F3 fill:#2d1508,stroke:#f97316,stroke-width:1.5px,color:#fed7aa
-    style F4 fill:#0f172a,stroke:#a855f7,stroke-width:1.5px,color:#d8b4fe
     style SRC fill:#1e1e38,stroke:#818cf8,stroke-width:2px,color:#c7d2fe
+    style P1 fill:#1e293b,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc
+    style P2 fill:#1e293b,stroke:#818cf8,stroke-width:1.5px,color:#f8fafc
+    style P3 fill:#2d1508,stroke:#f97316,stroke-width:2px,color:#fed7aa
+    style P4 fill:#1e293b,stroke:#a855f7,stroke-width:1.5px,color:#f8fafc
