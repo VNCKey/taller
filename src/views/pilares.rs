@@ -509,9 +509,9 @@ pub fn mostrar_pilares_tiempo(ui: &mut egui::Ui, state: &mut PortfolioState) {
                 );
                 ui.end_row();
 
-                // Fila 4: Diagrama Railroad
+                // Fila 4: Diagrama de Flujo
                 ui.label(
-                    egui::RichText::new("Diagrama Railroad")
+                    egui::RichText::new("Diagrama de Flujo")
                         .strong()
                         .color(egui::Color32::from_rgb(255, 160, 50)),
                 );
@@ -534,7 +534,7 @@ pub fn mostrar_pilares_tiempo(ui: &mut egui::Ui, state: &mut PortfolioState) {
                         )
                         .frame(state.show_railroad_modal == Some(4)),
                     )
-                    .on_hover_text("Ver diagrama Railroad (Tiempo de Compilación)")
+                    .on_hover_text("Ver diagrama de flujo (Tiempo de Compilación)")
                     .clicked()
                 {
                     state.show_railroad_modal = if state.show_railroad_modal == Some(4) { None } else { Some(4) };
@@ -558,7 +558,7 @@ pub fn mostrar_pilares_tiempo(ui: &mut egui::Ui, state: &mut PortfolioState) {
                         )
                         .frame(state.show_railroad_modal == Some(5)),
                     )
-                    .on_hover_text("Ver diagrama Railroad (Tiempo de Ejecución)")
+                    .on_hover_text("Ver diagrama de flujo (Tiempo de Ejecución)")
                     .clicked()
                 {
                     state.show_railroad_modal = if state.show_railroad_modal == Some(5) { None } else { Some(5) };
