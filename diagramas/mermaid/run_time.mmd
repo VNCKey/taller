@@ -4,14 +4,14 @@ flowchart TD
     %% RUN TIME (RESUMIDO Y TÉCNICO)
     %% ===================================================
 
-    BIN["<b>Ejecutable Binario (./programa)</b>"]
+    BIN["<b>Ejecutable Binario</b>"]
 
-    R1["<b>1. Carga del Proceso (Kernel SO)</b><br/>Mapeo a Memoria Virtual (.text instrucciones + .rodata estáticos)"]
-    R2["<b>2. Segmentación de Memoria</b><br/>Stack (rápido para frames/locales) + Heap (dinámico para Vec/String)"]
-    R3["<b>3. Ejecución Directa en CPU</b><br/>Instrucciones Nativas x86_64/ARM (Sin VM, Sin Intérprete, Sin Garbage Collector)"]
-    R4["<b>4. Gestión Automática RAII</b><br/>Llamada determinista a drop() al salir del Scope (Liberación instantánea)"]
+    R1["<b>Kernel SO</b><br/>Mapeo a Memoria Virtual"]
+    R2["<b>Segmentación de Memoria</b><br/>Stack + Heap"]
+    R3["<b>Ejecución Directa en CPU</b><br/>Instrucciones Nativas x86_64/ARM<br/><i>(Sin VM / Sin Intérprete / Sin GC)</i>"]
+    R4["<b>RAII</b><br/>Llamada determinista a drop() al salir del Scope"]
 
-    EXIT(["<b>TERMINACIÓN DEL PROCESO<br/>Exit Code 0 (Cero Fugas)</b>"]):::targetNode
+    EXIT(["<b>Cero Fugas</b>"]):::targetNode
 
     BIN --> R1 --> R2 --> R3 --> R4 --> EXIT
 

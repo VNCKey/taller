@@ -6,20 +6,20 @@ flowchart TD
 
     SRC["<b>Código Fuente (.rs)</b>"]
 
-    P1["<b>1. Frontend & Metaprogramación</b><br/>Parser (AST) + Expansión de Macros & Derives"]
-    P2["<b>2. Sistema de Tipos & Genéricos</b><br/>Inferencia Estática + Monomorfización a Tipos Concretos"]
-    P3["<b>3. Verificación de Seguridad</b><br/>Borrow Checker (Lifetimes, Ownership y Mutabilidad Única)"]
-    P4["<b>4. Backend & Optimización LLVM</b><br/>Optimizador -O3 (Inlining, SIMD) + Linker (ld/lld con libstd)"]
+    C1["<b>Frontend & Macros</b><br/>Parser (AST) + macro_rules! / derives"]
+    C2["<b>Sistema de Tipos</b><br/>Inferencia Estática + Monomorfización"]
+    C3["<b>Borrow Checker</b><br/>Lifetimes + Ownership + Mutabilidad Única"]
+    C4["<b>Backend LLVM</b><br/>Optimizador -O3 (SIMD / Inlining) + Linker"]
 
-    BIN(["<b>BINARIO NATIVO FINAL<br/>ELF / .EXE / WASM</b>"]):::targetNode
+    BIN(["<b>100% Seguro & Nativo</b>"]):::targetNode
 
-    SRC --> P1 --> P2 --> P3 ==>|"100% Seguro"| P4 --> BIN
+    SRC --> C1 --> C2 --> C3 --> C4 --> BIN
 
     classDef targetNode fill:#059669,stroke:#34d399,stroke-width:2.5px,color:#ffffff;
     classDef default fill:#1e293b,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
 
     style SRC fill:#1e1e38,stroke:#818cf8,stroke-width:2px,color:#c7d2fe
-    style P1 fill:#1e293b,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc
-    style P2 fill:#1e293b,stroke:#818cf8,stroke-width:1.5px,color:#f8fafc
-    style P3 fill:#2d1508,stroke:#f97316,stroke-width:2px,color:#fed7aa
-    style P4 fill:#1e293b,stroke:#a855f7,stroke-width:1.5px,color:#f8fafc
+    style C1 fill:#1e293b,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc
+    style C2 fill:#1e293b,stroke:#818cf8,stroke-width:1.5px,color:#f8fafc
+    style C3 fill:#2d1508,stroke:#f97316,stroke-width:2px,color:#fed7aa
+    style C4 fill:#1e293b,stroke:#a855f7,stroke-width:1.5px,color:#f8fafc
