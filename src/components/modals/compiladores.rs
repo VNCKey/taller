@@ -24,10 +24,10 @@ pub fn mostrar_modal_comparacion_compiladores(ctx: &egui::Context, state: &mut P
                 );
                 ui.add_space(10.0);
 
-                // Diagrama SVG generado desde Mermaid (pipe.svg)
+                // Diagrama SVG con texto nativo compatible con resvg/egui
                 let img = egui::Image::from_bytes(
-                    "bytes://pipe.svg",
-                    include_bytes!("../../../diagramas/pipe.svg"),
+                    "bytes://compilacion_rustc.svg",
+                    include_bytes!("../../../diagramas/compilacion_rustc.svg"),
                 )
                 .fit_to_original_size(1.0);
 
