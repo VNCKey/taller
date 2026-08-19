@@ -339,25 +339,40 @@ pub fn mostrar_pilares_proyecto(ui: &mut egui::Ui, state: &mut PortfolioState) {
                         .strong()
                         .color(egui::Color32::WHITE),
                 );
-                ui.label(
-                    egui::RichText::new("Diagrama")
-                        .strong()
-                        .color(egui::Color32::WHITE),
-                );
                 ui.end_row();
 
                 // Fila 1: Ejecutable (src/main.rs)
-                let btn_color_main = if state.show_railroad_modal == Some(2) {
-                    egui::Color32::from_rgb(255, 160, 50)
-                } else {
-                    egui::Color32::from_rgb(180, 190, 205)
-                };
+                ui.horizontal(|ui| {
+                    ui.label(
+                        egui::RichText::new("Ejecutable (Binario)")
+                            .strong()
+                            .color(egui::Color32::from_rgb(255, 160, 50)),
+                    );
+                    ui.add_space(4.0);
+                    let btn_color_main = if state.show_railroad_modal == Some(2) {
+                        egui::Color32::from_rgb(255, 160, 50)
+                    } else {
+                        egui::Color32::from_rgb(180, 190, 205)
+                    };
 
-                ui.label(
-                    egui::RichText::new("Ejecutable (Binario)")
-                        .strong()
-                        .color(egui::Color32::from_rgb(255, 160, 50)),
-                );
+                    if ui
+                        .add(
+                            egui::Button::image(
+                                egui::Image::from_bytes(
+                                    "bytes://view.svg",
+                                    include_bytes!("../../diagramas/view.svg"),
+                                )
+                                .fit_to_exact_size(egui::vec2(18.0, 18.0))
+                                .tint(btn_color_main),
+                            )
+                            .frame(state.show_railroad_modal == Some(2)),
+                        )
+                        .on_hover_text("Ver diagrama Railroad de sintaxis (fn main ejecutable)")
+                        .clicked()
+                    {
+                        state.show_railroad_modal = if state.show_railroad_modal == Some(2) { None } else { Some(2) };
+                    }
+                });
                 ui.label(
                     egui::RichText::new("cargo new <nombre>")
                         .monospace()
@@ -370,37 +385,40 @@ pub fn mostrar_pilares_proyecto(ui: &mut egui::Ui, state: &mut PortfolioState) {
                         .color(egui::Color32::from_rgb(100, 200, 255)),
                 );
                 ui.label("Programas independientes con función main() ejecutables por la CPU.");
-                if ui
-                    .add(
-                        egui::Button::image(
-                            egui::Image::from_bytes(
-                                "bytes://view.svg",
-                                include_bytes!("../../diagramas/view.svg"),
-                            )
-                            .fit_to_exact_size(egui::vec2(20.0, 20.0))
-                            .tint(btn_color_main),
-                        )
-                        .frame(state.show_railroad_modal == Some(2)),
-                    )
-                    .on_hover_text("Ver diagrama Railroad de sintaxis (fn main ejecutable)")
-                    .clicked()
-                {
-                    state.show_railroad_modal = if state.show_railroad_modal == Some(2) { None } else { Some(2) };
-                }
                 ui.end_row();
 
                 // Fila 2: Librería (src/lib.rs)
-                let btn_color_lib = if state.show_railroad_modal == Some(3) {
-                    egui::Color32::from_rgb(255, 160, 50)
-                } else {
-                    egui::Color32::from_rgb(180, 190, 205)
-                };
+                ui.horizontal(|ui| {
+                    ui.label(
+                        egui::RichText::new("Librería (Library)")
+                            .strong()
+                            .color(egui::Color32::from_rgb(255, 160, 50)),
+                    );
+                    ui.add_space(4.0);
+                    let btn_color_lib = if state.show_railroad_modal == Some(3) {
+                        egui::Color32::from_rgb(255, 160, 50)
+                    } else {
+                        egui::Color32::from_rgb(180, 190, 205)
+                    };
 
-                ui.label(
-                    egui::RichText::new("Librería (Library)")
-                        .strong()
-                        .color(egui::Color32::from_rgb(255, 160, 50)),
-                );
+                    if ui
+                        .add(
+                            egui::Button::image(
+                                egui::Image::from_bytes(
+                                    "bytes://view.svg",
+                                    include_bytes!("../../diagramas/view.svg"),
+                                )
+                                .fit_to_exact_size(egui::vec2(18.0, 18.0))
+                                .tint(btn_color_lib),
+                            )
+                            .frame(state.show_railroad_modal == Some(3)),
+                        )
+                        .on_hover_text("Ver diagrama Railroad de sintaxis (librería lib.rs)")
+                        .clicked()
+                    {
+                        state.show_railroad_modal = if state.show_railroad_modal == Some(3) { None } else { Some(3) };
+                    }
+                });
                 ui.label(
                     egui::RichText::new("cargo new <nombre> --lib")
                         .monospace()
@@ -413,23 +431,6 @@ pub fn mostrar_pilares_proyecto(ui: &mut egui::Ui, state: &mut PortfolioState) {
                         .color(egui::Color32::from_rgb(100, 200, 255)),
                 );
                 ui.label("Reutilización de código y módulos para ser consumidos por otros crates.");
-                if ui
-                    .add(
-                        egui::Button::image(
-                            egui::Image::from_bytes(
-                                "bytes://view.svg",
-                                include_bytes!("../../diagramas/view.svg"),
-                            )
-                            .fit_to_exact_size(egui::vec2(20.0, 20.0))
-                            .tint(btn_color_lib),
-                        )
-                        .frame(state.show_railroad_modal == Some(3)),
-                    )
-                    .on_hover_text("Ver diagrama Railroad de sintaxis (librería lib.rs)")
-                    .clicked()
-                {
-                    state.show_railroad_modal = if state.show_railroad_modal == Some(3) { None } else { Some(3) };
-                }
                 ui.end_row();
             });
     });
