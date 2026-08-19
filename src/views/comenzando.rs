@@ -1,6 +1,3 @@
-use eframe::egui;
-use std::sync::atomic::Ordering;
-use std::sync::Arc;
 use crate::app::PortfolioState;
 use crate::components::code_editor::mostrar_editor_interactivo;
 use crate::execution::ejecutar_codigo_rust;
@@ -9,11 +6,13 @@ use crate::views::tipos_datos::{
     mostrar_categoria_booleanos, mostrar_categoria_caracteres, mostrar_categoria_enteros,
     mostrar_categoria_flotantes,
 };
+use eframe::egui;
+use std::sync::Arc;
+use std::sync::atomic::Ordering;
 
 pub fn mostrar_comenzando(ui: &mut egui::Ui, state: &mut PortfolioState) {
     mostrar_tutorial_conceptos_basicos(ui, state);
 }
-
 
 pub fn mostrar_componente_terminal_3_modos(
     ui: &mut egui::Ui,
@@ -298,7 +297,6 @@ pub fn mostrar_componente_terminal_3_modos(
     });
 }
 
-
 fn obtener_repos_base_dir(term_cwd: &std::path::Path) -> std::path::PathBuf {
     let default_repos = std::path::Path::new("/home/alek/VNC/repos");
     if default_repos.exists() && default_repos.is_dir() {
@@ -313,7 +311,6 @@ fn obtener_repos_base_dir(term_cwd: &std::path::Path) -> std::path::PathBuf {
         std::path::PathBuf::from("/home/alek/VNC/repos")
     }
 }
-
 
 pub fn buscar_ruta_proyecto(base_path: &std::path::Path, proj_name: &str) -> std::path::PathBuf {
     let candidate1 = base_path.join(proj_name);
@@ -342,7 +339,6 @@ pub fn buscar_ruta_proyecto(base_path: &std::path::Path, proj_name: &str) -> std
     }
     base_path.join(proj_name)
 }
-
 
 pub fn listar_proyectos_cargo(base_path: &std::path::Path) -> Vec<String> {
     let mut proyectos = Vec::new();
@@ -405,7 +401,6 @@ pub fn listar_proyectos_cargo(base_path: &std::path::Path) -> Vec<String> {
     proyectos
 }
 
-
 pub fn mostrar_selector_proyectos_estandar(
     ui: &mut egui::Ui,
     selected_project: &mut Option<String>,
@@ -459,7 +454,6 @@ pub fn mostrar_selector_proyectos_estandar(
             });
     });
 }
-
 
 pub fn ejecutar_cargo_run_proyecto(state: &mut PortfolioState, ctx: &egui::Context) {
     let proj_dir = if let Some(ref proj) = state.selected_project {
@@ -555,7 +549,6 @@ pub fn ejecutar_cargo_run_proyecto(state: &mut PortfolioState, ctx: &egui::Conte
     });
 }
 
-
 pub fn mostrar_contenido_tipos_primitivos(ui: &mut egui::Ui, state: &mut PortfolioState) {
     // Selector de Categoría (Enteros, Decimales, Bool, Char)
     ui.horizontal(|ui| {
@@ -590,7 +583,6 @@ pub fn mostrar_contenido_tipos_primitivos(ui: &mut egui::Ui, state: &mut Portfol
         _ => mostrar_categoria_caracteres(ui),
     }
 }
-
 
 #[allow(dead_code)]
 fn centrar_texto_en_rectangulos(raw_svg: &str) -> String {
@@ -678,8 +670,6 @@ fn centrar_texto_en_rectangulos(raw_svg: &str) -> String {
     output
 }
 
-
-
 #[allow(dead_code)]
 fn generar_railroad_color_image() -> Option<egui::ColorImage> {
     use railroad::*;
@@ -755,7 +745,6 @@ fn generar_railroad_color_image() -> Option<egui::ColorImage> {
         pixels,
     ))
 }
-
 
 pub fn mostrar_contenido_macros(ui: &mut egui::Ui) {
     ui.heading(
@@ -1055,7 +1044,6 @@ pub fn mostrar_contenido_macros(ui: &mut egui::Ui) {
     });
 }
 
-
 #[allow(dead_code)]
 fn generar_railroad_desde_codigo(codigo: &str) -> Option<egui::ColorImage> {
     use railroad::*;
@@ -1211,7 +1199,6 @@ fn generar_railroad_desde_codigo(codigo: &str) -> Option<egui::ColorImage> {
         pixels,
     ))
 }
-
 
 pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut PortfolioState) {
     ui.add_space(15.0);
@@ -1508,7 +1495,7 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
                         ui.end_row();
 
                         // Fila 1: Mutabilidad
-                        ui.label(egui::RichText::new("Mutabilidad (mut)").strong().color(egui::Color32::from_rgb(255, 160, 50)));
+                        ui.label(egui::RichText::new("Mutabilidad").strong().color(egui::Color32::from_rgb(255, 160, 50)));
                         ui.label(egui::RichText::new("let mut x = 5;\nx = 10;").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
                         ui.label(egui::RichText::new("No").strong().color(egui::Color32::from_rgb(248, 113, 113)));
                         ui.label("Modifica el valor en la misma celda de memoria.");
@@ -1516,11 +1503,11 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
                         ui.end_row();
 
                         // Fila 2: Shadowing
-                        ui.label(egui::RichText::new("Shadowing (let)").strong().color(egui::Color32::from_rgb(52, 211, 153)));
-                        ui.label(egui::RichText::new("let x = \"42\";\nlet x: u32 = x.parse().unwrap();").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                        ui.label(egui::RichText::new("Shadowing").strong().color(egui::Color32::from_rgb(52, 211, 153)));
+                        ui.label(egui::RichText::new("let espacios = \"   \";\nlet espacios = espacios.len();").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
                         ui.label(egui::RichText::new("Sí").strong().color(egui::Color32::from_rgb(52, 211, 153)));
                         ui.label("Crea una nueva variable en el Stack que oculta a la anterior.");
-                        ui.label("Transformaciones de datos (parseo, sanitización) preservando inmutabilidad.");
+                        ui.label("Transformaciones de datos (cambio de tipo &str a usize) preservando inmutabilidad.");
                         ui.end_row();
                     });
             });
@@ -1626,4 +1613,3 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
         );
     }
 }
-
