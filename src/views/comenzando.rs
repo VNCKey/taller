@@ -1053,57 +1053,6 @@ pub fn mostrar_contenido_macros(ui: &mut egui::Ui) {
                 .color(egui::Color32::from_rgb(200, 230, 255)),
         );
     });
-
-    ui.add_space(16.0);
-    ui.heading(
-        egui::RichText::new("🛤️ Generador de Diagramas de Sintaxis SVG (railroad)")
-            .size(16.0)
-            .strong()
-            .color(egui::Color32::WHITE),
-    );
-    ui.add_space(6.0);
-    ui.label("La crate 'railroad' genera dinámicamente gráficos de sintaxis tipo ferrocarril (Railroad Diagram) en formato SVG a partir de reglas sintácticas:");
-    ui.add_space(10.0);
-
-    let mut railroad_frame = egui::Frame::new();
-    railroad_frame.fill = egui::Color32::from_rgb(14, 18, 26);
-    railroad_frame.inner_margin = egui::Margin::same(12);
-    railroad_frame.corner_radius = egui::CornerRadius::same(8);
-    railroad_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 60, 90));
-
-    railroad_frame.show(ui, |ui| {
-        ui.label(
-            egui::RichText::new(
-                "Diagrama de Sintaxis Generado para 'let [mut] ident [: tipo] = expr;':",
-            )
-            .strong()
-            .color(egui::Color32::from_rgb(100, 200, 255)),
-        );
-        ui.add_space(8.0);
-
-        ui.add(
-            egui::Image::from_bytes(
-                "bytes://diagrama_let.svg",
-                include_bytes!("../../diagramas/diagrama_let.svg"),
-            )
-            .fit_to_exact_size(egui::vec2(650.0, 80.0))
-            .corner_radius(egui::CornerRadius::same(6)),
-        );
-
-        ui.add_space(8.0);
-        if ui
-            .button(
-                egui::RichText::new("🌐 Abrir Diagrama SVG NATIVO en Navegador Web")
-                    .strong()
-                    .color(egui::Color32::from_rgb(100, 220, 255)),
-            )
-            .clicked()
-        {
-            let _ = std::process::Command::new("xdg-open")
-                .arg("/home/alek/VNC/repos/egui_vnc/diagramas/ver_diagrama.html")
-                .spawn();
-        }
-    });
 }
 
 
@@ -1362,7 +1311,6 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
                             ui.label(egui::RichText::new("Mutabilidad").strong().color(egui::Color32::WHITE));
                             ui.label(egui::RichText::new("Ejemplo de Código").strong().color(egui::Color32::WHITE));
                             ui.label(egui::RichText::new("Descripción").strong().color(egui::Color32::WHITE));
-                            ui.label(egui::RichText::new("Diagrama").strong().color(egui::Color32::WHITE));
                             ui.end_row();
 
                             // Fila 1: let (Inmutable)
@@ -1372,27 +1320,30 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
                                 egui::Color32::from_rgb(180, 190, 205)
                             };
 
-                            ui.label(egui::RichText::new("let").monospace().strong().color(egui::Color32::from_rgb(255, 160, 50)));
+                            ui.horizontal(|ui| {
+                                ui.label(egui::RichText::new("let").monospace().strong().color(egui::Color32::from_rgb(255, 160, 50)));
+                                ui.add_space(4.0);
+                                if ui
+                                    .add(
+                                        egui::Button::image(
+                                            egui::Image::from_bytes(
+                                                "bytes://view.svg",
+                                                include_bytes!("../../diagramas/view.svg"),
+                                            )
+                                            .fit_to_exact_size(egui::vec2(18.0, 18.0))
+                                            .tint(btn_color_0),
+                                        )
+                                        .frame(state.show_railroad_modal == Some(0)),
+                                    )
+                                    .on_hover_text("Ver diagrama Railroad de sintaxis (let inmutable)")
+                                    .clicked()
+                                {
+                                    state.show_railroad_modal = if state.show_railroad_modal == Some(0) { None } else { Some(0) };
+                                }
+                            });
                             ui.label(egui::RichText::new("No").strong().color(egui::Color32::from_rgb(180, 190, 205)));
                             ui.label(egui::RichText::new("let x = 5;").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
                             ui.label("No puede reasignarse dentro de su alcance salvo que se declare con mut.");
-                            if ui
-                                .add(
-                                    egui::Button::image(
-                                        egui::Image::from_bytes(
-                                            "bytes://view.svg",
-                                            include_bytes!("../../diagramas/view.svg"),
-                                        )
-                                        .fit_to_exact_size(egui::vec2(20.0, 20.0))
-                                        .tint(btn_color_0),
-                                    )
-                                    .frame(state.show_railroad_modal == Some(0)),
-                                )
-                                .on_hover_text("Ver diagrama Railroad de sintaxis (let inmutable)")
-                                .clicked()
-                            {
-                                state.show_railroad_modal = if state.show_railroad_modal == Some(0) { None } else { Some(0) };
-                            }
                             ui.end_row();
 
                             // Fila 2: let mut (Mutable)
@@ -1402,27 +1353,30 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
                                 egui::Color32::from_rgb(180, 190, 205)
                             };
 
-                            ui.label(egui::RichText::new("let mut").monospace().strong().color(egui::Color32::from_rgb(255, 160, 50)));
+                            ui.horizontal(|ui| {
+                                ui.label(egui::RichText::new("let mut").monospace().strong().color(egui::Color32::from_rgb(255, 160, 50)));
+                                ui.add_space(4.0);
+                                if ui
+                                    .add(
+                                        egui::Button::image(
+                                            egui::Image::from_bytes(
+                                                "bytes://view.svg",
+                                                include_bytes!("../../diagramas/view.svg"),
+                                            )
+                                            .fit_to_exact_size(egui::vec2(18.0, 18.0))
+                                            .tint(btn_color_1),
+                                        )
+                                        .frame(state.show_railroad_modal == Some(1)),
+                                    )
+                                    .on_hover_text("Ver diagrama Railroad de sintaxis (let mut mutable)")
+                                    .clicked()
+                                {
+                                    state.show_railroad_modal = if state.show_railroad_modal == Some(1) { None } else { Some(1) };
+                                }
+                            });
                             ui.label(egui::RichText::new("Sí").strong().color(egui::Color32::from_rgb(255, 160, 50)));
                             ui.label(egui::RichText::new("let mut x = 5;\nx = 10;").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
                             ui.label("Permite reasignar un nuevo valor a la misma variable de forma explícita.");
-                            if ui
-                                .add(
-                                    egui::Button::image(
-                                        egui::Image::from_bytes(
-                                            "bytes://view.svg",
-                                            include_bytes!("../../diagramas/view.svg"),
-                                        )
-                                        .fit_to_exact_size(egui::vec2(20.0, 20.0))
-                                        .tint(btn_color_1),
-                                    )
-                                    .frame(state.show_railroad_modal == Some(1)),
-                                )
-                                .on_hover_text("Ver diagrama Railroad de sintaxis (let mut mutable)")
-                                .clicked()
-                            {
-                                state.show_railroad_modal = if state.show_railroad_modal == Some(1) { None } else { Some(1) };
-                            }
                             ui.end_row();
                         });
                 });
@@ -1436,6 +1390,71 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
                         .texture_options(egui::TextureOptions::LINEAR)
                         .corner_radius(egui::CornerRadius::same(8)),
                 );
+            });
+
+            ui.add_space(14.0);
+
+            // --- CONCEPTOS CLAVE DE INGENIERÍA: SCOPE & SHADOWING ---
+            ui.columns(2, |cols| {
+                // Columna Izquierda: Scope (Ámbito Léxico)
+                let mut scope_frame = egui::Frame::new();
+                scope_frame.fill = egui::Color32::from_rgb(14, 18, 26);
+                scope_frame.inner_margin = egui::Margin::same(12);
+                scope_frame.corner_radius = egui::CornerRadius::same(8);
+                scope_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(56, 189, 248));
+
+                scope_frame.show(&mut cols[0], |ui| {
+                    ui.label(
+                        egui::RichText::new("📦 Ámbito Léxico (Scope { ... })")
+                            .strong()
+                            .size(14.0)
+                            .color(egui::Color32::from_rgb(56, 189, 248)),
+                    );
+                    ui.add_space(6.0);
+                    ui.label(
+                        "El bloque delimitado por llaves define el ciclo de vida de las variables en el Stack:",
+                    );
+                    ui.add_space(4.0);
+                    ui.label("• Al entrar a { se reserva espacio en la pila (Stack).");
+                    ui.label("• Al alcanzar la llave de cierre } la variable sale de scope y se destruye automáticamente con drop() (RAII).");
+                    ui.add_space(6.0);
+                    ui.label(
+                        egui::RichText::new("{\n    let temp = 100;\n} // ¡temp se libera aquí de memoria!")
+                            .monospace()
+                            .size(11.5)
+                            .color(egui::Color32::from_rgb(147, 197, 253)),
+                    );
+                });
+
+                // Columna Derecha: Shadowing (Ensombrecimiento con let)
+                let mut shadow_frame = egui::Frame::new();
+                shadow_frame.fill = egui::Color32::from_rgb(14, 18, 26);
+                shadow_frame.inner_margin = egui::Margin::same(12);
+                shadow_frame.corner_radius = egui::CornerRadius::same(8);
+                shadow_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(52, 211, 153));
+
+                shadow_frame.show(&mut cols[1], |ui| {
+                    ui.label(
+                        egui::RichText::new("👥 Ensombrecimiento (Shadowing)")
+                            .strong()
+                            .size(14.0)
+                            .color(egui::Color32::from_rgb(52, 211, 153)),
+                    );
+                    ui.add_space(6.0);
+                    ui.label(
+                        "Permite re-declarar una variable con 'let', creando una variable nueva:",
+                    );
+                    ui.add_space(4.0);
+                    ui.label("• A diferencia de 'mut', el shadowing permite cambiar el tipo de dato (&str ➔ usize).");
+                    ui.label("• La variable resultante sigue siendo 100% inmutable.");
+                    ui.add_space(6.0);
+                    ui.label(
+                        egui::RichText::new("let texto = \"42\";\nlet texto: usize = texto.parse().unwrap(); // ¡Cambio de tipo!")
+                            .monospace()
+                            .size(11.5)
+                            .color(egui::Color32::from_rgb(167, 243, 208)),
+                    );
+                });
             });
         }
         1 => {
