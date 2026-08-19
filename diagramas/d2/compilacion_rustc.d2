@@ -1,6 +1,6 @@
 direction: down
 
-title: "Pipeline de Compilación rustc" {
+title: "Pipeline de Compilación rustc y Extensiones de Archivo" {
   style: {
     font-size: 20
     bold: true
@@ -9,7 +9,7 @@ title: "Pipeline de Compilación rustc" {
 }
 
 # --- FILA 1: ANÁLISIS Y SEGURIDAD ---
-fila_1: "FASE DE ANÁLISIS Y SEGURIDAD" {
+fila_1: "1. FASE DE ANÁLISIS Y SEGURIDAD (rustc)" {
   direction: right
   style: {
     fill: "#0f172a"
@@ -18,15 +18,15 @@ fila_1: "FASE DE ANÁLISIS Y SEGURIDAD" {
     border-radius: 8
   }
 
-  origen: "Código (.rs)" {
+  origen: "Código Fuente\n[.rs]" {
     style: { fill: "#1e1e38"; stroke: "#818cf8"; font-color: "#c7d2fe"; bold: true }
   }
 
-  frontend: "Frontend (rustc)\n(Lexer -> AST -> HIR)" {
+  frontend: "Frontend (rustc)\nAST -> HIR [.hir]" {
     style: { fill: "#1e293b"; stroke: "#38bdf8"; font-color: "#ffffff" }
   }
 
-  middle: "Middle-End (MIR)\nBorrow Checker" {
+  middle: "Middle-End\nMIR [.mir] + Borrow Checker" {
     style: { fill: "#451a03"; stroke: "#ea580c"; font-color: "#ffedd5"; bold: true }
   }
 
@@ -34,7 +34,7 @@ fila_1: "FASE DE ANÁLISIS Y SEGURIDAD" {
 }
 
 # --- FILA 2: OPTIMIZACIÓN Y MÁQUINA ---
-fila_2: "FASE DE OPTIMIZACIÓN Y MÁQUINA" {
+fila_2: "2. FASE DE OPTIMIZACIÓN Y MÁQUINA (LLVM & Linker)" {
   direction: right
   style: {
     fill: "#0f172a"
@@ -43,19 +43,23 @@ fila_2: "FASE DE OPTIMIZACIÓN Y MÁQUINA" {
     border-radius: 8
   }
 
-  llvm: "Backend (LLVM)\n(LLVM IR + Opt O3)" {
+  llvm: "Backend (LLVM)\nLLVM IR [.ll / .bc] -> Opt O3" {
     style: { fill: "#1e293b"; stroke: "#c084fc"; font-color: "#ffffff" }
   }
 
-  linker: "Linker (ld / lld)\n(libstd + Crates)" {
+  asm: "Ensamblador [.s]\nCódigo Objeto [.o]" {
+    style: { fill: "#1e293b"; stroke: "#ec4899"; font-color: "#ffffff" }
+  }
+
+  linker: "Linker (ld / lld)\n+ libstd / Crates" {
     style: { fill: "#064e3b"; stroke: "#34d399"; font-color: "#ecfdf5" }
   }
 
-  binario: "ELF / .EXE / WASM\n(Binario Final)" {
+  binario: "EJECUTABLE FINAL\n[ELF / .EXE / WASM]" {
     style: { fill: "#065f46"; stroke: "#10b981"; font-color: "#ffffff"; bold: true }
   }
 
-  llvm -> linker -> binario
+  llvm -> asm -> linker -> binario
 }
 
 # Conexión entre Fila 1 y Fila 2

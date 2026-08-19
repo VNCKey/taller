@@ -3,23 +3,23 @@ flowchart TD
     %% ==========================================
     %% FILA 1: DE CÓDIGO A SEGURIDAD (IZQ -> DER)
     %% ==========================================
-    subgraph F1["FASE DE ANÁLISIS Y SEGURIDAD"]
+    subgraph F1["1. FASE DE ANÁLISIS Y SEGURIDAD (RUSTC)"]
         direction LR
 
-        SRC["Código (.rs)"]
+        SRC["Código Fuente<br/><b>.rs</b>"]
 
         subgraph S2["Frontend (rustc)"]
             direction TB
             LEX["Analizador Léxico + Parser"]
             AST["AST (Árbol Sintáctico)"]
-            HIR["HIR (Tipos & Macros)"]
+            HIR["HIR (Tipos & Macros)<br/><b>.hir</b>"]
             LEX --> AST --> HIR
         end
 
         subgraph S3["Middle-End"]
             direction TB
-            MIR["MIR (Grafo de Control)"]
-            BC{{"Borrow Checker"}}
+            MIR["MIR (Grafo de Control)<br/><b>.mir</b>"]
+            BC{{"Borrow Checker<br/><b>Validación de Memoria</b>"}}
             MIR --> BC
         end
 
@@ -33,27 +33,27 @@ flowchart TD
     %% ==========================================
     %% FILA 2: DE OPTIMIZACIÓN A EJECUTABLE (IZQ -> DER)
     %% ==========================================
-    subgraph F2["FASE DE OPTIMIZACIÓN Y MÁQUINA"]
+    subgraph F2["2. FASE DE OPTIMIZACIÓN Y MÁQUINA (LLVM & LINKER)"]
         direction LR
 
         subgraph S4["Backend (LLVM)"]
             direction TB
-            LLVM["LLVM IR Universal"]
+            LLVM["LLVM IR Universal<br/><b>.ll / .bc</b>"]
             OPT["Optimizador O3 (SIMD / Inlining)"]
-            ASM["Código Máquina (x86_64 / ARM)"]
+            ASM["Código Ensamblador<br/><b>.s / .asm</b>"]
             LLVM --> OPT --> ASM
         end
 
         subgraph S5["Enlace & Salida"]
             direction TB
-            LIB["libstd + Crates"]
-            LINK["Linker (ld / lld)"]
-            BIN(["<b>ELF / .EXE / WASM</b>"]):::target
-            LIB --> LINK
+            OBJ["Código Objeto<br/><b>.o</b>"]
+            LINK["Linker (ld / lld)<br/><i>+ libstd / Crates</i>"]
+            BIN(["<b>EJECUTABLE FINAL<br/>ELF / .EXE / WASM</b>"]):::target
+            OBJ --> LINK
             LINK --> BIN
         end
 
-        S4 --> LINK
+        S4 --> OBJ
     end
 
     classDef target fill:#059669,stroke:#34d399,stroke-width:3px,color:#fff;
