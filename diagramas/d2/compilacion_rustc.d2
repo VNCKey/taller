@@ -1,15 +1,15 @@
 direction: down
 
-title: "Pipeline Interno del Compilador rustc" {
+title: "Pipeline de Compilación rustc" {
   style: {
-    font-size: 22
+    font-size: 20
     bold: true
     font-color: "#ffffff"
   }
 }
 
-# --- FILA 1: ANÁLISIS Y SEGURIDAD (RUSTC) ---
-fila_1: "1. FASE DE ANÁLISIS Y SEGURIDAD (rustc)" {
+# --- FILA 1: ANÁLISIS Y SEGURIDAD ---
+fila_1: "FASE DE ANÁLISIS Y SEGURIDAD" {
   direction: right
   style: {
     fill: "#0f172a"
@@ -18,23 +18,23 @@ fila_1: "1. FASE DE ANÁLISIS Y SEGURIDAD (rustc)" {
     border-radius: 8
   }
 
-  origen: "📄 main.rs\n(Código Fuente)" {
-    style: { fill: "#1e1e38"; stroke: "#818cf8"; font-color: "#ffffff" }
+  origen: "Código (.rs)" {
+    style: { fill: "#1e1e38"; stroke: "#818cf8"; font-color: "#c7d2fe"; bold: true }
   }
 
-  frontend: "Frontend rustc\n(Lexer -> AST -> HIR)" {
+  frontend: "Frontend (rustc)\n(Lexer -> AST -> HIR)" {
     style: { fill: "#1e293b"; stroke: "#38bdf8"; font-color: "#ffffff" }
   }
 
-  middle: "🛡️ Middle-End (MIR)\nBorrow Checker & Lifetimes" {
+  middle: "Middle-End (MIR)\nBorrow Checker" {
     style: { fill: "#451a03"; stroke: "#ea580c"; font-color: "#ffedd5"; bold: true }
   }
 
   origen -> frontend -> middle
 }
 
-# --- FILA 2: OPTIMIZACIÓN Y MÁQUINA (LLVM & LINKER) ---
-fila_2: "2. FASE DE OPTIMIZACIÓN Y ENLACE (LLVM & Linker)" {
+# --- FILA 2: OPTIMIZACIÓN Y MÁQUINA ---
+fila_2: "FASE DE OPTIMIZACIÓN Y MÁQUINA" {
   direction: right
   style: {
     fill: "#0f172a"
@@ -43,15 +43,15 @@ fila_2: "2. FASE DE OPTIMIZACIÓN Y ENLACE (LLVM & Linker)" {
     border-radius: 8
   }
 
-  llvm: "LLVM IR\n(Optimizador O3 + SIMD)" {
+  llvm: "Backend (LLVM)\n(LLVM IR + Opt O3)" {
     style: { fill: "#1e293b"; stroke: "#c084fc"; font-color: "#ffffff" }
   }
 
-  linker: "Linker (ld / lld)\n+ libstd / Crates" {
+  linker: "Linker (ld / lld)\n(libstd + Crates)" {
     style: { fill: "#064e3b"; stroke: "#34d399"; font-color: "#ecfdf5" }
   }
 
-  binario: "🚀 EJECUTABLE FINAL\n(ELF / .EXE / WASM)" {
+  binario: "ELF / .EXE / WASM\n(Binario Final)" {
     style: { fill: "#065f46"; stroke: "#10b981"; font-color: "#ffffff"; bold: true }
   }
 

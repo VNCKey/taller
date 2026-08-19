@@ -3,14 +3,12 @@ flowchart TD
     %% ==========================================
     %% FILA 1: DE CÓDIGO A SEGURIDAD (IZQ -> DER)
     %% ==========================================
-    subgraph F1["FASE DE ANÁLISIS Y SEGURIDAD (RUSTC)"]
+    subgraph F1["FASE DE ANÁLISIS Y SEGURIDAD"]
         direction LR
 
-        subgraph S1["1. Entrada"]
-            SRC["📄 main.rs<br/><i>Código Fuente</i>"]
-        end
+        SRC["Código (.rs)"]
 
-        subgraph S2["2. Frontend (rustc)"]
+        subgraph S2["Frontend (rustc)"]
             direction TB
             LEX["Analizador Léxico + Parser"]
             AST["AST (Árbol Sintáctico)"]
@@ -18,10 +16,10 @@ flowchart TD
             LEX --> AST --> HIR
         end
 
-        subgraph S3["3. Middle-End"]
+        subgraph S3["Middle-End"]
             direction TB
-            MIR["MIR (Control Flow Graph)"]
-            BC{{"🛡️ BORROW CHECKER<br/><b>Ownership & Lifetimes</b>"}}
+            MIR["MIR (Grafo de Control)"]
+            BC{{"Borrow Checker"}}
             MIR --> BC
         end
 
@@ -35,10 +33,10 @@ flowchart TD
     %% ==========================================
     %% FILA 2: DE OPTIMIZACIÓN A EJECUTABLE (IZQ -> DER)
     %% ==========================================
-    subgraph F2["FASE DE OPTIMIZACIÓN Y MÁQUINA (LLVM & LINKER)"]
+    subgraph F2["FASE DE OPTIMIZACIÓN Y MÁQUINA"]
         direction LR
 
-        subgraph S4["4. Backend LLVM"]
+        subgraph S4["Backend (LLVM)"]
             direction TB
             LLVM["LLVM IR Universal"]
             OPT["Optimizador O3 (SIMD / Inlining)"]
@@ -46,11 +44,11 @@ flowchart TD
             LLVM --> OPT --> ASM
         end
 
-        subgraph S5["5. Enlace & Salida"]
+        subgraph S5["Enlace & Salida"]
             direction TB
-            LIB["📚 libstd + Crates"]
+            LIB["libstd + Crates"]
             LINK["Linker (ld / lld)"]
-            BIN(["🚀 EJECUTABLE FINAL<br/><b>ELF / .EXE / WASM</b>"]):::target
+            BIN(["<b>ELF / .EXE / WASM</b>"]):::target
             LIB --> LINK
             LINK --> BIN
         end
@@ -62,4 +60,5 @@ flowchart TD
     classDef default fill:#1e293b,stroke:#3b82f6,color:#f8fafc;
     style F1 fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#93c5fd
     style F2 fill:#0f172a,stroke:#a855f7,stroke-width:2px,color:#d8b4fe
+    style SRC fill:#1e1e38,stroke:#818cf8,stroke-width:2px,color:#c7d2fe
     style BC fill:#7c2d12,stroke:#f97316,stroke-width:2px,color:#ffedd5
