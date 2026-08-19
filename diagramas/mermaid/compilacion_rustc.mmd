@@ -1,0 +1,39 @@
+%%{init: {'theme': 'dark', 'themeVariables': { 'darkMode': true, 'background': '#0f172a'}}}%%
+flowchart LR
+    subgraph S1["1. Entrada"]
+        SRC["📄 main.rs<br/><i>Código Fuente</i>"]
+    end
+
+    subgraph S2["2. Frontend (rustc)"]
+        LEX["Analizador Léxico<br/>+ Parser"]
+        AST["AST<br/><i>Árbol Sintáctico</i>"]
+        HIR["HIR<br/><i>Tipos & Macros</i>"]
+        LEX --> AST --> HIR
+    end
+
+    subgraph S3["3. Middle-End (Seguridad)"]
+        MIR["MIR<br/><i>Control Flow</i>"]
+        BC{{"🛡️ Borrow Checker<br/><b>Ownership & Lifetimes</b>"}}
+        MIR --> BC
+    end
+
+    subgraph S4["4. Backend (LLVM)"]
+        LLVM["LLVM IR"]
+        OPT["Optimizador O3<br/><i>SIMD / Inlining</i>"]
+        ASM["Código Máquina<br/><i>x86_64 / ARM / WASM</i>"]
+        LLVM --> OPT --> ASM
+    end
+
+    subgraph S5["5. Salida"]
+        LINK["Linker (ld)"]
+        BIN(["🚀 Binario ELF / EXE"]):::target
+    end
+
+    SRC --> LEX
+    HIR --> MIR
+    BC --> LLVM
+    ASM --> LINK
+    LINK --> BIN
+
+    classDef target fill:#059669,stroke:#34d399,stroke-width:2px,color:#fff;
+    classDef default fill:#1e293b,stroke:#3b82f6,color:#f8fafc;
