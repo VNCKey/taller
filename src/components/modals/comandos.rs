@@ -34,6 +34,7 @@ pub const COMANDOS_TALLER: &[(&str, &str)] = &[
     ),
 ];
 
+#[allow(dead_code)]
 pub fn mostrar_modal_comandos(ctx: &egui::Context, state: &mut PortfolioState) {
     let mut abierto = state.show_commands_modal;
     let mut comando_elegido = None;

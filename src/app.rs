@@ -30,6 +30,7 @@ use crate::views::structs::mostrar_tutorial_structs;
 use crate::views::tipos_datos::mostrar_tutorial_tipos_datos;
 use crate::views::traits::mostrar_tutorial_traits;
 
+#[allow(dead_code)]
 pub struct PortfolioState {
     pub ruta_actual: AppRoute,
 

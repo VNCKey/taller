@@ -356,6 +356,7 @@ pub fn mostrar_categoria_caracteres(ui: &mut egui::Ui) {
 }
 
 
+#[allow(dead_code)]
 pub fn mostrar_macro_println(ui: &mut egui::Ui, state: &mut PortfolioState) {
     ui.heading("🧩 ¿Por qué `println!` termina con `!`?");
     ui.label("El signo `!` indica que estás invocando una macro. Una macro recibe tokens y genera código durante la compilación.");

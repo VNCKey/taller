@@ -36,6 +36,7 @@ pub(crate) fn ejecutar_codigo_rust(codigo: &str) -> String {
     }
 }
 
+#[allow(dead_code)]
 pub(crate) fn expandir_macros_rust(codigo: &str) -> String {
     // 1. Intentar cargo expand local si existe
     if let Ok(run) = TemporaryRun::create() {
@@ -97,6 +98,7 @@ pub(crate) fn expandir_macros_rust(codigo: &str) -> String {
     expandir_macros_didactico(codigo)
 }
 
+#[allow(dead_code)]
 fn expandir_macros_didactico(codigo: &str) -> String {
     let mut resultado = codigo.to_string();
 
@@ -124,6 +126,7 @@ fn expandir_macros_didactico(codigo: &str) -> String {
     )
 }
 
+#[allow(dead_code)]
 pub(crate) fn ejecutar_codigo_cargo_run(codigo: &str, project_dir: Option<&std::path::Path>) -> String {
     if let Some(dir) = project_dir {
         if dir.exists() {

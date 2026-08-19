@@ -5,6 +5,7 @@ use crate::views::tipos_datos::{
     mostrar_categoria_flotantes,
 };
 
+#[allow(dead_code)]
 pub fn mostrar_modal_tipos_primitivos(ctx: &egui::Context, state: &mut PortfolioState) {
     if !state.show_tipos_primitivos_modal {
         return;

@@ -1,6 +1,5 @@
 use eframe::egui;
 use crate::app::PortfolioState;
-use crate::routes::AppRoute;
 
 pub fn mostrar_tutorial_cargo(ui: &mut egui::Ui, state: &mut PortfolioState) {
     ui.add_space(15.0);
@@ -667,6 +666,7 @@ pub fn mostrar_desglose_template_con_imagen(ui: &mut egui::Ui, state: &Portfolio
 }
 
 
+#[allow(dead_code)]
 #[derive(Clone, Copy)]
 struct TipoEscalar {
     nombre: &'static str,
@@ -679,6 +679,7 @@ struct TipoEscalar {
     descripcion: &'static str,
 }
 
+#[allow(dead_code)]
 const TIPOS_ESCALARES: &[TipoEscalar] = &[
     TipoEscalar {
         nombre: "i8",
@@ -843,6 +844,7 @@ const TIPOS_ESCALARES: &[TipoEscalar] = &[
 ];
 
 
+#[allow(dead_code)]
 fn codigo_variable(state: &PortfolioState) -> String {
     let tipo = TIPOS_ESCALARES[state.variable_type];
     let nombre = state.variable_name.trim();

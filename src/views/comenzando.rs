@@ -592,6 +592,7 @@ pub fn mostrar_contenido_tipos_primitivos(ui: &mut egui::Ui, state: &mut Portfol
 }
 
 
+#[allow(dead_code)]
 fn centrar_texto_en_rectangulos(raw_svg: &str) -> String {
     let clean_svg = raw_svg.replace(">\n", ">").replace(">\r\n", ">");
 
@@ -678,6 +679,8 @@ fn centrar_texto_en_rectangulos(raw_svg: &str) -> String {
 }
 
 
+
+#[allow(dead_code)]
 fn generar_railroad_color_image() -> Option<egui::ColorImage> {
     use railroad::*;
 
@@ -1104,6 +1107,7 @@ pub fn mostrar_contenido_macros(ui: &mut egui::Ui) {
 }
 
 
+#[allow(dead_code)]
 fn generar_railroad_desde_codigo(codigo: &str) -> Option<egui::ColorImage> {
     use railroad::*;
 
