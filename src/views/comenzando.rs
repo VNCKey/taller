@@ -1582,13 +1582,23 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
                     ui.label("• Al entrar a '{' se reserva espacio en el Stack Frame.");
                     ui.label("• Al alcanzar la llave de cierre '}' la variable sale de scope y se destruye inmediatamente ejecutando drop() (RAII).");
                     ui.label("• Las variables declaradas en un ámbito interno no son accesibles desde el exterior.");
-                    ui.add_space(6.0);
-                    ui.label(
-                        egui::RichText::new("let exterior = 10;\n{\n    let interior = 20;\n    println!(\"{interior}\"); // Válido\n}\n// println!(\"{interior}\"); ❌ Error: no existe")
-                            .monospace()
-                            .size(11.5)
-                            .color(egui::Color32::from_rgb(100, 200, 255)),
-                    );
+                    ui.add_space(8.0);
+
+                    // Contenedor de Código estilo IDE
+                    let mut code_box = egui::Frame::new();
+                    code_box.fill = egui::Color32::from_rgb(8, 12, 18);
+                    code_box.inner_margin = egui::Margin::same(10);
+                    code_box.corner_radius = egui::CornerRadius::same(6);
+                    code_box.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(35, 50, 75));
+
+                    code_box.show(ui, |ui| {
+                        ui.label(
+                            egui::RichText::new("let exterior = 10;\n{\n    let interior = 20;\n    println!(\"{interior}\"); // Válido\n}\n// println!(\"{interior}\"); ❌ Error: no existe")
+                                .monospace()
+                                .size(12.0)
+                                .color(egui::Color32::from_rgb(100, 200, 255)),
+                        );
+                    });
                 });
 
                 // Columna Derecha: Shadowing (Ensombrecimiento con let)
@@ -1613,13 +1623,23 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
                     ui.label("• Reutiliza el mismo nombre conceptual sin variables temporales.");
                     ui.label("• Permite cambiar el tipo de dato y devuelve inmutabilidad al valor resultante.");
                     ui.label("• Shadowing por Bloque: Dentro de { ... } oculta temporalmente la variable exterior sin alterarla.");
-                    ui.add_space(6.0);
-                    ui.label(
-                        egui::RichText::new("let x = 5;\n{\n    let x = x * 2; // x es 10 dentro del bloque\n}\nprintln!(\"{x}\"); // x vuelve a ser 5 (intacto)")
-                            .monospace()
-                            .size(11.5)
-                            .color(egui::Color32::from_rgb(100, 200, 255)),
-                    );
+                    ui.add_space(8.0);
+
+                    // Contenedor de Código estilo IDE
+                    let mut code_box = egui::Frame::new();
+                    code_box.fill = egui::Color32::from_rgb(8, 12, 18);
+                    code_box.inner_margin = egui::Margin::same(10);
+                    code_box.corner_radius = egui::CornerRadius::same(6);
+                    code_box.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(35, 50, 75));
+
+                    code_box.show(ui, |ui| {
+                        ui.label(
+                            egui::RichText::new("let x = 5;\n{\n    let x = x * 2; // x es 10 dentro del bloque\n}\nprintln!(\"{x}\"); // x vuelve a ser 5 (intacto)")
+                                .monospace()
+                                .size(12.0)
+                                .color(egui::Color32::from_rgb(100, 200, 255)),
+                        );
+                    });
                 });
             });
         }
