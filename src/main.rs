@@ -2,6 +2,7 @@ mod app;
 mod components;
 mod execution;
 mod routes;
+mod svg_loader;
 mod views;
 
 use app::PortfolioState;
@@ -34,8 +35,11 @@ fn main() -> eframe::Result {
         "FerrisKey 🦀🔑 - El Ecosistema Interactivo de Rust (Luis Alexander / Alekay)",
         options,
         Box::new(|cc| {
+            // 1. Instalar loaders estándar de imágenes (png, jpg, etc.)
             egui_extras::install_image_loaders(&cc.egui_ctx);
-            log::info!("✅ Loaders de imágenes y SVGs cargados exitosamente.");
+            // 2. Instalar loader SVG con soporte completo para fuentes del sistema Linux
+            svg_loader::SystemFontSvgLoader::install(&cc.egui_ctx);
+            log::info!("✅ Loaders de imágenes y SVG con fuentes de Linux cargados exitosamente.");
             Ok(Box::new(PortfolioState::default()))
         }),
     )
