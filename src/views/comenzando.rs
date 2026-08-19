@@ -1235,7 +1235,11 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
                 .color(egui::Color32::from_rgb(140, 150, 165)),
         );
 
-        let tabs_practica = [(0, "Inmutabilidad"), (1, "const y static")];
+        let tabs_practica = [
+            (0, "Inmutabilidad"),
+            (1, "const y static"),
+            (2, "Scope & Shadowing"),
+        ];
         for (indice, texto) in tabs_practica {
             let es_activo = state.conceptos_tab == indice;
             let text_color = if es_activo {
@@ -1256,7 +1260,7 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
         }
 
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-            let tabs_teoria = [(3, "Macro & Format"), (2, "Data Types")];
+            let tabs_teoria = [(4, "Macro & Format"), (3, "Data Types")];
             for (indice, texto) in tabs_teoria {
                 let es_activo = state.conceptos_tab == indice;
                 let text_color = if es_activo {
@@ -1391,71 +1395,6 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
                         .corner_radius(egui::CornerRadius::same(8)),
                 );
             });
-
-            ui.add_space(14.0);
-
-            // --- CONCEPTOS CLAVE DE INGENIERÍA: SCOPE & SHADOWING ---
-            ui.columns(2, |cols| {
-                // Columna Izquierda: Scope (Ámbito Léxico)
-                let mut scope_frame = egui::Frame::new();
-                scope_frame.fill = egui::Color32::from_rgb(14, 18, 26);
-                scope_frame.inner_margin = egui::Margin::same(12);
-                scope_frame.corner_radius = egui::CornerRadius::same(8);
-                scope_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(56, 189, 248));
-
-                scope_frame.show(&mut cols[0], |ui| {
-                    ui.label(
-                        egui::RichText::new("📦 Ámbito Léxico (Scope { ... })")
-                            .strong()
-                            .size(14.0)
-                            .color(egui::Color32::from_rgb(56, 189, 248)),
-                    );
-                    ui.add_space(6.0);
-                    ui.label(
-                        "El bloque delimitado por llaves define el ciclo de vida de las variables en el Stack:",
-                    );
-                    ui.add_space(4.0);
-                    ui.label("• Al entrar a { se reserva espacio en la pila (Stack).");
-                    ui.label("• Al alcanzar la llave de cierre } la variable sale de scope y se destruye automáticamente con drop() (RAII).");
-                    ui.add_space(6.0);
-                    ui.label(
-                        egui::RichText::new("{\n    let temp = 100;\n} // ¡temp se libera aquí de memoria!")
-                            .monospace()
-                            .size(11.5)
-                            .color(egui::Color32::from_rgb(147, 197, 253)),
-                    );
-                });
-
-                // Columna Derecha: Shadowing (Ensombrecimiento con let)
-                let mut shadow_frame = egui::Frame::new();
-                shadow_frame.fill = egui::Color32::from_rgb(14, 18, 26);
-                shadow_frame.inner_margin = egui::Margin::same(12);
-                shadow_frame.corner_radius = egui::CornerRadius::same(8);
-                shadow_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(52, 211, 153));
-
-                shadow_frame.show(&mut cols[1], |ui| {
-                    ui.label(
-                        egui::RichText::new("👥 Ensombrecimiento (Shadowing)")
-                            .strong()
-                            .size(14.0)
-                            .color(egui::Color32::from_rgb(52, 211, 153)),
-                    );
-                    ui.add_space(6.0);
-                    ui.label(
-                        "Permite re-declarar una variable con 'let', creando una variable nueva:",
-                    );
-                    ui.add_space(4.0);
-                    ui.label("• A diferencia de 'mut', el shadowing permite cambiar el tipo de dato (&str ➔ usize).");
-                    ui.label("• La variable resultante sigue siendo 100% inmutable.");
-                    ui.add_space(6.0);
-                    ui.label(
-                        egui::RichText::new("let texto = \"42\";\nlet texto: usize = texto.parse().unwrap(); // ¡Cambio de tipo!")
-                            .monospace()
-                            .size(11.5)
-                            .color(egui::Color32::from_rgb(167, 243, 208)),
-                    );
-                });
-            });
         }
         1 => {
             let mut table_frame = egui::Frame::new();
@@ -1544,6 +1483,116 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
             });
         }
         2 => {
+            ui.label(
+                "En Rust, la gestión de memoria y el ciclo de vida de las variables se rigen por el Ámbito Léxico (Scope) y el Ensombrecimiento (Shadowing), eliminando la necesidad de un Garbage Collector.",
+            );
+            ui.add_space(10.0);
+
+            // Tabla Comparativa: mutabilidad vs shadowing
+            let mut table_frame = egui::Frame::new();
+            table_frame.fill = egui::Color32::from_rgb(14, 18, 26);
+            table_frame.inner_margin = egui::Margin::same(12);
+            table_frame.corner_radius = egui::CornerRadius::same(8);
+            table_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 60, 90));
+
+            table_frame.show(ui, |ui| {
+                egui::Grid::new("tabla_scope_shadowing")
+                    .striped(true)
+                    .spacing([25.0, 8.0])
+                    .show(ui, |ui| {
+                        ui.label(egui::RichText::new("Mecanismo").strong().color(egui::Color32::WHITE));
+                        ui.label(egui::RichText::new("Sintaxis").strong().color(egui::Color32::WHITE));
+                        ui.label(egui::RichText::new("¿Cambia Tipo?").strong().color(egui::Color32::WHITE));
+                        ui.label(egui::RichText::new("Comportamiento en Memoria").strong().color(egui::Color32::WHITE));
+                        ui.label(egui::RichText::new("Uso Principal").strong().color(egui::Color32::WHITE));
+                        ui.end_row();
+
+                        // Fila 1: Mutabilidad
+                        ui.label(egui::RichText::new("Mutabilidad (mut)").strong().color(egui::Color32::from_rgb(255, 160, 50)));
+                        ui.label(egui::RichText::new("let mut x = 5;\nx = 10;").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                        ui.label(egui::RichText::new("No").strong().color(egui::Color32::from_rgb(248, 113, 113)));
+                        ui.label("Modifica el valor en la misma celda de memoria.");
+                        ui.label("Acumuladores, buffers y bucles donde el valor cambia constantemente.");
+                        ui.end_row();
+
+                        // Fila 2: Shadowing
+                        ui.label(egui::RichText::new("Shadowing (let)").strong().color(egui::Color32::from_rgb(52, 211, 153)));
+                        ui.label(egui::RichText::new("let x = \"42\";\nlet x: u32 = x.parse().unwrap();").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                        ui.label(egui::RichText::new("Sí").strong().color(egui::Color32::from_rgb(52, 211, 153)));
+                        ui.label("Crea una nueva variable en el Stack que oculta a la anterior.");
+                        ui.label("Transformaciones de datos (parseo, sanitización) preservando inmutabilidad.");
+                        ui.end_row();
+                    });
+            });
+
+            ui.add_space(14.0);
+
+            // Dos Columnas: Scope & Shadowing profundo
+            ui.columns(2, |cols| {
+                // Columna Izquierda: Scope (Ámbito Léxico)
+                let mut scope_frame = egui::Frame::new();
+                scope_frame.fill = egui::Color32::from_rgb(14, 18, 26);
+                scope_frame.inner_margin = egui::Margin::same(12);
+                scope_frame.corner_radius = egui::CornerRadius::same(8);
+                scope_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(56, 189, 248));
+
+                scope_frame.show(&mut cols[0], |ui| {
+                    ui.label(
+                        egui::RichText::new("📦 Ámbito Léxico (Scope { ... })")
+                            .strong()
+                            .size(15.0)
+                            .color(egui::Color32::from_rgb(56, 189, 248)),
+                    );
+                    ui.add_space(6.0);
+                    ui.label(
+                        "El bloque delimitado por llaves define el ciclo de vida estricto de las variables en la pila:",
+                    );
+                    ui.add_space(4.0);
+                    ui.label("• Al entrar a { se reserva espacio en el Stack Frame.");
+                    ui.label("• Al alcanzar la llave de cierre } la variable sale de scope y se destruye inmediatamente ejecutando drop() (RAII).");
+                    ui.label("• Las variables declaradas en un ámbito interno NO son accesibles desde el exterior.");
+                    ui.add_space(6.0);
+                    ui.label(
+                        egui::RichText::new("let exterior = 10;\n{\n    let interior = 20;\n    println!(\"{interior}\"); // Válido\n}\n// println!(\"{interior}\"); ❌ Error: no existe")
+                            .monospace()
+                            .size(11.5)
+                            .color(egui::Color32::from_rgb(147, 197, 253)),
+                    );
+                });
+
+                // Columna Derecha: Shadowing (Ensombrecimiento con let)
+                let mut shadow_frame = egui::Frame::new();
+                shadow_frame.fill = egui::Color32::from_rgb(14, 18, 26);
+                shadow_frame.inner_margin = egui::Margin::same(12);
+                shadow_frame.corner_radius = egui::CornerRadius::same(8);
+                shadow_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(52, 211, 153));
+
+                shadow_frame.show(&mut cols[1], |ui| {
+                    ui.label(
+                        egui::RichText::new("👥 Ensombrecimiento (Shadowing)")
+                            .strong()
+                            .size(15.0)
+                            .color(egui::Color32::from_rgb(52, 211, 153)),
+                    );
+                    ui.add_space(6.0);
+                    ui.label(
+                        "Permite re-declarar una variable con 'let', creando una variable totalmente nueva:",
+                    );
+                    ui.add_space(4.0);
+                    ui.label("• Reutiliza el mismo nombre conceptual sin variables temporales como 'texto_str' o 'texto_num'.");
+                    ui.label("• Permite cambiar el tipo de dato y devuelve inmutabilidad al valor resultante.");
+                    ui.label("• Shadowing por Bloque: Dentro de { ... } oculta temporalmente la variable exterior sin alterarla.");
+                    ui.add_space(6.0);
+                    ui.label(
+                        egui::RichText::new("let x = 5;\n{\n    let x = x * 2; // x es 10 dentro del bloque\n}\nprintln!(\"{x}\"); // x vuelve a ser 5 (intacto)")
+                            .monospace()
+                            .size(11.5)
+                            .color(egui::Color32::from_rgb(167, 243, 208)),
+                    );
+                });
+            });
+        }
+        3 => {
             mostrar_contenido_tipos_primitivos(ui, state);
         }
         _ => {
@@ -1551,8 +1600,8 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
         }
     }
 
-    // El selector de proyectos y el editor de código solo se muestran en las pestañas interactivas de código (0 e 1)
-    if state.conceptos_tab < 2 {
+    // El selector de proyectos y el editor de código se muestran en las pestañas interactivas de código (0, 1 y 2)
+    if state.conceptos_tab < 3 {
         ui.add_space(15.0);
 
         mostrar_selector_proyectos_estandar(
