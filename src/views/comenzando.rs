@@ -1592,12 +1592,15 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
                     code_box.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(35, 50, 75));
 
                     code_box.show(ui, |ui| {
-                        ui.label(
-                            egui::RichText::new("let exterior = 10;\n{\n    let interior = 20;\n    println!(\"{interior}\"); // Válido\n}\n// println!(\"{interior}\"); ❌ Error: no existe")
-                                .monospace()
-                                .size(12.0)
-                                .color(egui::Color32::from_rgb(100, 200, 255)),
-                        );
+                        ui.spacing_mut().item_spacing.y = 2.0;
+                        ui.label(egui::RichText::new("let exterior = 10;").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+                        ui.label(egui::RichText::new("{").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+                        ui.indent("scope_code_inner", |ui| {
+                            ui.label(egui::RichText::new("let interior = 20;").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+                            ui.label(egui::RichText::new("println!(\"{interior}\"); // Válido").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+                        });
+                        ui.label(egui::RichText::new("}").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+                        ui.label(egui::RichText::new("// println!(\"{interior}\"); // ❌ Error: no existe").monospace().size(12.0).color(egui::Color32::from_rgb(140, 160, 185)));
                     });
                 });
 
@@ -1633,12 +1636,14 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
                     code_box.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(35, 50, 75));
 
                     code_box.show(ui, |ui| {
-                        ui.label(
-                            egui::RichText::new("let x = 5;\n{\n    let x = x * 2; // x es 10 dentro del bloque\n}\nprintln!(\"{x}\"); // x vuelve a ser 5 (intacto)")
-                                .monospace()
-                                .size(12.0)
-                                .color(egui::Color32::from_rgb(100, 200, 255)),
-                        );
+                        ui.spacing_mut().item_spacing.y = 2.0;
+                        ui.label(egui::RichText::new("let x = 5;").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+                        ui.label(egui::RichText::new("{").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+                        ui.indent("shadow_code_inner", |ui| {
+                            ui.label(egui::RichText::new("let x = x * 2; // x es 10 dentro del bloque").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+                        });
+                        ui.label(egui::RichText::new("}").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+                        ui.label(egui::RichText::new("println!(\"{x}\"); // x vuelve a ser 5 (intacto)").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
                     });
                 });
             });
