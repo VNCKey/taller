@@ -466,16 +466,72 @@ pub fn mostrar_pilares_tiempo(ui: &mut egui::Ui, state: &mut PortfolioState) {
                         .strong()
                         .color(egui::Color32::WHITE),
                 );
-                ui.label(
-                    egui::RichText::new("Tiempo de Compilación")
-                        .strong()
-                        .color(egui::Color32::WHITE),
-                );
-                ui.label(
-                    egui::RichText::new("Tiempo de Ejecución")
-                        .strong()
-                        .color(egui::Color32::WHITE),
-                );
+
+                // Columna 2: Tiempo de Compilación + Botón Ver Diagrama
+                ui.horizontal(|ui| {
+                    ui.label(
+                        egui::RichText::new("Tiempo de Compilación")
+                            .strong()
+                            .color(egui::Color32::WHITE),
+                    );
+                    ui.add_space(4.0);
+                    let btn_color_compile = if state.show_railroad_modal == Some(4) {
+                        egui::Color32::from_rgb(255, 160, 50)
+                    } else {
+                        egui::Color32::from_rgb(180, 190, 205)
+                    };
+
+                    if ui
+                        .add(
+                            egui::Button::image(
+                                egui::Image::from_bytes(
+                                    "bytes://view.svg",
+                                    include_bytes!("../../diagramas/view.svg"),
+                                )
+                                .fit_to_exact_size(egui::vec2(18.0, 18.0))
+                                .tint(btn_color_compile),
+                            )
+                            .frame(state.show_railroad_modal == Some(4)),
+                        )
+                        .on_hover_text("Ver diagrama de flujo (Tiempo de Compilación)")
+                        .clicked()
+                    {
+                        state.show_railroad_modal = if state.show_railroad_modal == Some(4) { None } else { Some(4) };
+                    }
+                });
+
+                // Columna 3: Tiempo de Ejecución + Botón Ver Diagrama
+                ui.horizontal(|ui| {
+                    ui.label(
+                        egui::RichText::new("Tiempo de Ejecución")
+                            .strong()
+                            .color(egui::Color32::WHITE),
+                    );
+                    ui.add_space(4.0);
+                    let btn_color_run = if state.show_railroad_modal == Some(5) {
+                        egui::Color32::from_rgb(255, 160, 50)
+                    } else {
+                        egui::Color32::from_rgb(180, 190, 205)
+                    };
+
+                    if ui
+                        .add(
+                            egui::Button::image(
+                                egui::Image::from_bytes(
+                                    "bytes://view.svg",
+                                    include_bytes!("../../diagramas/view.svg"),
+                                )
+                                .fit_to_exact_size(egui::vec2(18.0, 18.0))
+                                .tint(btn_color_run),
+                            )
+                            .frame(state.show_railroad_modal == Some(5)),
+                        )
+                        .on_hover_text("Ver diagrama de flujo (Tiempo de Ejecución)")
+                        .clicked()
+                    {
+                        state.show_railroad_modal = if state.show_railroad_modal == Some(5) { None } else { Some(5) };
+                    }
+                });
                 ui.end_row();
 
                 ui.label(
@@ -507,62 +563,6 @@ pub fn mostrar_pilares_tiempo(ui: &mut egui::Ui, state: &mut PortfolioState) {
                 ui.label(
                     "Interacción con el usuario, lectura de archivos, red y cálculo de lógica.",
                 );
-                ui.end_row();
-
-                // Fila 4: Diagrama de Flujo
-                ui.label(
-                    egui::RichText::new("Diagrama de Flujo")
-                        .strong()
-                        .color(egui::Color32::from_rgb(255, 160, 50)),
-                );
-
-                let btn_color_compile = if state.show_railroad_modal == Some(4) {
-                    egui::Color32::from_rgb(255, 160, 50)
-                } else {
-                    egui::Color32::from_rgb(180, 190, 205)
-                };
-
-                if ui
-                    .add(
-                        egui::Button::image(
-                            egui::Image::from_bytes(
-                                "bytes://view.svg",
-                                include_bytes!("../../diagramas/view.svg"),
-                            )
-                            .fit_to_exact_size(egui::vec2(20.0, 20.0))
-                            .tint(btn_color_compile),
-                        )
-                        .frame(state.show_railroad_modal == Some(4)),
-                    )
-                    .on_hover_text("Ver diagrama de flujo (Tiempo de Compilación)")
-                    .clicked()
-                {
-                    state.show_railroad_modal = if state.show_railroad_modal == Some(4) { None } else { Some(4) };
-                }
-
-                let btn_color_run = if state.show_railroad_modal == Some(5) {
-                    egui::Color32::from_rgb(255, 160, 50)
-                } else {
-                    egui::Color32::from_rgb(180, 190, 205)
-                };
-
-                if ui
-                    .add(
-                        egui::Button::image(
-                            egui::Image::from_bytes(
-                                "bytes://view.svg",
-                                include_bytes!("../../diagramas/view.svg"),
-                            )
-                            .fit_to_exact_size(egui::vec2(20.0, 20.0))
-                            .tint(btn_color_run),
-                        )
-                        .frame(state.show_railroad_modal == Some(5)),
-                    )
-                    .on_hover_text("Ver diagrama de flujo (Tiempo de Ejecución)")
-                    .clicked()
-                {
-                    state.show_railroad_modal = if state.show_railroad_modal == Some(5) { None } else { Some(5) };
-                }
                 ui.end_row();
 
                 ui.label(
