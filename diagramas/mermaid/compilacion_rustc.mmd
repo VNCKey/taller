@@ -1,39 +1,65 @@
 %%{init: {'theme': 'dark', 'themeVariables': { 'darkMode': true, 'background': '#0f172a'}}}%%
-flowchart LR
-    subgraph S1["1. Entrada"]
-        SRC["📄 main.rs<br/><i>Código Fuente</i>"]
+flowchart TD
+    %% ==========================================
+    %% FILA 1: DE CÓDIGO A SEGURIDAD (IZQ -> DER)
+    %% ==========================================
+    subgraph F1["FASE DE ANÁLISIS Y SEGURIDAD (RUSTC)"]
+        direction LR
+
+        subgraph S1["1. Entrada"]
+            SRC["📄 main.rs<br/><i>Código Fuente</i>"]
+        end
+
+        subgraph S2["2. Frontend (rustc)"]
+            direction TB
+            LEX["Analizador Léxico + Parser"]
+            AST["AST (Árbol Sintáctico)"]
+            HIR["HIR (Tipos & Macros)"]
+            LEX --> AST --> HIR
+        end
+
+        subgraph S3["3. Middle-End"]
+            direction TB
+            MIR["MIR (Control Flow Graph)"]
+            BC{{"🛡️ BORROW CHECKER<br/><b>Ownership & Lifetimes</b>"}}
+            MIR --> BC
+        end
+
+        SRC --> S2
+        S2 --> S3
     end
 
-    subgraph S2["2. Frontend (rustc)"]
-        LEX["Analizador Léxico<br/>+ Parser"]
-        AST["AST<br/><i>Árbol Sintáctico</i>"]
-        HIR["HIR<br/><i>Tipos & Macros</i>"]
-        LEX --> AST --> HIR
+    %% Conexión entre Fila 1 y Fila 2 (De arriba hacia abajo)
+    F1 ==>|Código 100% Seguro| F2
+
+    %% ==========================================
+    %% FILA 2: DE OPTIMIZACIÓN A EJECUTABLE (IZQ -> DER)
+    %% ==========================================
+    subgraph F2["FASE DE OPTIMIZACIÓN Y MÁQUINA (LLVM & LINKER)"]
+        direction LR
+
+        subgraph S4["4. Backend LLVM"]
+            direction TB
+            LLVM["LLVM IR Universal"]
+            OPT["Optimizador O3 (SIMD / Inlining)"]
+            ASM["Código Máquina (x86_64 / ARM)"]
+            LLVM --> OPT --> ASM
+        end
+
+        subgraph S5["5. Enlace & Salida"]
+            direction TB
+            LIB["📚 libstd + Crates"]
+            LINK["Linker (ld / lld)"]
+            BIN(["🚀 EJECUTABLE FINAL<br/><b>ELF / .EXE / WASM</b>"]):::target
+            LIB --> LINK
+            LINK --> BIN
+        end
+
+        S4 --> LINK
     end
 
-    subgraph S3["3. Middle-End (Seguridad)"]
-        MIR["MIR<br/><i>Control Flow</i>"]
-        BC{{"🛡️ Borrow Checker<br/><b>Ownership & Lifetimes</b>"}}
-        MIR --> BC
-    end
-
-    subgraph S4["4. Backend (LLVM)"]
-        LLVM["LLVM IR"]
-        OPT["Optimizador O3<br/><i>SIMD / Inlining</i>"]
-        ASM["Código Máquina<br/><i>x86_64 / ARM / WASM</i>"]
-        LLVM --> OPT --> ASM
-    end
-
-    subgraph S5["5. Salida"]
-        LINK["Linker (ld)"]
-        BIN(["🚀 Binario ELF / EXE"]):::target
-    end
-
-    SRC --> LEX
-    HIR --> MIR
-    BC --> LLVM
-    ASM --> LINK
-    LINK --> BIN
-
-    classDef target fill:#059669,stroke:#34d399,stroke-width:2px,color:#fff;
+    classDef target fill:#059669,stroke:#34d399,stroke-width:3px,color:#fff;
     classDef default fill:#1e293b,stroke:#3b82f6,color:#f8fafc;
+    style F1 fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#93c5fd
+    style F2 fill:#0f172a,stroke:#a855f7,stroke-width:2px,color:#d8b4fe
+    style BC fill:#7c2d12,stroke:#f97316,stroke-width:2px,color:#ffedd5

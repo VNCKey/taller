@@ -1,120 +1,62 @@
-direction: right
+direction: down
 
-# Configuración de estilos generales
-classes: {
-  fase: {
-    style: {
-      border-radius: 8
-      stroke-width: 2
-    }
-  }
-  proceso: {
-    style: {
-      fill: "#1e293b"
-      stroke: "#38bdf8"
-      font-color: "#ffffff"
-      border-radius: 6
-    }
-  }
-  artefacto: {
-    style: {
-      fill: "#0f172a"
-      stroke: "#fb923c"
-      font-color: "#fdba74"
-      border-radius: 6
-    }
+title: "Pipeline Interno del Compilador rustc" {
+  style: {
+    font-size: 22
+    bold: true
+    font-color: "#ffffff"
   }
 }
 
-# 1. ENTRADA
-origen: "📄 main.rs\n(Código Fuente Rust)" {
-  class: artefacto
-  style.fill: "#1e1e38"
-  style.stroke: "#818cf8"
+# --- FILA 1: ANÁLISIS Y SEGURIDAD (RUSTC) ---
+fila_1: "1. FASE DE ANÁLISIS Y SEGURIDAD (rustc)" {
+  direction: right
+  style: {
+    fill: "#0f172a"
+    stroke: "#38bdf8"
+    stroke-width: 2
+    border-radius: 8
+  }
+
+  origen: "📄 main.rs\n(Código Fuente)" {
+    style: { fill: "#1e1e38"; stroke: "#818cf8"; font-color: "#ffffff" }
+  }
+
+  frontend: "Frontend rustc\n(Lexer -> AST -> HIR)" {
+    style: { fill: "#1e293b"; stroke: "#38bdf8"; font-color: "#ffffff" }
+  }
+
+  middle: "🛡️ Middle-End (MIR)\nBorrow Checker & Lifetimes" {
+    style: { fill: "#451a03"; stroke: "#ea580c"; font-color: "#ffedd5"; bold: true }
+  }
+
+  origen -> frontend -> middle
 }
 
-# 2. FRONTEND DE RUSTC
-frontend: "1. Frontend de rustc" {
-  class: fase
-  style.fill: "#0f172a"
-  style.stroke: "#38bdf8"
-
-  lex_parse: "Analizador Léxico y Parser\n(Tokens + Expansión de Macros)" {
-    class: proceso
-  }
-  ast: "AST\n(Árbol de Sintaxis Abstracta)" {
-    class: artefacto
-  }
-  hir: "HIR\n(Inferencia de Tipos y Desugaring)" {
-    class: artefacto
+# --- FILA 2: OPTIMIZACIÓN Y MÁQUINA (LLVM & LINKER) ---
+fila_2: "2. FASE DE OPTIMIZACIÓN Y ENLACE (LLVM & Linker)" {
+  direction: right
+  style: {
+    fill: "#0f172a"
+    stroke: "#a855f7"
+    stroke-width: 2
+    border-radius: 8
   }
 
-  lex_parse -> ast -> hir
+  llvm: "LLVM IR\n(Optimizador O3 + SIMD)" {
+    style: { fill: "#1e293b"; stroke: "#c084fc"; font-color: "#ffffff" }
+  }
+
+  linker: "Linker (ld / lld)\n+ libstd / Crates" {
+    style: { fill: "#064e3b"; stroke: "#34d399"; font-color: "#ecfdf5" }
+  }
+
+  binario: "🚀 EJECUTABLE FINAL\n(ELF / .EXE / WASM)" {
+    style: { fill: "#065f46"; stroke: "#10b981"; font-color: "#ffffff"; bold: true }
+  }
+
+  llvm -> linker -> binario
 }
 
-# 3. MIDDLE-END (EL CORAZÓN DE RUST)
-middle: "2. Middle-End (Seguridad)" {
-  class: fase
-  style.fill: "#1c1917"
-  style.stroke: "#f97316"
-
-  mir: "MIR (Mid-level IR)\nGrafo de Flujo de Control" {
-    class: artefacto
-  }
-  borrow_checker: "🛡️ BORROW CHECKER\nVerificación de Lifetimes y Ownership" {
-    class: proceso
-    style.fill: "#451a03"
-    style.stroke: "#ea580c"
-    style.font-color: "#ffedd5"
-  }
-
-  mir -> borrow_checker
-}
-
-# 4. BACKEND LLVM
-backend: "3. Backend LLVM (Optimización)" {
-  class: fase
-  style.fill: "#0f172a"
-  style.stroke: "#a855f7"
-
-  llvm_ir: "LLVM IR\n(Representación Intermedia Universal)" {
-    class: artefacto
-  }
-  opt: "Optimizador LLVM (O3)\n(Inlining, Vectorización SIMD)" {
-    class: proceso
-  }
-  codegen: "Generador de Código Máquina\n(Ensamblador x86_64 / ARM / WASM)" {
-    class: proceso
-  }
-
-  llvm_ir -> opt -> codegen
-}
-
-# 5. ENLACE Y SALIDA FINAL
-linker: "4. Linker (ld / lld / msvc)" {
-  class: proceso
-  style.fill: "#064e3b"
-  style.stroke: "#34d399"
-  style.font-color: "#ecfdf5"
-}
-
-std_lib: "📚 libstd + Crates Externas\n(Dependencias compiladas)" {
-  class: artefacto
-  style.stroke: "#34d399"
-}
-
-binario: "🚀 EJECUTABLE FINAL\n(ELF en Linux / .exe en Windows / .wasm)" {
-  class: artefacto
-  style.fill: "#065f46"
-  style.stroke: "#10b981"
-  style.font-color: "#ffffff"
-  style.bold: true
-}
-
-# CONEXIONES PRINCIPALES
-origen -> frontend.lex_parse
-frontend.hir -> middle.mir
-middle.borrow_checker -> backend.llvm_ir
-backend.codegen -> linker
-std_lib -> linker
-linker -> binario
+# Conexión entre Fila 1 y Fila 2
+fila_1.middle -> fila_2.llvm: "Código 100% Seguro"
