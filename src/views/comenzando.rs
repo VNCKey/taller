@@ -1485,29 +1485,29 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
             table_frame.show(ui, |ui| {
                 egui::Grid::new("tabla_scope_shadowing")
                     .striped(true)
-                    .spacing([25.0, 8.0])
+                    .spacing([20.0, 8.0])
                     .show(ui, |ui| {
                         ui.label(egui::RichText::new("Mecanismo").strong().color(egui::Color32::WHITE));
                         ui.label(egui::RichText::new("Sintaxis").strong().color(egui::Color32::WHITE));
                         ui.label(egui::RichText::new("¿Cambia Tipo?").strong().color(egui::Color32::WHITE));
-                        ui.label(egui::RichText::new("Comportamiento en Memoria").strong().color(egui::Color32::WHITE));
-                        ui.label(egui::RichText::new("Uso Principal").strong().color(egui::Color32::WHITE));
+                        ui.label(egui::RichText::new("Memoria (Stack)").strong().color(egui::Color32::WHITE));
+                        ui.label(egui::RichText::new("Uso Ideal").strong().color(egui::Color32::WHITE));
                         ui.end_row();
 
                         // Fila 1: Mutabilidad
-                        ui.label(egui::RichText::new("Mutabilidad").strong().color(egui::Color32::from_rgb(255, 160, 50)));
+                        ui.label(egui::RichText::new("Mutabilidad (mut)").strong().color(egui::Color32::from_rgb(255, 160, 50)));
                         ui.label(egui::RichText::new("let mut x = 5;\nx = 10;").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
                         ui.label(egui::RichText::new("No").strong().color(egui::Color32::from_rgb(248, 113, 113)));
-                        ui.label("Modifica el valor en la misma celda de memoria.");
-                        ui.label("Acumuladores, buffers y bucles donde el valor cambia constantemente.");
+                        ui.label("Misma celda en Stack");
+                        ui.label("Bucles y acumuladores");
                         ui.end_row();
 
                         // Fila 2: Shadowing
-                        ui.label(egui::RichText::new("Shadowing").strong().color(egui::Color32::from_rgb(52, 211, 153)));
-                        ui.label(egui::RichText::new("let espacios = \"   \";\nlet espacios = espacios.len();").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
-                        ui.label(egui::RichText::new("Sí").strong().color(egui::Color32::from_rgb(52, 211, 153)));
-                        ui.label("Crea una nueva variable en el Stack que oculta a la anterior.");
-                        ui.label("Transformaciones de datos (cambio de tipo &str a usize) preservando inmutabilidad.");
+                        ui.label(egui::RichText::new("Shadowing (let)").strong().color(egui::Color32::from_rgb(52, 211, 153)));
+                        ui.label(egui::RichText::new("let x = \"hola\";\nlet x = x.len();").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                        ui.label(egui::RichText::new("Sí (&str ➔ usize)").strong().color(egui::Color32::from_rgb(52, 211, 153)));
+                        ui.label("Nueva variable en Stack");
+                        ui.label("Transformación de datos");
                         ui.end_row();
                     });
             });
