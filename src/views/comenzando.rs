@@ -1277,7 +1277,35 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
 
     ui.add_space(6.0);
     ui.separator();
-    ui.add_space(12.0);
+    ui.add_space(10.0);
+
+    // El selector de proyectos y el editor de código interactivo en primera posición para las pestañas prácticas
+    if state.conceptos_tab < 4 {
+        mostrar_selector_proyectos_estandar(
+            ui,
+            &mut state.selected_project,
+            &mut state.term_cwd,
+            "combo_proyectos_comenzando",
+            &mut state.conceptos_code,
+        );
+
+        ui.add_space(10.0);
+
+        let theme = &state.theme_set.themes["base16-ocean.dark"];
+        mostrar_editor_interactivo(
+            ui,
+            &mut state.conceptos_code,
+            Arc::clone(&state.conceptos_output),
+            "",
+            ejecutar_codigo_rust,
+            &state.syntax_set,
+            theme,
+        );
+
+        ui.add_space(15.0);
+        ui.separator();
+        ui.add_space(12.0);
+    }
 
     match state.conceptos_tab {
         0 => {
@@ -1828,31 +1856,5 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
         _ => {
             mostrar_contenido_macros(ui);
         }
-    }
-
-    // El selector de proyectos y el editor de código se muestran en las pestañas interactivas de código (0, 1, 2 y 3)
-    if state.conceptos_tab < 4 {
-        ui.add_space(15.0);
-
-        mostrar_selector_proyectos_estandar(
-            ui,
-            &mut state.selected_project,
-            &mut state.term_cwd,
-            "combo_proyectos_comenzando",
-            &mut state.conceptos_code,
-        );
-
-        ui.add_space(10.0);
-
-        let theme = &state.theme_set.themes["base16-ocean.dark"];
-        mostrar_editor_interactivo(
-            ui,
-            &mut state.conceptos_code,
-            Arc::clone(&state.conceptos_output),
-            "",
-            ejecutar_codigo_rust,
-            &state.syntax_set,
-            theme,
-        );
     }
 }
