@@ -83,8 +83,8 @@ pub fn mostrar_pilares_entorno_trabajo(ui: &mut egui::Ui, state: &mut PortfolioS
                     ui.add_space(4.0);
                     ui.heading(egui::RichText::new("rustc").size(17.0).strong().color(title_color));
                     ui.add_space(4.0);
-                    if ui.button(egui::RichText::new("🔍 Comparar").small().color(egui::Color32::from_rgb(100, 200, 255)))
-                        .on_hover_text("Abrir comparativa didáctica: Compilador vs Intérprete vs Máquina Virtual")
+                    if ui.button(egui::RichText::new("🔍 Ver").small().color(egui::Color32::from_rgb(100, 200, 255)))
+                        .on_hover_text("Abrir diagrama del pipeline de compilación de rustc")
                         .clicked()
                     {
                         state.show_rustc_compilador_modal = true;
