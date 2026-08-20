@@ -1,16 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 440" width="820" height="440" style="font-family: 'DejaVu Sans', Arial, sans-serif;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 430" width="820" height="430" style="font-family: 'DejaVu Sans', Arial, sans-serif;">
   <style>
     text, tspan { stroke: none !important; stroke-width: 0 !important; }
     .title-main { font-size: 15px; font-weight: bold; fill: #ffa032; }
     .card-title { font-size: 13px; font-weight: bold; fill: #ffffff; }
+    .card-title-heap { font-size: 13px; font-weight: bold; fill: #ffa032; }
     .label-meta { font-size: 10px; font-weight: bold; fill: #8c96a5; letter-spacing: 0.5px; }
     .label-sub { font-size: 10px; fill: #8c96a5; }
     .val-code { font-size: 12px; font-family: monospace; font-weight: bold; fill: #64c8ff; }
     .val-ptr { font-size: 12px; font-family: monospace; font-weight: bold; fill: #ffa032; }
-    .val-char { font-size: 14px; font-family: monospace; font-weight: bold; fill: #ffffff; }
+    .val-char { font-size: 15px; font-family: monospace; font-weight: bold; fill: #ffffff; }
     .val-byte { font-size: 10px; font-family: monospace; fill: #ffa032; }
-    .field-name { font-size: 12px; font-weight: bold; fill: #64c8ff; }
-    .field-desc { font-size: 11px; fill: #8c96a5; }
   </style>
 
   <defs>
@@ -21,12 +20,12 @@
   </defs>
 
   <!-- ================= TITULO PRINCIPAL ================= -->
-  <text x="20" y="32" class="title-main">HEAP (Memoria Dinamica &amp; String)</text>
+  <text x="20" y="30" class="title-main">HEAP (Dynamic Memory)</text>
 
   <!-- ================= COLUMNA IZQUIERDA: STACK ================= -->
-  <g transform="translate(20, 50)">
+  <g transform="translate(20, 45)">
     <!-- Marco Stack -->
-    <rect x="0" y="0" width="370" height="360" rx="8" fill="#141c2b" stroke="#2d3c5a" stroke-width="1.2"/>
+    <rect x="0" y="0" width="370" height="365" rx="8" fill="#141c2b" stroke="#2d3c5a" stroke-width="1.2"/>
     
     <!-- Encabezado de la variable -->
     <rect x="15" y="12" width="280" height="26" rx="4" fill="#080c12" stroke="#64c8ff" stroke-width="1"/>
@@ -36,33 +35,33 @@
     <g transform="translate(15, 48)">
       <rect x="0" y="0" width="340" height="52" rx="6" fill="#080c12" stroke="#64c8ff" stroke-width="1.2"/>
       <text x="15" y="20" class="label-meta">STACK MEMORY ADDRESS</text>
-      <text x="15" y="38" class="val-code">0x7FFEE4B2A890 (24 Bytes en Stack)</text>
+      <text x="15" y="38" class="val-code">0x7FFEE4B2A890 (24 Bytes)</text>
     </g>
 
     <!-- Sub-caja 2: Estructura interna de 3 campos -->
     <g transform="translate(15, 110)">
-      <rect x="0" y="0" width="340" height="235" rx="6" fill="#080c12" stroke="#456090" stroke-width="1.2"/>
-      <text x="15" y="22" class="label-meta">ESTRUCTURA DE CONTROL (3 CAMPOS)</text>
+      <rect x="0" y="0" width="340" height="240" rx="6" fill="#080c12" stroke="#456090" stroke-width="1.2"/>
+      <text x="15" y="22" class="label-meta">STACK METADATA (3 CAMPOS)</text>
       
       <!-- Campo 1: ptr -->
       <g transform="translate(10, 32)">
-        <rect x="0" y="0" width="320" height="58" rx="4" fill="#26180a" stroke="#ffa032" stroke-width="1.2"/>
-        <text x="12" y="22" class="val-ptr">ptr: 0x55A8F210E400</text>
-        <text x="12" y="44" class="label-sub">8 Bytes - Puntero de 64 bits al Heap</text>
+        <rect x="0" y="0" width="320" height="60" rx="4" fill="#26180a" stroke="#ffa032" stroke-width="1.2"/>
+        <text x="12" y="24" class="val-ptr">ptr: 0x55A8F210E400</text>
+        <text x="12" y="46" class="label-sub">8 Bytes - Puntero hacia el Heap</text>
       </g>
 
       <!-- Campo 2: len -->
-      <g transform="translate(10, 98)">
-        <rect x="0" y="0" width="320" height="58" rx="4" fill="#141c2b" stroke="#38bdf8" stroke-width="1"/>
-        <text x="12" y="22" class="val-code">len: 4</text>
-        <text x="12" y="44" class="label-sub">8 Bytes (usize) - Bytes validos en uso</text>
+      <g transform="translate(10, 100)">
+        <rect x="0" y="0" width="320" height="60" rx="4" fill="#141c2b" stroke="#38bdf8" stroke-width="1"/>
+        <text x="12" y="24" class="val-code">len: 4</text>
+        <text x="12" y="46" class="label-sub">8 Bytes (usize) - Longitud en uso</text>
       </g>
 
       <!-- Campo 3: cap -->
-      <g transform="translate(10, 164)">
-        <rect x="0" y="0" width="320" height="58" rx="4" fill="#141c2b" stroke="#38bdf8" stroke-width="1"/>
-        <text x="12" y="22" class="val-code">cap: 4</text>
-        <text x="12" y="44" class="label-sub">8 Bytes (usize) - Capacidad reservada</text>
+      <g transform="translate(10, 168)">
+        <rect x="0" y="0" width="320" height="60" rx="4" fill="#141c2b" stroke="#38bdf8" stroke-width="1"/>
+        <text x="12" y="24" class="val-code">cap: 4</text>
+        <text x="12" y="46" class="label-sub">8 Bytes (usize) - Capacidad asignada</text>
       </g>
     </g>
   </g>
@@ -71,68 +70,68 @@
   <path d="M 365 210 L 415 210" stroke="#ffa032" stroke-width="2.5" stroke-dasharray="5,3" marker-end="url(#arrow-ptr)" fill="none"/>
 
   <!-- ================= COLUMNA DERECHA: HEAP ================= -->
-  <g transform="translate(430, 50)">
+  <g transform="translate(430, 45)">
     <!-- Marco Heap -->
-    <rect x="0" y="0" width="370" height="360" rx="8" fill="#141c2b" stroke="#ffa032" stroke-width="1.2"/>
+    <rect x="0" y="0" width="370" height="365" rx="8" fill="#141c2b" stroke="#ffa032" stroke-width="1.2"/>
     
     <!-- Encabezado Heap -->
-    <rect x="15" y="12" width="280" height="26" rx="4" fill="#26180a" stroke="#ffa032" stroke-width="1"/>
-    <text x="155" y="29" text-anchor="middle" class="sp-title">HEAP (Buffer Dinamico de Bytes)</text>
+    <rect x="15" y="12" width="220" height="26" rx="4" fill="#26180a" stroke="#ffa032" stroke-width="1"/>
+    <text x="125" y="29" text-anchor="middle" class="card-title-heap">HEAP BUFFER: "Rust"</text>
 
     <!-- Sub-caja 1: Memory Address en Heap -->
     <g transform="translate(15, 48)">
       <rect x="0" y="0" width="340" height="52" rx="6" fill="#080c12" stroke="#ffa032" stroke-width="1.2"/>
-      <text x="15" y="20" class="label-meta">HEAP MEMORY ADDRESS (DESTINO DEL PUNTERO)</text>
-      <text x="15" y="38" class="val-ptr">0x55A8F210E400</text>
+      <text x="15" y="20" class="label-meta">HEAP MEMORY ADDRESS</text>
+      <text x="15" y="38" class="val-ptr">0x55A8F210E400 (Destino)</text>
     </g>
 
     <!-- Sub-caja 2: Contenido en bytes del buffer -->
     <g transform="translate(15, 110)">
-      <rect x="0" y="0" width="340" height="235" rx="6" fill="#080c12" stroke="#456090" stroke-width="1.2"/>
-      <text x="15" y="22" class="label-meta">BUFFER CONTIGUO UTF-8 EN HEAP</text>
+      <rect x="0" y="0" width="340" height="240" rx="6" fill="#080c12" stroke="#456090" stroke-width="1.2"/>
+      <text x="15" y="22" class="label-meta">CONTENIDO UTF-8 EN HEAP</text>
       
       <!-- Celdas de caracteres -->
-      <g transform="translate(12, 38)">
+      <g transform="translate(10, 36)">
         <!-- Byte 0: 'R' -->
         <g transform="translate(0, 0)">
-          <rect x="0" y="0" width="72" height="75" rx="4" fill="#26180a" stroke="#ffa032" stroke-width="1.2"/>
-          <text x="36" y="20" text-anchor="middle" class="label-sub">[0]</text>
-          <text x="36" y="44" text-anchor="middle" class="val-char">'R'</text>
-          <text x="36" y="64" text-anchor="middle" class="val-byte">0x52</text>
+          <rect x="0" y="0" width="74" height="80" rx="4" fill="#26180a" stroke="#ffa032" stroke-width="1.2"/>
+          <text x="37" y="22" text-anchor="middle" class="label-sub">[0]</text>
+          <text x="37" y="48" text-anchor="middle" class="val-char">'R'</text>
+          <text x="37" y="68" text-anchor="middle" class="val-byte">0x52</text>
         </g>
 
         <!-- Byte 1: 'u' -->
-        <g transform="translate(80, 0)">
-          <rect x="0" y="0" width="72" height="75" rx="4" fill="#26180a" stroke="#ffa032" stroke-width="1.2"/>
-          <text x="36" y="20" text-anchor="middle" class="label-sub">[1]</text>
-          <text x="36" y="44" text-anchor="middle" class="val-char">'u'</text>
-          <text x="36" y="64" text-anchor="middle" class="val-byte">0x75</text>
+        <g transform="translate(82, 0)">
+          <rect x="0" y="0" width="74" height="80" rx="4" fill="#26180a" stroke="#ffa032" stroke-width="1.2"/>
+          <text x="37" y="22" text-anchor="middle" class="label-sub">[1]</text>
+          <text x="37" y="48" text-anchor="middle" class="val-char">'u'</text>
+          <text x="37" y="68" text-anchor="middle" class="val-byte">0x75</text>
         </g>
 
         <!-- Byte 2: 's' -->
-        <g transform="translate(160, 0)">
-          <rect x="0" y="0" width="72" height="75" rx="4" fill="#26180a" stroke="#ffa032" stroke-width="1.2"/>
-          <text x="36" y="20" text-anchor="middle" class="label-sub">[2]</text>
-          <text x="36" y="44" text-anchor="middle" class="val-char">'s'</text>
-          <text x="36" y="64" text-anchor="middle" class="val-byte">0x73</text>
+        <g transform="translate(164, 0)">
+          <rect x="0" y="0" width="74" height="80" rx="4" fill="#26180a" stroke="#ffa032" stroke-width="1.2"/>
+          <text x="37" y="22" text-anchor="middle" class="label-sub">[2]</text>
+          <text x="37" y="48" text-anchor="middle" class="val-char">'s'</text>
+          <text x="37" y="68" text-anchor="middle" class="val-byte">0x73</text>
         </g>
 
         <!-- Byte 3: 't' -->
-        <g transform="translate(240, 0)">
-          <rect x="0" y="0" width="72" height="75" rx="4" fill="#26180a" stroke="#ffa032" stroke-width="1.2"/>
-          <text x="36" y="20" text-anchor="middle" class="label-sub">[3]</text>
-          <text x="36" y="44" text-anchor="middle" class="val-char">'t'</text>
-          <text x="36" y="64" text-anchor="middle" class="val-byte">0x74</text>
+        <g transform="translate(246, 0)">
+          <rect x="0" y="0" width="74" height="80" rx="4" fill="#26180a" stroke="#ffa032" stroke-width="1.2"/>
+          <text x="37" y="22" text-anchor="middle" class="label-sub">[3]</text>
+          <text x="37" y="48" text-anchor="middle" class="val-char">'t'</text>
+          <text x="37" y="68" text-anchor="middle" class="val-byte">0x74</text>
         </g>
       </g>
 
-      <!-- Resumen explicativo -->
-      <g transform="translate(12, 130)">
-        <rect x="0" y="0" width="315" height="90" rx="4" fill="#141c2b" stroke="#2d3c5a" stroke-width="1"/>
-        <text x="12" y="22" class="label-meta">PROPIEDADES DE ESTA ASIGNACION:</text>
-        <text x="12" y="42" class="label-sub">• Tamanio: 4 Bytes contiguos en memoria RAM.</text>
-        <text x="12" y="60" class="label-sub">• Capacidad: Puede crecer reubicandose en Heap.</text>
-        <text x="12" y="78" class="label-sub">• Liberacion: drop() limpia este buffer al salir de scope.</text>
+      <!-- Resumen explicativo compacto -->
+      <g transform="translate(10, 130)">
+        <rect x="0" y="0" width="320" height="96" rx="4" fill="#141c2b" stroke="#2d3c5a" stroke-width="1"/>
+        <text x="12" y="22" class="label-meta">PROPIEDADES:</text>
+        <text x="12" y="42" class="label-sub">SIZE: 4 Bytes UTF-8 | CAP: 4 Bytes</text>
+        <text x="12" y="62" class="label-sub">Asignado dinamicamente en tiempo de ejecucion</text>
+        <text x="12" y="82" class="label-sub">Liberado por drop(texto) al salir del scope</text>
       </g>
     </g>
   </g>
