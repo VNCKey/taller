@@ -20,7 +20,7 @@
   </defs>
 
   <!-- ================= TITULO PRINCIPAL ================= -->
-  <text x="20" y="30" class="title-main">HEAP (Dynamic Memory)</text>
+  <text x="20" y="30" class="title-main">HEAP</text>
 
   <!-- ================= COLUMNA IZQUIERDA: STACK ================= -->
   <g transform="translate(20, 45)">
@@ -41,27 +41,27 @@
     <!-- Sub-caja 2: Estructura interna de 3 campos -->
     <g transform="translate(15, 110)">
       <rect x="0" y="0" width="340" height="240" rx="6" fill="#080c12" stroke="#456090" stroke-width="1.2"/>
-      <text x="15" y="22" class="label-meta">STACK METADATA (3 CAMPOS)</text>
+      <text x="15" y="22" class="label-meta">STACK METADATA (3 CAMPOS - 24B)</text>
       
       <!-- Campo 1: ptr -->
       <g transform="translate(10, 32)">
         <rect x="0" y="0" width="320" height="60" rx="4" fill="#26180a" stroke="#ffa032" stroke-width="1.2"/>
         <text x="12" y="24" class="val-ptr">ptr: 0x55A8F210E400</text>
-        <text x="12" y="46" class="label-sub">8 Bytes - Puntero hacia el Heap</text>
+        <text x="12" y="46" class="label-sub">8 Bytes - Puntero de 64-bit hacia el Heap</text>
       </g>
 
       <!-- Campo 2: len -->
       <g transform="translate(10, 100)">
         <rect x="0" y="0" width="320" height="60" rx="4" fill="#141c2b" stroke="#38bdf8" stroke-width="1"/>
         <text x="12" y="24" class="val-code">len: 4</text>
-        <text x="12" y="46" class="label-sub">8 Bytes (usize) - Longitud en uso</text>
+        <text x="12" y="46" class="label-sub">8 Bytes (usize) - Bytes usados: "Rust"</text>
       </g>
 
       <!-- Campo 3: cap -->
       <g transform="translate(10, 168)">
         <rect x="0" y="0" width="320" height="60" rx="4" fill="#141c2b" stroke="#38bdf8" stroke-width="1"/>
         <text x="12" y="24" class="val-code">cap: 4</text>
-        <text x="12" y="46" class="label-sub">8 Bytes (usize) - Capacidad asignada</text>
+        <text x="12" y="46" class="label-sub">8 Bytes (usize) - Capacidad total reservada</text>
       </g>
     </g>
   </g>
