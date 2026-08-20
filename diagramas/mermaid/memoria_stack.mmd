@@ -1,31 +1,40 @@
 %%{init: {'theme': 'dark', 'themeVariables': { 'darkMode': true, 'background': '#0e121a'}}}%%
 flowchart TD
     %% ===================================================
-    %% ARQUITECTURA DE MEMORIA STACK (PILA DE EJECUCION)
+    %% ARQUITECTURA DE MEMORIA: EXCLUSIVA DEL STACK (PILA)
     %% ===================================================
 
-    subgraph STACK ["Memoria Stack (Pila) - Acceso LIFO"]
+    subgraph MEMORIA_STACK ["Memoria en la Pila (Stack) - Celdas Fijas y Contiguas"]
         direction TB
 
-        subgraph F2 ["Stack Frame: funcion calcular()"]
-            V_Y["<b>y: i32 = 20</b><br/>4 bytes (tamanio fijo)"]
-            V_FLAG["<b>activo: bool = true</b><br/>1 byte (tamanio fijo)"]
+        subgraph CELDA3 ["Variable: notas: [u8; 3] = [10, 20, 30]"]
+            DIR3["Direccion de Memoria: 0x7FFEE4B2A898"]:::dirStyle
+            T3["Tamanio: 3 Bytes (24 bits) contiguos en el Stack"]
+            VAL3["Contenido en Memoria: [ 0x0A (10), 0x14 (20), 0x1E (30) ]"]:::valStyle
         end
 
-        subgraph F1 ["Stack Frame: funcion main()"]
-            V_X["<b>x: i32 = 10</b><br/>4 bytes (tamanio fijo)"]
-            V_ARR["<b>buffer: [u8; 4] = [1, 2, 3, 4]</b><br/>4 bytes contiguos"]
-            V_PTR["<b>s: String (Stack Metadata)</b><br/>ptr: 0x5000 | len: 4 | cap: 4 (24 bytes)"]
+        subgraph CELDA2 ["Variable: activo: bool = true"]
+            DIR2["Direccion de Memoria: 0x7FFEE4B2A894"]:::dirStyle
+            T2["Tamanio: 1 Byte (8 bits) fijo"]
+            VAL2["Contenido en Bits: 00000001 (0x01)"]:::valStyle
+        end
+
+        subgraph CELDA1 ["Variable: edad: i32 = 25"]
+            DIR1["Direccion de Memoria: 0x7FFEE4B2A890"]:::dirStyle
+            T1["Tamanio: 4 Bytes (32 bits) | 1 Byte = 8 bits"]
+            VAL1["Contenido en Bits: 00000000 00000000 00000000 00011001 (0x00000019)"]:::valStyle
         end
     end
 
-    SP["<b>Stack Pointer (SP - CPU)</b><br/>Apunta al tope actual de la pila"]:::spStyle
+    SP["Stack Pointer (SP) de la CPU<br/>Registro de hardware que apunta a la cima actual de la pila"]:::spStyle
+    SP --> CELDA3
 
-    SP --> F2
-    F2 -.->|"Al salir de calcular() (POP / Drop)"| F1
+    REGLA["Por que viven 100% en el Stack?<br/>1. El compilador conoce su tamanio exacto en bytes al compilar.<br/>2. Nunca aumentan ni disminuyen de tamanio en ejecucion.<br/>3. Acceso instantaneo: no existen punteros ni desreferencias externas." ]:::ruleStyle
+
+    MEMORIA_STACK --- REGLA
 
     classDef default fill:#161c28,stroke:#456090,stroke-width:1.5px,color:#ffffff;
-    classDef varStyle fill:#080c12,stroke:#64c8ff,stroke-width:1.5px,color:#64c8ff;
+    classDef dirStyle fill:#080c12,stroke:#64c8ff,stroke-width:1.5px,color:#64c8ff;
+    classDef valStyle fill:#141c2b,stroke:#38bdf8,stroke-width:1px,color:#f8fafc;
     classDef spStyle fill:#2d1b0d,stroke:#ffa032,stroke-width:2px,color:#ffa032;
-
-    class V_Y,V_FLAG,V_X,V_ARR,V_PTR varStyle;
+    classDef ruleStyle fill:#141a24,stroke:#2d3c5a,stroke-width:1.5px,color:#cbd5e1;
