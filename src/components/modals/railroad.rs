@@ -91,10 +91,15 @@ pub fn mostrar_modal_railroad_let(ctx: &egui::Context, state: &mut PortfolioStat
             include_bytes!("../../../diagramas/run_time.svg").as_slice(),
             "bytes://run_time.svg",
         ),
-        _ => (
+        6 => (
             "Arquitectura Memoria Stack",
             include_bytes!("../../../diagramas/diagrama_stack.svg").as_slice(),
             "bytes://diagrama_stack.svg",
+        ),
+        _ => (
+            "Arquitectura Memoria Heap",
+            include_bytes!("../../../diagramas/diagrama_heap.svg").as_slice(),
+            "bytes://diagrama_heap.svg",
         ),
     };
 

@@ -157,7 +157,32 @@ pub fn mostrar_tutorial_strings_ownership(ui: &mut egui::Ui, state: &mut Portfol
                                 state.show_railroad_modal = if state.show_railroad_modal == Some(6) { None } else { Some(6) };
                             }
                         });
-                        ui.label(egui::RichText::new("Heap").strong().color(egui::Color32::WHITE));
+                        ui.horizontal(|ui| {
+                            ui.label(egui::RichText::new("Heap").strong().color(egui::Color32::WHITE));
+                            ui.add_space(4.0);
+                            let btn_color = if state.show_railroad_modal == Some(7) {
+                                egui::Color32::from_rgb(255, 160, 50)
+                            } else {
+                                egui::Color32::from_rgb(180, 190, 205)
+                            };
+                            if ui
+                                .add(
+                                    egui::Button::image(
+                                        egui::Image::from_bytes(
+                                            "bytes://view.svg",
+                                            include_bytes!("../../diagramas/view.svg"),
+                                        )
+                                        .fit_to_exact_size(egui::vec2(18.0, 18.0))
+                                        .tint(btn_color),
+                                    )
+                                    .frame(state.show_railroad_modal == Some(7)),
+                                )
+                                .on_hover_text("Ver diagrama visual de la arquitectura del Heap")
+                                .clicked()
+                            {
+                                state.show_railroad_modal = if state.show_railroad_modal == Some(7) { None } else { Some(7) };
+                            }
+                        });
                         ui.label(egui::RichText::new("Diferencia Técnica").strong().color(egui::Color32::WHITE));
                         ui.end_row();
 
