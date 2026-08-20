@@ -114,14 +114,22 @@ pub fn mostrar_modal_railroad_let(ctx: &egui::Context, state: &mut PortfolioStat
         let (native_w, native_h) = parse_svg_wh(s).unwrap_or((248.0, 704.0));
         let aspect = native_w / native_h.max(1.0);
 
+        let (default_w, default_h) = if aspect >= 1.0 {
+            (840.0, 640.0)
+        } else {
+            (380.0, 720.0)
+        };
+
         window
             .resizable(true)
-            .default_size([380.0, 720.0])
+            .default_size([default_w, default_h])
+            .min_width(360.0)
+            .min_height(300.0)
             .show(ctx, |ui| {
-                egui::ScrollArea::vertical().show(ui, |ui| {
-                    ui.add_space(4.0);
+                egui::ScrollArea::both().show(ui, |ui| {
+                    ui.add_space(6.0);
                     // Aprovechar todo el ancho disponible del modal para que el diagrama se expanda
-                    let avail_w = (ui.available_width() - 8.0).max(240.0);
+                    let avail_w = (ui.available_width() - 12.0).max(native_w.min(800.0));
                     let target_h = avail_w / aspect;
 
                     ui.vertical_centered(|ui| {
@@ -131,7 +139,7 @@ pub fn mostrar_modal_railroad_let(ctx: &egui::Context, state: &mut PortfolioStat
                                 .maintain_aspect_ratio(true),
                         );
                     });
-                    ui.add_space(4.0);
+                    ui.add_space(6.0);
                 });
             });
     } else {
