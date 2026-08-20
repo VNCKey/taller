@@ -1,0 +1,31 @@
+%%{init: {'theme': 'dark', 'themeVariables': { 'darkMode': true, 'background': '#0e121a'}}}%%
+flowchart TD
+    %% ===================================================
+    %% ARQUITECTURA DE MEMORIA STACK (PILA DE EJECUCION)
+    %% ===================================================
+
+    subgraph STACK ["Memoria Stack (Pila) - Acceso LIFO"]
+        direction TB
+
+        subgraph F2 ["Stack Frame: funcion calcular()"]
+            V_Y["<b>y: i32 = 20</b><br/>4 bytes (tamanio fijo)"]
+            V_FLAG["<b>activo: bool = true</b><br/>1 byte (tamanio fijo)"]
+        end
+
+        subgraph F1 ["Stack Frame: funcion main()"]
+            V_X["<b>x: i32 = 10</b><br/>4 bytes (tamanio fijo)"]
+            V_ARR["<b>buffer: [u8; 4] = [1, 2, 3, 4]</b><br/>4 bytes contiguos"]
+            V_PTR["<b>s: String (Stack Metadata)</b><br/>ptr: 0x5000 | len: 4 | cap: 4 (24 bytes)"]
+        end
+    end
+
+    SP["<b>Stack Pointer (SP - CPU)</b><br/>Apunta al tope actual de la pila"]:::spStyle
+
+    SP --> F2
+    F2 -.->|"Al salir de calcular() (POP / Drop)"| F1
+
+    classDef default fill:#161c28,stroke:#456090,stroke-width:1.5px,color:#ffffff;
+    classDef varStyle fill:#080c12,stroke:#64c8ff,stroke-width:1.5px,color:#64c8ff;
+    classDef spStyle fill:#2d1b0d,stroke:#ffa032,stroke-width:2px,color:#ffa032;
+
+    class V_Y,V_FLAG,V_X,V_ARR,V_PTR varStyle;

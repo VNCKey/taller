@@ -1,0 +1,29 @@
+%%{init: {'theme': 'dark', 'themeVariables': { 'darkMode': true, 'background': '#0e121a'}}}%%
+flowchart LR
+    %% ===================================================
+    %% ARQUITECTURA DE MEMORIA HEAP Y VINCULACION CON STACK
+    %% ===================================================
+
+    subgraph STACK ["Stack (Punteros y Metadatos)"]
+        direction TB
+        S_PTR["<b>Variable 'texto' (String)</b><br/>ptr: 0x7FFF0040<br/>len: 4 (bytes usados)<br/>cap: 8 (bytes reservados)"]:::stackNode
+        S_VEC["<b>Variable 'numeros' (Vec&lt;i32&gt;)</b><br/>ptr: 0x7FFF0080<br/>len: 3 | cap: 4"]:::stackNode
+    end
+
+    subgraph HEAP ["Heap (Memoria Dinamica Contigua)"]
+        direction TB
+        subgraph H_TEXTO ["Buffer Heap de 'texto' (0x7FFF0040)"]
+            H_BYTES["['H', 'o', 'l', 'a', _, _, _, _]<br/>Capacidad para crecer sin reubicar"]:::heapNode
+        end
+
+        subgraph H_VEC ["Buffer Heap de 'numeros' (0x7FFF0080)"]
+            H_DATA["[10, 20, 30, _]<br/>Enteros i32 asignados en runtime"]:::heapNode
+        end
+    end
+
+    S_PTR ==>|"Puntero 64-bit (0x7FFF0040)"| H_BYTES
+    S_VEC ==>|"Puntero 64-bit (0x7FFF0080)"| H_DATA
+
+    classDef default fill:#161c28,stroke:#456090,stroke-width:1.5px,color:#ffffff;
+    classDef stackNode fill:#080c12,stroke:#64c8ff,stroke-width:2px,color:#64c8ff;
+    classDef heapNode fill:#2d1b0d,stroke:#ffa032,stroke-width:2px,color:#ffa032;
