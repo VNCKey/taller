@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 535" width="760" height="535" style="background-color: #0e121a; font-family: 'DejaVu Sans', Arial, sans-serif;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 740 480" width="740" height="480" style="font-family: 'DejaVu Sans', Arial, sans-serif;">
   <style>
     text, tspan { stroke: none !important; stroke-width: 0 !important; }
     .title-main { font-size: 14px; font-weight: bold; fill: #64c8ff; }
@@ -20,25 +20,23 @@
   </defs>
 
   <!-- ================= STACK POINTER (SP) ================= -->
-  <g transform="translate(255, 20)">
-    <rect x="0" y="0" width="250" height="46" rx="8" fill="#26180a" stroke="#ffa032" stroke-width="1.8"/>
-    <text x="125" y="20" text-anchor="middle" class="sp-title">Stack Pointer (SP - CPU)</text>
-    <text x="125" y="36" text-anchor="middle" class="sp-sub">Apunta al tope actual de la pila</text>
+  <g transform="translate(245, 10)">
+    <rect x="0" y="0" width="250" height="44" rx="8" fill="#26180a" stroke="#ffa032" stroke-width="1.8"/>
+    <text x="125" y="19" text-anchor="middle" class="sp-title">Stack Pointer (SP - CPU)</text>
+    <text x="125" y="34" text-anchor="middle" class="sp-sub">Apunta a la cima actual de la pila</text>
   </g>
 
   <!-- Flecha desde SP hacia la cima del Stack -->
-  <line x1="380" y1="66" x2="380" y2="108" stroke="#ffa032" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrow-sp)"/>
+  <line x1="370" y1="54" x2="370" y2="88" stroke="#ffa032" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrow-sp)"/>
 
-  <!-- ================= CONTENEDOR PRINCIPAL: STACK ================= -->
-  <rect x="40" y="115" width="680" height="395" rx="10" fill="#101520" stroke="#324468" stroke-width="1.5"/>
-  
-  <text x="60" y="142" class="title-main">STACK (Memoria en Pila - LIFO)</text>
-  <text x="60" y="160" class="subtitle">Celdas fijas contiguas asignadas en tiempo de compilacion sin punteros externos</text>
+  <!-- ================= TITULO DEL STACK ================= -->
+  <text x="20" y="80" class="title-main">STACK (Memoria en Pila - LIFO)</text>
+  <text x="20" y="98" class="subtitle">Celdas de memoria de tamanio fijo asignadas contiguamente sin punteros externos</text>
 
   <!-- ================= VARIABLE 2: activo: bool = true (CIMA DE PILA) ================= -->
-  <g transform="translate(60, 175)">
+  <g transform="translate(10, 115)">
     <!-- Marco de la variable -->
-    <rect x="0" y="0" width="640" height="135" rx="8" fill="#141c2b" stroke="#2d3c5a" stroke-width="1.2"/>
+    <rect x="0" y="0" width="720" height="135" rx="8" fill="#141c2b" stroke="#2d3c5a" stroke-width="1.2"/>
     
     <!-- Encabezado de la variable -->
     <rect x="15" y="10" width="220" height="24" rx="4" fill="#080c12" stroke="#64c8ff" stroke-width="1"/>
@@ -46,33 +44,33 @@
 
     <!-- Sub-caja 1: Direccion -->
     <g transform="translate(15, 45)">
-      <rect x="0" y="0" width="190" height="75" rx="6" fill="#080c12" stroke="#64c8ff" stroke-width="1.2"/>
-      <text x="95" y="24" text-anchor="middle" class="label-meta">DIRECCION DE MEMORIA</text>
-      <text x="95" y="48" text-anchor="middle" class="val-code">0x7FFEE4B2A894</text>
-      <text x="95" y="64" text-anchor="middle" class="label-meta">Tope actual (SP)</text>
+      <rect x="0" y="0" width="215" height="75" rx="6" fill="#080c12" stroke="#64c8ff" stroke-width="1.2"/>
+      <text x="107" y="24" text-anchor="middle" class="label-meta">DIRECCION DE MEMORIA</text>
+      <text x="107" y="48" text-anchor="middle" class="val-code">0x7FFEE4B2A894</text>
+      <text x="107" y="64" text-anchor="middle" class="label-meta">Tope de la pila (SP)</text>
     </g>
 
     <!-- Sub-caja 2: Tamanio -->
-    <g transform="translate(225, 45)">
-      <rect x="0" y="0" width="190" height="75" rx="6" fill="#080c12" stroke="#456090" stroke-width="1.2"/>
-      <text x="95" y="24" text-anchor="middle" class="label-meta">TAMANIO EXACTO</text>
-      <text x="95" y="48" text-anchor="middle" class="val-size">1 Byte (8 bits)</text>
-      <text x="95" y="64" text-anchor="middle" class="label-meta">Tamanio fijo en compilacion</text>
+    <g transform="translate(250, 45)">
+      <rect x="0" y="0" width="215" height="75" rx="6" fill="#080c12" stroke="#456090" stroke-width="1.2"/>
+      <text x="107" y="24" text-anchor="middle" class="label-meta">TAMANIO EXACTO</text>
+      <text x="107" y="48" text-anchor="middle" class="val-size">1 Byte (8 bits)</text>
+      <text x="107" y="64" text-anchor="middle" class="label-meta">Tamanio fijo en compilacion</text>
     </g>
 
     <!-- Sub-caja 3: Valor Binario / Hex -->
-    <g transform="translate(435, 45)">
-      <rect x="0" y="0" width="190" height="75" rx="6" fill="#080c12" stroke="#38bdf8" stroke-width="1.2"/>
-      <text x="95" y="24" text-anchor="middle" class="label-meta">CONTENIDO EN BYTES</text>
-      <text x="95" y="46" text-anchor="middle" class="val-code">00000001</text>
-      <text x="95" y="64" text-anchor="middle" class="val-hex">Hex: 0x01 (true)</text>
+    <g transform="translate(485, 45)">
+      <rect x="0" y="0" width="220" height="75" rx="6" fill="#080c12" stroke="#38bdf8" stroke-width="1.2"/>
+      <text x="110" y="24" text-anchor="middle" class="label-meta">CONTENIDO EN MEMORIA</text>
+      <text x="110" y="46" text-anchor="middle" class="val-code">00000001</text>
+      <text x="110" y="64" text-anchor="middle" class="val-hex">Hex: 0x01 (true)</text>
     </g>
   </g>
 
   <!-- ================= VARIABLE 1: edad: i32 = 25 (BASE DE PILA) ================= -->
-  <g transform="translate(60, 325)">
+  <g transform="translate(10, 265)">
     <!-- Marco de la variable -->
-    <rect x="0" y="0" width="640" height="165" rx="8" fill="#141c2b" stroke="#2d3c5a" stroke-width="1.2"/>
+    <rect x="0" y="0" width="720" height="165" rx="8" fill="#141c2b" stroke="#2d3c5a" stroke-width="1.2"/>
     
     <!-- Encabezado de la variable -->
     <rect x="15" y="10" width="220" height="24" rx="4" fill="#080c12" stroke="#64c8ff" stroke-width="1"/>
@@ -80,29 +78,29 @@
 
     <!-- Sub-caja 1: Direccion -->
     <g transform="translate(15, 45)">
-      <rect x="0" y="0" width="190" height="105" rx="6" fill="#080c12" stroke="#64c8ff" stroke-width="1.2"/>
-      <text x="95" y="24" text-anchor="middle" class="label-meta">DIRECCION DE MEMORIA</text>
-      <text x="95" y="52" text-anchor="middle" class="val-code">0x7FFEE4B2A890</text>
-      <text x="95" y="76" text-anchor="middle" class="label-meta">4 bytes contiguos</text>
-      <text x="95" y="92" text-anchor="middle" class="label-meta">(0x890 a 0x893)</text>
+      <rect x="0" y="0" width="215" height="105" rx="6" fill="#080c12" stroke="#64c8ff" stroke-width="1.2"/>
+      <text x="107" y="24" text-anchor="middle" class="label-meta">DIRECCION DE MEMORIA</text>
+      <text x="107" y="52" text-anchor="middle" class="val-code">0x7FFEE4B2A890</text>
+      <text x="107" y="76" text-anchor="middle" class="label-meta">4 bytes contiguos</text>
+      <text x="107" y="92" text-anchor="middle" class="label-meta">(0x890 a 0x893)</text>
     </g>
 
     <!-- Sub-caja 2: Tamanio -->
-    <g transform="translate(225, 45)">
-      <rect x="0" y="0" width="190" height="105" rx="6" fill="#080c12" stroke="#456090" stroke-width="1.2"/>
-      <text x="95" y="24" text-anchor="middle" class="label-meta">TAMANIO EXACTO</text>
-      <text x="95" y="52" text-anchor="middle" class="val-size">4 Bytes (32 bits)</text>
-      <text x="95" y="76" text-anchor="middle" class="label-meta">1 Byte = 8 bits</text>
-      <text x="95" y="92" text-anchor="middle" class="label-meta">4 * 8 = 32 bits fijos</text>
+    <g transform="translate(250, 45)">
+      <rect x="0" y="0" width="215" height="105" rx="6" fill="#080c12" stroke="#456090" stroke-width="1.2"/>
+      <text x="107" y="24" text-anchor="middle" class="label-meta">TAMANIO EXACTO</text>
+      <text x="107" y="52" text-anchor="middle" class="val-size">4 Bytes (32 bits)</text>
+      <text x="107" y="76" text-anchor="middle" class="label-meta">1 Byte = 8 bits</text>
+      <text x="107" y="92" text-anchor="middle" class="label-meta">4 * 8 = 32 bits fijos</text>
     </g>
 
     <!-- Sub-caja 3: Valor Binario / Hex -->
-    <g transform="translate(435, 45)">
-      <rect x="0" y="0" width="190" height="105" rx="6" fill="#080c12" stroke="#38bdf8" stroke-width="1.2"/>
-      <text x="95" y="22" text-anchor="middle" class="label-meta">CONTENIDO EN BYTES</text>
-      <text x="95" y="42" text-anchor="middle" class="val-code">00000000 00000000</text>
-      <text x="95" y="60" text-anchor="middle" class="val-code">00000000 00011001</text>
-      <text x="95" y="86" text-anchor="middle" class="val-hex">Hex: 0x00000019 (25)</text>
+    <g transform="translate(485, 45)">
+      <rect x="0" y="0" width="220" height="105" rx="6" fill="#080c12" stroke="#38bdf8" stroke-width="1.2"/>
+      <text x="110" y="22" text-anchor="middle" class="label-meta">CONTENIDO EN MEMORIA</text>
+      <text x="110" y="42" text-anchor="middle" class="val-code">00000000 00000000</text>
+      <text x="110" y="60" text-anchor="middle" class="val-code">00000000 00011001</text>
+      <text x="110" y="86" text-anchor="middle" class="val-hex">Hex: 0x00000019 (25)</text>
     </g>
   </g>
 </svg>
