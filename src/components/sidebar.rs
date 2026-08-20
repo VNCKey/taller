@@ -88,12 +88,12 @@ pub fn mostrar_sidebar(ui: &mut egui::Ui, state: &mut PortfolioState) {
                     state.ruta_actual = AppRoute::Comenzando;
                 }
 
-                // 3. Strings & Ownership (reglas de memoria + String/&str)
+                // 3. Memoria & Ownership (reglas de memoria + String/&str)
                 if ui
                     .selectable_label(
                         state.ruta_actual == AppRoute::TutorialOwnership
                             || state.ruta_actual == AppRoute::TutorialStrings,
-                        "Strings & Ownership",
+                        "Memoria & Ownership",
                     )
                     .clicked()
                 {
