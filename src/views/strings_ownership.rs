@@ -132,7 +132,7 @@ pub fn mostrar_tutorial_strings_ownership(ui: &mut egui::Ui, state: &mut Portfol
                     .show(ui, |ui| {
                         ui.label(egui::RichText::new("Aspecto").strong().color(egui::Color32::WHITE));
                         ui.horizontal(|ui| {
-                            ui.label(egui::RichText::new("Stack (Pila)").strong().color(egui::Color32::WHITE));
+                            ui.label(egui::RichText::new("Stack").strong().color(egui::Color32::WHITE));
                             ui.add_space(4.0);
                             let btn_color = if state.show_railroad_modal == Some(6) {
                                 egui::Color32::from_rgb(255, 160, 50)
@@ -157,7 +157,7 @@ pub fn mostrar_tutorial_strings_ownership(ui: &mut egui::Ui, state: &mut Portfol
                                 state.show_railroad_modal = if state.show_railroad_modal == Some(6) { None } else { Some(6) };
                             }
                         });
-                        ui.label(egui::RichText::new("Heap (Montículo)").strong().color(egui::Color32::WHITE));
+                        ui.label(egui::RichText::new("Heap").strong().color(egui::Color32::WHITE));
                         ui.label(egui::RichText::new("Diferencia Técnica").strong().color(egui::Color32::WHITE));
                         ui.end_row();
 
@@ -172,13 +172,13 @@ pub fn mostrar_tutorial_strings_ownership(ui: &mut egui::Ui, state: &mut Portfol
                         ui.label(egui::RichText::new("Velocidad de Acceso").strong().color(egui::Color32::from_rgb(255, 160, 50)));
                         ui.label("Ultra rápida (Costo cero de asignación)");
                         ui.label("Más lenta (Búsqueda de dirección + puntero)");
-                        ui.label("Stack solo mueve el puntero de pila (Stack Pointer).");
+                        ui.label("Stack solo mueve el registro Stack Pointer (SP).");
                         ui.end_row();
 
                         // Fila 3: Organización
                         ui.label(egui::RichText::new("Estructura de Memoria").strong().color(egui::Color32::from_rgb(255, 160, 50)));
                         ui.label("LIFO (Last In, First Out)");
-                        ui.label("Bloques dispersos asignados por el OS");
+                        ui.label("Bloques contiguos asignados por el OS");
                         ui.label("Heap requiere punteros en Stack que guarden su dirección.");
                         ui.end_row();
 
@@ -193,97 +193,30 @@ pub fn mostrar_tutorial_strings_ownership(ui: &mut egui::Ui, state: &mut Portfol
 
             ui.add_space(14.0);
 
-            // Dos Columnas: Stack vs Heap
+            // Sección Especial: String como puente entre Stack y Heap
             ui.columns(2, |cols| {
-                // Columna Izquierda: Stack
-                let mut stack_frame = egui::Frame::new();
-                stack_frame.fill = egui::Color32::from_rgb(14, 18, 26);
-                stack_frame.inner_margin = egui::Margin::same(12);
-                stack_frame.corner_radius = egui::CornerRadius::same(8);
-                stack_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 60, 90));
+                // Columna Izquierda: Arquitectura de String
+                let mut string_frame = egui::Frame::new();
+                string_frame.fill = egui::Color32::from_rgb(14, 18, 26);
+                string_frame.inner_margin = egui::Margin::same(12);
+                string_frame.corner_radius = egui::CornerRadius::same(8);
+                string_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 60, 90));
 
-                stack_frame.show(&mut cols[0], |ui| {
-                    ui.horizontal(|ui| {
-                        ui.label(
-                            egui::RichText::new("La Pila (Stack)")
-                                .strong()
-                                .size(15.0)
-                                .color(egui::Color32::from_rgb(255, 160, 50)),
-                        );
-                        ui.add_space(4.0);
-                        let btn_color = if state.show_railroad_modal == Some(6) {
-                            egui::Color32::from_rgb(255, 160, 50)
-                        } else {
-                            egui::Color32::from_rgb(180, 190, 205)
-                        };
-                        if ui
-                            .add(
-                                egui::Button::image(
-                                    egui::Image::from_bytes(
-                                        "bytes://view.svg",
-                                        include_bytes!("../../diagramas/view.svg"),
-                                    )
-                                    .fit_to_exact_size(egui::vec2(18.0, 18.0))
-                                    .tint(btn_color),
-                                )
-                                .frame(state.show_railroad_modal == Some(6)),
-                            )
-                            .on_hover_text("Ver diagrama visual de la arquitectura del Stack")
-                            .clicked()
-                        {
-                            state.show_railroad_modal = if state.show_railroad_modal == Some(6) { None } else { Some(6) };
-                        }
-                    });
-                    ui.add_space(6.0);
+                string_frame.show(&mut cols[0], |ui| {
                     ui.label(
-                        "Almacena variables locales cuyo tamaño exacto en bytes se conoce al compilar:",
-                    );
-                    ui.add_space(4.0);
-                    ui.label("• Enteros, booleanos, flotantes, caracteres y arrays fijos.");
-                    ui.label("• Punteros a datos dinámicos (dirección, longitud y capacidad).");
-                    ui.label("• Asignar y desasignar solo requiere mover un registro de CPU.");
-                    ui.add_space(8.0);
-
-                    // Contenedor de Código estilo IDE
-                    let mut code_box = egui::Frame::new();
-                    code_box.fill = egui::Color32::from_rgb(8, 12, 18);
-                    code_box.inner_margin = egui::Margin::same(10);
-                    code_box.corner_radius = egui::CornerRadius::same(6);
-                    code_box.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(35, 50, 75));
-
-                    code_box.show(ui, |ui| {
-                        ui.spacing_mut().item_spacing.y = 2.0;
-                        ui.label(egui::RichText::new("fn main() {").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
-                        ui.indent("stack_code_inner", |ui| {
-                            ui.label(egui::RichText::new("let a: i32 = 42; // 4 bytes en Stack").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
-                            ui.label(egui::RichText::new("let arr: [u8; 3] = [1, 2, 3]; // 3 bytes en Stack").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
-                        });
-                        ui.label(egui::RichText::new("} // Memoria liberada al instante").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
-                    });
-                });
-
-                // Columna Derecha: Heap
-                let mut heap_frame = egui::Frame::new();
-                heap_frame.fill = egui::Color32::from_rgb(14, 18, 26);
-                heap_frame.inner_margin = egui::Margin::same(12);
-                heap_frame.corner_radius = egui::CornerRadius::same(8);
-                heap_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 60, 90));
-
-                heap_frame.show(&mut cols[1], |ui| {
-                    ui.label(
-                        egui::RichText::new("El Montículo (Heap)")
+                        egui::RichText::new("String: El Puente entre Stack y Heap")
                             .strong()
                             .size(15.0)
                             .color(egui::Color32::from_rgb(255, 160, 50)),
                     );
                     ui.add_space(6.0);
                     ui.label(
-                        "Almacena estructuras de datos dinámicas que pueden crecer en tiempo de ejecución:",
+                        "El tipo String demuestra perfectamente la colaboración entre ambas memorias:",
                     );
                     ui.add_space(4.0);
-                    ui.label("• Strings modificables (`String`), vectores (`Vec<T>`), Boxes.");
-                    ui.label("• El sistema operativo busca un bloque contiguo libre y devuelve un puntero.");
-                    ui.label("• Al salir de scope, el dueño en Stack libera el bloque en Heap automáticamente.");
+                    ui.label("• En el Stack: Vive una tarjeta fija de 24 bytes (ptr: 8B, len: 8B, cap: 8B).");
+                    ui.label("• En el Heap: Viven los bytes reales del texto asignados dinámicamente.");
+                    ui.label("• Al salir de scope: El Stack ejecuta drop() y desasigna el bloque en Heap.");
                     ui.add_space(8.0);
 
                     // Contenedor de Código estilo IDE
@@ -296,11 +229,56 @@ pub fn mostrar_tutorial_strings_ownership(ui: &mut egui::Ui, state: &mut Portfol
                     code_box.show(ui, |ui| {
                         ui.spacing_mut().item_spacing.y = 2.0;
                         ui.label(egui::RichText::new("fn main() {").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
-                        ui.indent("heap_code_inner", |ui| {
-                            ui.label(egui::RichText::new("let mut s = String::from(\"Hola\"); // Buffer en Heap").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
-                            ui.label(egui::RichText::new("s.push_str(\" Rust\"); // Crece dinamicamente").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+                        ui.indent("string_stack_heap_code", |ui| {
+                            ui.label(egui::RichText::new("let mut s = String::from(\"Hola\"); // 24B Stack -> Heap").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+                            ui.label(egui::RichText::new("s.push_str(\" Rust\"); // Crece dinamicamente en Heap").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+                            ui.label(egui::RichText::new("println!(\"{s}\"); // Imprime: Hola Rust").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
                         });
-                        ui.label(egui::RichText::new("} // drop() libera el buffer en Heap").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+                        ui.label(egui::RichText::new("} // drop() libera el Heap automaticamente").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+                    });
+                });
+
+                // Columna Derecha: ¿Por qué no vive 100% en el Stack?
+                let mut why_frame = egui::Frame::new();
+                why_frame.fill = egui::Color32::from_rgb(14, 18, 26);
+                why_frame.inner_margin = egui::Margin::same(12);
+                why_frame.corner_radius = egui::CornerRadius::same(8);
+                why_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 60, 90));
+
+                why_frame.show(&mut cols[1], |ui| {
+                    ui.label(
+                        egui::RichText::new("¿Por qué no vive 100% en el Stack?")
+                            .strong()
+                            .size(15.0)
+                            .color(egui::Color32::from_rgb(255, 160, 50)),
+                    );
+                    ui.add_space(6.0);
+                    ui.label(
+                        "El Stack exige que el tamaño de toda variable sea fijo e inmutable en compilación:",
+                    );
+                    ui.add_space(4.0);
+                    ui.label("• Un String puede recibir texto de un usuario o archivo en tiempo de ejecución.");
+                    ui.label("• Si creciera en el Stack, obligaría a desplazar todas las variables vecinas.");
+                    ui.label("• Delegar el buffer al Heap permite crecer con realloc() sin mover el Stack.");
+                    ui.add_space(8.0);
+
+                    // Contenedor de Código estilo IDE
+                    let mut code_box = egui::Frame::new();
+                    code_box.fill = egui::Color32::from_rgb(8, 12, 18);
+                    code_box.inner_margin = egui::Margin::same(10);
+                    code_box.corner_radius = egui::CornerRadius::same(6);
+                    code_box.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(35, 50, 75));
+
+                    code_box.show(ui, |ui| {
+                        ui.spacing_mut().item_spacing.y = 2.0;
+                        ui.label(egui::RichText::new("// Estructura interna de String en Stack (24 bytes):").monospace().size(12.0).color(egui::Color32::from_rgb(140, 150, 165)));
+                        ui.label(egui::RichText::new("struct String {").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+                        ui.indent("string_struct_fields", |ui| {
+                            ui.label(egui::RichText::new("ptr: *mut u8, // Puntero de 8B hacia el Heap").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+                            ui.label(egui::RichText::new("len: usize,   // 8B: Longitud usada (bytes)").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+                            ui.label(egui::RichText::new("cap: usize,   // 8B: Capacidad reservada").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+                        });
+                        ui.label(egui::RichText::new("}").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
                     });
                 });
             });
