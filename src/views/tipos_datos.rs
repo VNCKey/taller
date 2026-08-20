@@ -355,6 +355,118 @@ pub fn mostrar_categoria_caracteres(ui: &mut egui::Ui) {
     });
 }
 
+pub fn mostrar_categoria_casting(ui: &mut egui::Ui) {
+    ui.label("En Rust NO existe la coerción implícita de tipos (conversión automática silenciosa). Para operar o transformar tipos primitivos diferentes se requiere un casting explícito usando la palabra clave 'as'.");
+    ui.add_space(10.0);
+
+    let mut frame = egui::Frame::new();
+    frame.fill = egui::Color32::from_rgb(14, 18, 26);
+    frame.inner_margin = egui::Margin::same(12);
+    frame.corner_radius = egui::CornerRadius::same(8);
+    frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 60, 90));
+
+    frame.show(ui, |ui| {
+        egui::Grid::new("grid_tipos_casting")
+            .striped(true)
+            .spacing([20.0, 8.0])
+            .show(ui, |ui| {
+                ui.label(egui::RichText::new("Conversión").strong().color(egui::Color32::WHITE));
+                ui.label(egui::RichText::new("Sintaxis con 'as'").strong().color(egui::Color32::WHITE));
+                ui.label(egui::RichText::new("Comportamiento").strong().color(egui::Color32::WHITE));
+                ui.label(egui::RichText::new("Ejemplo de Código").strong().color(egui::Color32::WHITE));
+                ui.end_row();
+
+                // Fila 1: Entero a Flotante
+                ui.label(egui::RichText::new("Entero a Decimal").strong().color(egui::Color32::from_rgb(255, 160, 50)));
+                ui.label(egui::RichText::new("i32 as f64").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.label("Conversión exacta sin pérdida de datos.");
+                ui.label(egui::RichText::new("let a: i32 = 10;\nlet b = a as f64 + 0.5;").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.end_row();
+
+                // Fila 2: Flotante a Entero
+                ui.label(egui::RichText::new("Decimal a Entero").strong().color(egui::Color32::from_rgb(255, 160, 50)));
+                ui.label(egui::RichText::new("f64 as i32").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.label("Trunca la parte decimal (redondeo hacia cero).");
+                ui.label(egui::RichText::new("let pi: f64 = 3.1415;\nlet entero = pi as i32; // Vale 3").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.end_row();
+
+                // Fila 3: Entero a usize
+                ui.label(egui::RichText::new("Entero a Índice").strong().color(egui::Color32::from_rgb(255, 160, 50)));
+                ui.label(egui::RichText::new("u32 as usize").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.label("Permite indexar arrays y slices con seguridad.");
+                ui.label(egui::RichText::new("let pos: u8 = 2;\nlet val = array[pos as usize];").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.end_row();
+            });
+    });
+
+    ui.add_space(14.0);
+
+    // Tarjeta con Código explicativo de por qué falla la coerción implícita
+    ui.columns(2, |cols| {
+        let mut card_err = egui::Frame::new();
+        card_err.fill = egui::Color32::from_rgb(14, 18, 26);
+        card_err.inner_margin = egui::Margin::same(12);
+        card_err.corner_radius = egui::CornerRadius::same(8);
+        card_err.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 60, 90));
+
+        card_err.show(&mut cols[0], |ui| {
+            ui.label(
+                egui::RichText::new("❌ Coerción Implícita (Prohibida)")
+                    .strong()
+                    .size(15.0)
+                    .color(egui::Color32::from_rgb(255, 160, 50)),
+            );
+            ui.add_space(6.0);
+            ui.label("Rust previene bugs sutiles exigiendo que ambos operandos tengan exactamente el mismo tipo:");
+            ui.add_space(8.0);
+
+            let mut code_box = egui::Frame::new();
+            code_box.fill = egui::Color32::from_rgb(8, 12, 18);
+            code_box.inner_margin = egui::Margin::same(10);
+            code_box.corner_radius = egui::CornerRadius::same(6);
+            code_box.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(35, 50, 75));
+
+            code_box.show(ui, |ui| {
+                ui.spacing_mut().item_spacing.y = 2.0;
+                ui.label(egui::RichText::new("let x: i32 = 10;").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.label(egui::RichText::new("let y: f64 = 2.5;").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.label(egui::RichText::new("// let z = x + y; // ❌ Error: mismatched types").monospace().size(12.0).color(egui::Color32::from_rgb(140, 160, 185)));
+            });
+        });
+
+        let mut card_ok = egui::Frame::new();
+        card_ok.fill = egui::Color32::from_rgb(14, 18, 26);
+        card_ok.inner_margin = egui::Margin::same(12);
+        card_ok.corner_radius = egui::CornerRadius::same(8);
+        card_ok.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 60, 90));
+
+        card_ok.show(&mut cols[1], |ui| {
+            ui.label(
+                egui::RichText::new("✔️ Casting Explícito con 'as'")
+                    .strong()
+                    .size(15.0)
+                    .color(egui::Color32::from_rgb(255, 160, 50)),
+            );
+            ui.add_space(6.0);
+            ui.label("Al indicar explícitamente la conversión, el desarrollador asume el control del tipo resultante:");
+            ui.add_space(8.0);
+
+            let mut code_box = egui::Frame::new();
+            code_box.fill = egui::Color32::from_rgb(8, 12, 18);
+            code_box.inner_margin = egui::Margin::same(10);
+            code_box.corner_radius = egui::CornerRadius::same(6);
+            code_box.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(35, 50, 75));
+
+            code_box.show(ui, |ui| {
+                ui.spacing_mut().item_spacing.y = 2.0;
+                ui.label(egui::RichText::new("let x: i32 = 10;").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.label(egui::RichText::new("let y: f64 = 2.5;").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.label(egui::RichText::new("let z = (x as f64) + y; // ✔️ Válido (12.5)").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
+            });
+        });
+    });
+}
+
 
 #[allow(dead_code)]
 pub fn mostrar_macro_println(ui: &mut egui::Ui, state: &mut PortfolioState) {
