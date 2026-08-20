@@ -82,14 +82,19 @@ pub fn mostrar_modal_railroad_let(ctx: &egui::Context, state: &mut PortfolioStat
             "bytes://diagrama_lib.svg",
         ),
         4 => (
-            "Tiempo de Compilación (Compile Time)",
+            "Compile Time",
             include_bytes!("../../../diagramas/compile_time.svg").as_slice(),
             "bytes://compile_time.svg",
         ),
-        _ => (
-            "Tiempo de Ejecución (Run Time)",
+        5 => (
+            "Run Time",
             include_bytes!("../../../diagramas/run_time.svg").as_slice(),
             "bytes://run_time.svg",
+        ),
+        _ => (
+            "Arquitectura Memoria Stack",
+            include_bytes!("../../../diagramas/diagrama_stack.svg").as_slice(),
+            "bytes://diagrama_stack.svg",
         ),
     };
 

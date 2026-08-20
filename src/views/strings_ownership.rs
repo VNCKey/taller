@@ -128,7 +128,32 @@ pub fn mostrar_tutorial_strings_ownership(ui: &mut egui::Ui, state: &mut Portfol
                     .spacing([20.0, 8.0])
                     .show(ui, |ui| {
                         ui.label(egui::RichText::new("Aspecto").strong().color(egui::Color32::WHITE));
-                        ui.label(egui::RichText::new("Stack (Pila)").strong().color(egui::Color32::WHITE));
+                        ui.horizontal(|ui| {
+                            ui.label(egui::RichText::new("Stack (Pila)").strong().color(egui::Color32::WHITE));
+                            ui.add_space(4.0);
+                            let btn_color = if state.show_railroad_modal == Some(6) {
+                                egui::Color32::from_rgb(255, 160, 50)
+                            } else {
+                                egui::Color32::from_rgb(180, 190, 205)
+                            };
+                            if ui
+                                .add(
+                                    egui::Button::image(
+                                        egui::Image::from_bytes(
+                                            "bytes://view.svg",
+                                            include_bytes!("../../diagramas/view.svg"),
+                                        )
+                                        .fit_to_exact_size(egui::vec2(18.0, 18.0))
+                                        .tint(btn_color),
+                                    )
+                                    .frame(state.show_railroad_modal == Some(6)),
+                                )
+                                .on_hover_text("Ver diagrama visual de la arquitectura del Stack")
+                                .clicked()
+                            {
+                                state.show_railroad_modal = if state.show_railroad_modal == Some(6) { None } else { Some(6) };
+                            }
+                        });
                         ui.label(egui::RichText::new("Heap (Montículo)").strong().color(egui::Color32::WHITE));
                         ui.label(egui::RichText::new("Diferencia Técnica").strong().color(egui::Color32::WHITE));
                         ui.end_row();
@@ -175,12 +200,37 @@ pub fn mostrar_tutorial_strings_ownership(ui: &mut egui::Ui, state: &mut Portfol
                 stack_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 60, 90));
 
                 stack_frame.show(&mut cols[0], |ui| {
-                    ui.label(
-                        egui::RichText::new("La Pila (Stack)")
-                            .strong()
-                            .size(15.0)
-                            .color(egui::Color32::from_rgb(255, 160, 50)),
-                    );
+                    ui.horizontal(|ui| {
+                        ui.label(
+                            egui::RichText::new("La Pila (Stack)")
+                                .strong()
+                                .size(15.0)
+                                .color(egui::Color32::from_rgb(255, 160, 50)),
+                        );
+                        ui.add_space(4.0);
+                        let btn_color = if state.show_railroad_modal == Some(6) {
+                            egui::Color32::from_rgb(255, 160, 50)
+                        } else {
+                            egui::Color32::from_rgb(180, 190, 205)
+                        };
+                        if ui
+                            .add(
+                                egui::Button::image(
+                                    egui::Image::from_bytes(
+                                        "bytes://view.svg",
+                                        include_bytes!("../../diagramas/view.svg"),
+                                    )
+                                    .fit_to_exact_size(egui::vec2(18.0, 18.0))
+                                    .tint(btn_color),
+                                )
+                                .frame(state.show_railroad_modal == Some(6)),
+                            )
+                            .on_hover_text("Ver diagrama visual de la arquitectura del Stack")
+                            .clicked()
+                        {
+                            state.show_railroad_modal = if state.show_railroad_modal == Some(6) { None } else { Some(6) };
+                        }
+                    });
                     ui.add_space(6.0);
                     ui.label(
                         "Almacena variables locales cuyo tamaño exacto en bytes se conoce al compilar:",
