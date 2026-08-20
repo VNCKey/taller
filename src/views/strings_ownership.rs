@@ -57,7 +57,7 @@ pub fn mostrar_tutorial_strings_ownership(ui: &mut egui::Ui, state: &mut Portfol
             if ui
                 .add(
                     egui::Button::new(
-                        egui::RichText::new("Simulador Memoria")
+                        egui::RichText::new("String")
                             .strong()
                             .color(color),
                     )
@@ -69,7 +69,7 @@ pub fn mostrar_tutorial_strings_ownership(ui: &mut egui::Ui, state: &mut Portfol
             }
             ui.add_space(4.0);
             ui.label(
-                egui::RichText::new("Visual:")
+                egui::RichText::new("Teórico:")
                     .small()
                     .color(egui::Color32::from_rgb(140, 150, 165)),
             );
@@ -189,98 +189,6 @@ pub fn mostrar_tutorial_strings_ownership(ui: &mut egui::Ui, state: &mut Portfol
                         ui.label("Rust ejecuta drop() cuando el dueño en Stack sale de scope.");
                         ui.end_row();
                     });
-            });
-
-            ui.add_space(14.0);
-
-            // Sección Especial: String como puente entre Stack y Heap
-            ui.columns(2, |cols| {
-                // Columna Izquierda: Arquitectura de String
-                let mut string_frame = egui::Frame::new();
-                string_frame.fill = egui::Color32::from_rgb(14, 18, 26);
-                string_frame.inner_margin = egui::Margin::same(12);
-                string_frame.corner_radius = egui::CornerRadius::same(8);
-                string_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 60, 90));
-
-                string_frame.show(&mut cols[0], |ui| {
-                    ui.label(
-                        egui::RichText::new("String: El Puente entre Stack y Heap")
-                            .strong()
-                            .size(15.0)
-                            .color(egui::Color32::from_rgb(255, 160, 50)),
-                    );
-                    ui.add_space(6.0);
-                    ui.label(
-                        "El tipo String demuestra perfectamente la colaboración entre ambas memorias:",
-                    );
-                    ui.add_space(4.0);
-                    ui.label("• En el Stack: Vive una tarjeta fija de 24 bytes (ptr: 8B, len: 8B, cap: 8B).");
-                    ui.label("• En el Heap: Viven los bytes reales del texto asignados dinámicamente.");
-                    ui.label("• Al salir de scope: El Stack ejecuta drop() y desasigna el bloque en Heap.");
-                    ui.add_space(8.0);
-
-                    // Contenedor de Código estilo IDE
-                    let mut code_box = egui::Frame::new();
-                    code_box.fill = egui::Color32::from_rgb(8, 12, 18);
-                    code_box.inner_margin = egui::Margin::same(10);
-                    code_box.corner_radius = egui::CornerRadius::same(6);
-                    code_box.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(35, 50, 75));
-
-                    code_box.show(ui, |ui| {
-                        ui.spacing_mut().item_spacing.y = 2.0;
-                        ui.label(egui::RichText::new("fn main() {").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
-                        ui.indent("string_stack_heap_code", |ui| {
-                            ui.label(egui::RichText::new("let mut s = String::from(\"Hola\"); // 24B Stack -> Heap").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
-                            ui.label(egui::RichText::new("s.push_str(\" Rust\"); // Crece dinamicamente en Heap").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
-                            ui.label(egui::RichText::new("println!(\"{s}\"); // Imprime: Hola Rust").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
-                        });
-                        ui.label(egui::RichText::new("} // drop() libera el Heap automaticamente").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
-                    });
-                });
-
-                // Columna Derecha: ¿Por qué no vive 100% en el Stack?
-                let mut why_frame = egui::Frame::new();
-                why_frame.fill = egui::Color32::from_rgb(14, 18, 26);
-                why_frame.inner_margin = egui::Margin::same(12);
-                why_frame.corner_radius = egui::CornerRadius::same(8);
-                why_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 60, 90));
-
-                why_frame.show(&mut cols[1], |ui| {
-                    ui.label(
-                        egui::RichText::new("¿Por qué no vive 100% en el Stack?")
-                            .strong()
-                            .size(15.0)
-                            .color(egui::Color32::from_rgb(255, 160, 50)),
-                    );
-                    ui.add_space(6.0);
-                    ui.label(
-                        "El Stack exige que el tamaño de toda variable sea fijo e inmutable en compilación:",
-                    );
-                    ui.add_space(4.0);
-                    ui.label("• Un String puede recibir texto de un usuario o archivo en tiempo de ejecución.");
-                    ui.label("• Si creciera en el Stack, obligaría a desplazar todas las variables vecinas.");
-                    ui.label("• Delegar el buffer al Heap permite crecer con realloc() sin mover el Stack.");
-                    ui.add_space(8.0);
-
-                    // Contenedor de Código estilo IDE
-                    let mut code_box = egui::Frame::new();
-                    code_box.fill = egui::Color32::from_rgb(8, 12, 18);
-                    code_box.inner_margin = egui::Margin::same(10);
-                    code_box.corner_radius = egui::CornerRadius::same(6);
-                    code_box.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(35, 50, 75));
-
-                    code_box.show(ui, |ui| {
-                        ui.spacing_mut().item_spacing.y = 2.0;
-                        ui.label(egui::RichText::new("// Estructura interna de String en Stack (24 bytes):").monospace().size(12.0).color(egui::Color32::from_rgb(140, 150, 165)));
-                        ui.label(egui::RichText::new("struct String {").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
-                        ui.indent("string_struct_fields", |ui| {
-                            ui.label(egui::RichText::new("ptr: *mut u8, // Puntero de 8B hacia el Heap").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
-                            ui.label(egui::RichText::new("len: usize,   // 8B: Longitud usada (bytes)").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
-                            ui.label(egui::RichText::new("cap: usize,   // 8B: Capacidad reservada").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
-                        });
-                        ui.label(egui::RichText::new("}").monospace().size(12.0).color(egui::Color32::from_rgb(100, 200, 255)));
-                    });
-                });
             });
         }
         1 => {
@@ -817,225 +725,167 @@ pub fn mostrar_tutorial_strings_ownership(ui: &mut egui::Ui, state: &mut Portfol
             });
         }
         _ => {
-            ui.label(
-                "Visualiza gráficamente cómo se representan los datos en la Pila (Stack) y el Montículo (Heap). Observa cómo MOVE transfiere la titularidad y cómo BORROW añade referencias seguras sin duplicar la memoria.",
-            );
-            ui.add_space(10.0);
-
-            ui.horizontal(|ui| {
-                ui.label(egui::RichText::new("Paso de Ejecución:").strong().color(gris_tab));
-                ui.add_space(6.0);
-                for (i, label) in [
-                    (0, "1. Asignación s1 = String"),
-                    (1, "2. MOVE: s2 = s1"),
-                    (2, "3. BORROW: s3 = &s2"),
-                ] {
-                    let activo = state.ownership_step == i;
-                    let color = if activo { naranja } else { gris_tab };
-                    if ui
-                        .add(
-                            egui::Button::new(egui::RichText::new(label).strong().color(color))
-                                .frame(activo),
-                        )
-                        .clicked()
-                    {
-                        state.ownership_step = i;
-                    }
-                    ui.add_space(4.0);
-                }
-            });
-
-            ui.add_space(12.0);
-            mostrar_simulador_ownership_memoria(ui, state.ownership_step);
+            mostrar_teoria_string(ui);
         }
     }
     });
 }
 
-/// Simulador stack/heap para MOVE y BORROW con paleta unificada.
-pub fn mostrar_simulador_ownership_memoria(ui: &mut egui::Ui, step: usize) {
-    let azul_codigo = egui::Color32::from_rgb(100, 200, 255);
-    let naranja = egui::Color32::from_rgb(255, 160, 50);
-    let gris_invalido = egui::Color32::from_rgb(120, 130, 145);
-    let canvas_bg = egui::Color32::from_rgb(14, 18, 26);
-    let border = egui::Color32::from_rgb(45, 60, 90);
-
-    let height = 220.0;
-    let width = ui.available_width().min(780.0);
-    let (_, rect) = ui.allocate_space(egui::vec2(width, height));
-    let painter = ui.painter_at(rect);
-
-    painter.rect(
-        rect,
-        8.0,
-        canvas_bg,
-        egui::Stroke::new(1.0, border),
-        egui::StrokeKind::Inside,
-    );
-
-    let stack_rect = egui::Rect::from_min_size(
-        egui::pos2(rect.left() + 24.0, rect.top() + 28.0),
-        egui::vec2(240.0, 168.0),
-    );
-    let heap_rect = egui::Rect::from_min_size(
-        egui::pos2(rect.left() + 360.0, rect.top() + 28.0),
-        egui::vec2(240.0, 168.0),
-    );
-
-    painter.rect(
-        stack_rect,
-        6.0,
-        egui::Color32::from_rgb(18, 24, 34),
-        egui::Stroke::new(1.5, azul_codigo),
-        egui::StrokeKind::Middle,
-    );
-    painter.text(
-        stack_rect.left_top() + egui::vec2(12.0, 10.0),
-        egui::Align2::LEFT_TOP,
-        "STACK (Pila)",
-        egui::FontId::proportional(13.0),
-        azul_codigo,
-    );
-
-    painter.rect(
-        heap_rect,
-        6.0,
-        egui::Color32::from_rgb(28, 22, 14),
-        egui::Stroke::new(1.5, naranja),
-        egui::StrokeKind::Middle,
-    );
-    painter.text(
-        heap_rect.left_top() + egui::vec2(12.0, 10.0),
-        egui::Align2::LEFT_TOP,
-        "HEAP (Montículo)",
-        egui::FontId::proportional(13.0),
-        naranja,
-    );
-
-    let heap_data = heap_rect.center() + egui::vec2(0.0, 12.0);
-    painter.circle_filled(heap_data, 30.0, egui::Color32::from_rgb(45, 30, 15));
-    painter.circle_stroke(heap_data, 30.0, egui::Stroke::new(2.0, naranja));
-    painter.text(
-        heap_data,
-        egui::Align2::CENTER_CENTER,
-        "\"Hola\"",
-        egui::FontId::monospace(13.0),
-        egui::Color32::WHITE,
-    );
-
-    let slot = |y: f32| egui::pos2(stack_rect.center().x, stack_rect.top() + y);
-
-    match step {
-        0 => {
-            let s1 = slot(70.0);
-            painter.rect(
-                egui::Rect::from_center_size(s1, egui::vec2(190.0, 34.0)),
-                4.0,
-                egui::Color32::from_rgb(20, 35, 55),
-                egui::Stroke::new(1.5, azul_codigo),
-                egui::StrokeKind::Middle,
-            );
-            painter.text(
-                s1,
-                egui::Align2::CENTER_CENTER,
-                "s1 (dueño activo)",
-                egui::FontId::proportional(13.0),
-                egui::Color32::WHITE,
-            );
-            painter.line_segment(
-                [s1 + egui::vec2(95.0, 0.0), heap_data - egui::vec2(30.0, 0.0)],
-                egui::Stroke::new(2.0, azul_codigo),
-            );
-        }
-        1 => {
-            let s1 = slot(55.0);
-            let s2 = slot(115.0);
-            painter.rect(
-                egui::Rect::from_center_size(s1, egui::vec2(190.0, 34.0)),
-                4.0,
-                egui::Color32::from_rgb(18, 22, 30),
-                egui::Stroke::new(1.0, gris_invalido),
-                egui::StrokeKind::Middle,
-            );
-            painter.text(
-                s1,
-                egui::Align2::CENTER_CENTER,
-                "s1 (inválido - movido)",
-                egui::FontId::proportional(12.0),
-                gris_invalido,
-            );
-            painter.rect(
-                egui::Rect::from_center_size(s2, egui::vec2(190.0, 34.0)),
-                4.0,
-                egui::Color32::from_rgb(20, 35, 55),
-                egui::Stroke::new(1.5, naranja),
-                egui::StrokeKind::Middle,
-            );
-            painter.text(
-                s2,
-                egui::Align2::CENTER_CENTER,
-                "s2 (nuevo dueño)",
-                egui::FontId::proportional(13.0),
-                egui::Color32::WHITE,
-            );
-            painter.line_segment(
-                [s2 + egui::vec2(95.0, 0.0), heap_data - egui::vec2(30.0, 0.0)],
-                egui::Stroke::new(2.0, naranja),
-            );
-        }
-        _ => {
-            let s2 = slot(55.0);
-            let s3 = slot(115.0);
-            painter.rect(
-                egui::Rect::from_center_size(s2, egui::vec2(190.0, 34.0)),
-                4.0,
-                egui::Color32::from_rgb(20, 35, 55),
-                egui::Stroke::new(1.5, naranja),
-                egui::StrokeKind::Middle,
-            );
-            painter.text(
-                s2,
-                egui::Align2::CENTER_CENTER,
-                "s2 (dueño)",
-                egui::FontId::proportional(13.0),
-                egui::Color32::WHITE,
-            );
-            painter.rect(
-                egui::Rect::from_center_size(s3, egui::vec2(190.0, 34.0)),
-                4.0,
-                egui::Color32::from_rgb(20, 35, 55),
-                egui::Stroke::new(1.5, azul_codigo),
-                egui::StrokeKind::Middle,
-            );
-            painter.text(
-                s3,
-                egui::Align2::CENTER_CENTER,
-                "s3 = &s2 (préstamo)",
-                egui::FontId::proportional(12.0),
-                egui::Color32::WHITE,
-            );
-            painter.line_segment(
-                [s2 + egui::vec2(95.0, 0.0), heap_data - egui::vec2(30.0, 0.0)],
-                egui::Stroke::new(2.0, naranja),
-            );
-            painter.line_segment(
-                [s3 + egui::vec2(0.0, -17.0), s2 + egui::vec2(0.0, 17.0)],
-                egui::Stroke::new(2.0, azul_codigo),
-            );
-        }
-    }
-
-    let caption = match step {
-        0 => "s1 en el Stack apunta al buffer \"Hola\" en el Heap.",
-        1 => "MOVE: la titularidad se transfiere a s2; usar s1 produce error de compilación.",
-        _ => "BORROW: s3 toma prestada una referencia a s2; el dueño sigue siendo s2.",
-    };
-    ui.add_space(6.0);
+/// Sección teórica completa sobre el tipo String en Rust
+pub fn mostrar_teoria_string(ui: &mut egui::Ui) {
     ui.label(
-        egui::RichText::new(caption)
-            .small()
-            .color(egui::Color32::from_rgb(140, 150, 165)),
+        "String es el tipo de texto dinámico y modificable por excelencia en Rust. Se almacena como un vector de bytes UTF-8 en el Heap y gestiona su memoria automáticamente sin recolector de basura.",
     );
+    ui.add_space(10.0);
+
+    // Tabla 1: Anatomía de Memoria de String
+    let mut table_mem = egui::Frame::new();
+    table_mem.fill = egui::Color32::from_rgb(14, 18, 26);
+    table_mem.inner_margin = egui::Margin::same(12);
+    table_mem.corner_radius = egui::CornerRadius::same(8);
+    table_mem.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 60, 90));
+
+    table_mem.show(ui, |ui| {
+        ui.label(
+            egui::RichText::new("Estructura Interna en Memoria (24 Bytes en Stack + Buffer en Heap)")
+                .strong()
+                .size(14.0)
+                .color(egui::Color32::from_rgb(255, 160, 50)),
+        );
+        ui.add_space(8.0);
+
+        egui::Grid::new("tabla_string_memoria_anatomia")
+            .striped(true)
+            .spacing([20.0, 8.0])
+            .show(ui, |ui| {
+                ui.label(egui::RichText::new("Campo").strong().color(egui::Color32::WHITE));
+                ui.label(egui::RichText::new("Ubicación").strong().color(egui::Color32::WHITE));
+                ui.label(egui::RichText::new("Tamaño").strong().color(egui::Color32::WHITE));
+                ui.label(egui::RichText::new("Propósito / Descripción").strong().color(egui::Color32::WHITE));
+                ui.end_row();
+
+                ui.label(egui::RichText::new("ptr").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.label("Stack");
+                ui.label("8 Bytes (64-bit)");
+                ui.label("Puntero con la dirección de memoria exacta del buffer en el Heap.");
+                ui.end_row();
+
+                ui.label(egui::RichText::new("len").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.label("Stack");
+                ui.label("8 Bytes (usize)");
+                ui.label("Longitud actual: cantidad de bytes UTF-8 válidos en uso.");
+                ui.end_row();
+
+                ui.label(egui::RichText::new("cap").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.label("Stack");
+                ui.label("8 Bytes (usize)");
+                ui.label("Capacidad total: bytes reservados en Heap antes de requerir realloc.");
+                ui.end_row();
+
+                ui.label(egui::RichText::new("Buffer UTF-8").strong().color(egui::Color32::from_rgb(255, 160, 50)));
+                ui.label("Heap");
+                ui.label("Dinámico (cap bytes)");
+                ui.label("Secuencia contigua de bytes donde residen las letras del texto.");
+                ui.end_row();
+            });
+    });
+
+    ui.add_space(14.0);
+
+    // Tabla 2: Métodos y Operaciones Esenciales de String
+    let mut table_methods = egui::Frame::new();
+    table_methods.fill = egui::Color32::from_rgb(14, 18, 26);
+    table_methods.inner_margin = egui::Margin::same(12);
+    table_methods.corner_radius = egui::CornerRadius::same(8);
+    table_methods.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 60, 90));
+
+    table_methods.show(ui, |ui| {
+        ui.label(
+            egui::RichText::new("Métodos y Operaciones Esenciales de String")
+                .strong()
+                .size(14.0)
+                .color(egui::Color32::from_rgb(255, 160, 50)),
+        );
+        ui.add_space(8.0);
+
+        egui::Grid::new("tabla_string_metodos_operaciones")
+            .striped(true)
+            .spacing([20.0, 8.0])
+            .show(ui, |ui| {
+                ui.label(egui::RichText::new("Operación").strong().color(egui::Color32::WHITE));
+                ui.label(egui::RichText::new("Sintaxis").strong().color(egui::Color32::WHITE));
+                ui.label(egui::RichText::new("Mutabilidad").strong().color(egui::Color32::WHITE));
+                ui.label(egui::RichText::new("Descripción Técnica").strong().color(egui::Color32::WHITE));
+                ui.label(egui::RichText::new("Resultado").strong().color(egui::Color32::WHITE));
+                ui.end_row();
+
+                // Creación
+                ui.label("Crear vacío");
+                ui.label(egui::RichText::new("String::new()").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.label("Inmutable / mut");
+                ui.label("Crea un String vacío sin reservar Heap inicial.");
+                ui.label("len: 0, cap: 0");
+                ui.end_row();
+
+                ui.label("Desde literal");
+                ui.label(egui::RichText::new("String::from(\"Hola\")").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.label("Inmutable / mut");
+                ui.label("Reserva memoria en Heap y copia el literal &str.");
+                ui.label("\"Hola\"");
+                ui.end_row();
+
+                ui.label("to_string()");
+                ui.label(egui::RichText::new("\"Hola\".to_string()").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.label("Inmutable / mut");
+                ui.label("Convierte cualquier tipo con trait Display a String.");
+                ui.label("\"Hola\"");
+                ui.end_row();
+
+                // Mutación
+                ui.label("Añadir &str");
+                ui.label(egui::RichText::new("s.push_str(\" mundo\")").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.label("Requiere mut");
+                ui.label("Concatena un slice de texto al final del buffer.");
+                ui.label("\"Hola mundo\"");
+                ui.end_row();
+
+                ui.label("Añadir char");
+                ui.label(egui::RichText::new("s.push('!')").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.label("Requiere mut");
+                ui.label("Añade un único carácter Unicode al final.");
+                ui.label("\"Hola mundo!\"");
+                ui.end_row();
+
+                ui.label("Eliminar último");
+                ui.label(egui::RichText::new("s.pop()").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.label("Requiere mut");
+                ui.label("Extrae y devuelve el último carácter (Option<char>).");
+                ui.label("Some('!')");
+                ui.end_row();
+
+                // Capacidad e Inspección
+                ui.label("Longitud en bytes");
+                ui.label(egui::RichText::new("s.len()").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.label("Solo Lectura");
+                ui.label("Devuelve la cantidad de bytes que ocupa el texto.");
+                ui.label("usize");
+                ui.end_row();
+
+                ui.label("Capacidad en Heap");
+                ui.label(egui::RichText::new("s.capacity()").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.label("Solo Lectura");
+                ui.label("Bytes totales asignados en el buffer del Heap.");
+                ui.label("usize");
+                ui.end_row();
+
+                ui.label("Vaciar buffer");
+                ui.label(egui::RichText::new("s.clear()").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.label("Requiere mut");
+                ui.label("Elimina todo el contenido pero mantiene la capacidad en Heap.");
+                ui.label("len: 0");
+                ui.end_row();
+            });
+    });
 }
 
 pub fn mostrar_tutorial_memoria(ui: &mut egui::Ui, state: &mut PortfolioState) {
