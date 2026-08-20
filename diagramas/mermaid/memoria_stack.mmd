@@ -1,25 +1,26 @@
 %%{init: {'theme': 'dark', 'themeVariables': { 'darkMode': true, 'background': '#0e121a'}}}%%
 flowchart TD
-    subgraph STACK ["Stack"]
+    subgraph STACK ["Stack (Memoria de Tamanios Fijos)"]
         direction TB
 
-        subgraph C2 ["activo: bool = true"]
-            DIR2["0x7FFEE4B2A894"]:::dirStyle
-            T2["1 Byte (8 bits)"]
-            VAL2["00000001 (0x01)"]:::valStyle
+        subgraph C2 ["Variable: activo (bool) = true"]
+            DIR2["Direccion: 0x7FFEE4B2A894"]:::dirStyle
+            T2["Tamanio: 1 Byte (8 bits)"]:::sizeStyle
+            VAL2["Binario: 00000001<br/>Hex: 0x01"]:::valStyle
         end
 
-        subgraph C1 ["edad: i32 = 25"]
-            DIR1["0x7FFEE4B2A890"]:::dirStyle
-            T1["4 Bytes (32 bits)"]
-            VAL1["00000000 00000000 00000000 00011001 (0x19)"]:::valStyle
+        subgraph C1 ["Variable: edad (i32) = 25"]
+            DIR1["Direccion: 0x7FFEE4B2A890"]:::dirStyle
+            T1["Tamanio: 4 Bytes (32 bits)"]:::sizeStyle
+            VAL1["Binario:<br/>00000000 00000000<br/>00000000 00011001<br/>Hex: 0x00000019"]:::valStyle
         end
     end
 
     SP["Stack Pointer (SP)"]:::spStyle
     SP --> C2
 
-    classDef default fill:#161c28,stroke:#456090,stroke-width:1.5px,color:#ffffff;
-    classDef dirStyle fill:#080c12,stroke:#64c8ff,stroke-width:1.5px,color:#64c8ff;
-    classDef valStyle fill:#141c2b,stroke:#38bdf8,stroke-width:1px,color:#f8fafc;
-    classDef spStyle fill:#2d1b0d,stroke:#ffa032,stroke-width:2px,color:#ffa032;
+    classDef default fill:#141a24,stroke:#456090,stroke-width:1.5px,color:#ffffff;
+    classDef dirStyle fill:#0b1017,stroke:#64c8ff,stroke-width:1.5px,color:#64c8ff;
+    classDef sizeStyle fill:#162030,stroke:#3b82f6,stroke-width:1px,color:#ffffff;
+    classDef valStyle fill:#0d1420,stroke:#38bdf8,stroke-width:1px,color:#64c8ff;
+    classDef spStyle fill:#26180a,stroke:#ffa032,stroke-width:2px,color:#ffa032;
