@@ -80,8 +80,11 @@ pub fn mostrar_tutorial_strings_ownership(ui: &mut egui::Ui, state: &mut Portfol
     ui.separator();
     ui.add_space(10.0);
 
-    // El selector de proyectos y el editor de código interactivo en primera posición para las pestañas prácticas
-    if state.strings_ownership_tab < 5 {
+    egui::ScrollArea::vertical()
+        .auto_shrink([false, false])
+        .show(ui, |ui| {
+            // El selector de proyectos y el editor de código interactivo en primera posición para las pestañas prácticas
+            if state.strings_ownership_tab < 5 {
         mostrar_selector_proyectos_estandar(
             ui,
             &mut state.selected_project,
@@ -868,6 +871,7 @@ pub fn mostrar_tutorial_strings_ownership(ui: &mut egui::Ui, state: &mut Portfol
             mostrar_simulador_ownership_memoria(ui, state.ownership_step);
         }
     }
+    });
 }
 
 /// Simulador stack/heap para MOVE y BORROW con paleta unificada.
