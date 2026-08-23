@@ -71,5 +71,6 @@ pub fn mostrar_modal_template_creado(ctx: &egui::Context, state: &mut PortfolioS
 
     if !open {
         state.created_project_name = None;
+        state.show_cargo_output_modal.store(true, std::sync::atomic::Ordering::Relaxed);
     }
 }

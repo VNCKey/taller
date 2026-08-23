@@ -1,8 +1,9 @@
 [package]
-name = "egui_vnc"
+name = "ferrikey"
 version = "0.1.0"
 edition = "2024"
-default-run = "egui_vnc"
+default-run = "ferrikey"
+description = "Plataforma educativa interactiva para aprender Rust de forma visual"
 
 [dependencies]
 egui = "0.35.0"

@@ -10,10 +10,9 @@ use crate::components::modals::{
 };
 use crate::routes::AppRoute;
 use crate::views::colecciones::mostrar_tutorial_colecciones;
-use crate::views::comenzando::{
+use crate::views::conceptos::{
     buscar_ruta_proyecto, ejecutar_cargo_run_proyecto, mostrar_comenzando,
 };
-use crate::views::compilacion::mostrar_tutorial_compilacion;
 use crate::views::control_flujo::mostrar_tutorial_control_flujo;
 use crate::views::dashboard::mostrar_graficos;
 use crate::views::enums::mostrar_tutorial_enums;
@@ -23,11 +22,9 @@ use crate::views::iteradores::mostrar_tutorial_iteradores;
 use crate::views::landing::{mostrar_landing_page, mostrar_portafolio};
 use crate::views::pilares::mostrar_tutorial_cargo;
 use crate::views::playground::{mostrar_editor, mostrar_editor_nube};
-use crate::views::strings_ownership::{
-    mostrar_tutorial_memoria, mostrar_tutorial_strings_ownership,
-};
+use crate::views::memoria::mostrar_tutorial_strings_ownership;
 use crate::views::structs::mostrar_tutorial_structs;
-use crate::views::tipos_datos::mostrar_tutorial_tipos_datos;
+use crate::views::genericos::mostrar_tutorial_genericos;
 use crate::views::traits::mostrar_tutorial_traits;
 
 #[allow(dead_code)]
@@ -74,6 +71,13 @@ pub struct PortfolioState {
     pub ts_show_volume: bool,
     pub ts_show_rsi: bool,
 
+    pub bool_sim_a: bool,
+    pub bool_sim_b: bool,
+
+    pub show_code_modal: Option<(String, String)>,
+    pub shared_project_code: String,
+    pub shared_project_output: Arc<Mutex<String>>,
+
     // State para los nuevos Módulos del Curso Interactivo de Rust
     pub controlflujo_code: String,
     pub controlflujo_output: Arc<Mutex<String>>,
@@ -96,6 +100,7 @@ pub struct PortfolioState {
     pub colecciones_output: Arc<Mutex<String>>,
     pub vec_sim_len: usize,
     pub vec_sim_cap: usize,
+    pub colecciones_tab: usize,
 
     pub errores_code: String,
     pub errores_output: Arc<Mutex<String>>,
@@ -103,6 +108,8 @@ pub struct PortfolioState {
 
     pub traits_code: String,
     pub traits_output: Arc<Mutex<String>>,
+    pub genericos_code: String,
+    pub genericos_output: Arc<Mutex<String>>,
 
     // State para Juegos Interactivos de Tipos Compuestos (Arrays, Slices, Tuplas)
     pub arr_elem_type: usize,
@@ -128,6 +135,10 @@ pub struct PortfolioState {
     pub funciones_step: usize,
     pub funciones_tab: usize,
 
+    pub iteradores_tab: usize,
+    pub enums_tab: usize,
+    pub traits_tab: usize,
+    pub genericos_tab: usize,
     pub iteradores_code: String,
     pub iteradores_output: Arc<Mutex<String>>,
     pub iter_mode: usize,
@@ -140,6 +151,8 @@ pub struct PortfolioState {
     pub slice_output: Arc<Mutex<String>>,
     pub tup_code: String,
     pub tup_output: Arc<Mutex<String>>,
+    pub tup_active_idx: usize,
+    pub compuestos_info_tab: usize,
 
     // State para Estructura de Proyecto y Conceptos Básicos
     pub comenzando_step: usize,
@@ -147,7 +160,6 @@ pub struct PortfolioState {
     pub show_commands_modal: bool,
     pub show_macro_expansion: bool,
     pub show_cargo_output_modal: Arc<AtomicBool>,
-    pub show_tipos_primitivos_modal: bool,
     pub show_rustc_compilador_modal: bool,
     pub show_terminal_modal: bool,
     pub show_settings_modal: bool,
@@ -166,6 +178,9 @@ pub struct PortfolioState {
     pub controlflujo_tab: usize,
     pub conceptos_code: String,
     pub conceptos_output: Arc<Mutex<String>>,
+    pub modulos_code: String,
+    pub modulos_output: Arc<Mutex<String>>,
+    pub modulos_tab: usize,
 
     // State para Componente de Terminal de 3 Modos
     pub term_selected_mode: usize,
@@ -175,6 +190,7 @@ pub struct PortfolioState {
     pub show_terminal_history: bool,
     pub created_project_name: Option<String>,
     pub selected_project: Option<String>,
+    pub selected_file: Option<String>,
 }
 
 
@@ -189,9 +205,12 @@ impl Default for PortfolioState {
             year: 2025,
             tutorial_step: 0,
             tutorial_time: 0.0,
+            show_code_modal: None,
+            shared_project_code: String::new(),
+            shared_project_output: Arc::new(Mutex::new(String::new())),
             playground_code: "fn main() {\n    println!(\"¡Hola desde el Editor de Egui!\");\n}\n".to_string(),
             playground_output: Arc::new(Mutex::new(String::new())),
-            datatypes_code: "fn main() {\n    let edad: u8 = 25;\n    let saldo: i32 = -15000;\n    println!(\"Edad: {}, Saldo: {}\", edad, saldo);\n}".to_string(),
+            datatypes_code: "// Tipos Compuestos en Rust: Arrays, Slices y Tuplas\nfn main() {\n    let numeros: [i32; 5] = [10, 20, 30, 40, 50];\n    let slice_nums: &[i32] = &numeros[1..4];\n    let tupla: (&str, u8) = (\"Rust\", 10);\n\n    println!(\"Array: {:?}\", numeros);\n    println!(\"Slice: {:?}\", slice_nums);\n    println!(\"Tupla: {}, {}\", tupla.0, tupla.1);\n}\n".to_string(),
             datatypes_output: Arc::new(Mutex::new(String::new())),
             strings_code: "fn main() {\n    let estatico: &str = \"¡Hola desde la memoria de sólo lectura (binario)!\";\n    let mut dinamico: String = String::from(\"¡Hola\");\n    dinamico.push_str(\" desde el Heap!\");\n    \n    // Convertir String a &str usando ref (&)\n    let prestado: &str = &dinamico;\n\n    println!(\"{}\\n{}\\n{}\", estatico, dinamico, prestado);\n}".to_string(),
             strings_output: Arc::new(Mutex::new(String::new())),
@@ -212,6 +231,9 @@ impl Default for PortfolioState {
             ts_show_ma: true,
             ts_show_volume: true,
             ts_show_rsi: true,
+            
+            bool_sim_a: true,
+            bool_sim_b: false,
 
             controlflujo_code: "fn main() {\n    let numero = 7;\n    \n    // 'if' usado como expresión\n    let estado = if numero % 2 == 0 { \"par\" } else { \"impar\" };\n    println!(\"El número {} es {}\", numero, estado);\n\n    // Bucle 'for' sobre un rango inclusivo\n    print!(\"Conteo: \");\n    for i in 1..=5 {\n        print!(\"{} \", i);\n    }\n    println!();\n}\n".to_string(),
             controlflujo_output: Arc::new(Mutex::new(String::new())),
@@ -233,6 +255,7 @@ impl Default for PortfolioState {
             colecciones_output: Arc::new(Mutex::new(String::new())),
             vec_sim_len: 3,
             vec_sim_cap: 4,
+            colecciones_tab: 0,
 
             errores_code: "fn dividir(a: f64, b: f64) -> Result<f64, String> {\n    if b == 0.0 {\n        Err(\"No se puede dividir entre cero\".to_string())\n    } else {\n        Ok(a / b)\n    }\n}\n\nfn calcular() -> Result<f64, String> {\n    let res1 = dividir(100.0, 2.0)?;\n    let res2 = dividir(res1, 5.0)?;\n    Ok(res2)\n}\n\nfn main() {\n    match calcular() {\n        Ok(val) => println!(\"Resultado exitoso: {}\", val),\n        Err(err) => println!(\"Error en cálculo: {}\", err),\n    }\n}\n".to_string(),
             errores_output: Arc::new(Mutex::new(String::new())),
@@ -240,17 +263,22 @@ impl Default for PortfolioState {
 
             traits_code: "trait Dibujable {\n    fn dibujar(&self);\n}\n\nstruct Circulo { radio: f64 }\nstruct Rectangulo { ancho: f64, alto: f64 }\n\nimpl Dibujable for Circulo {\n    fn dibujar(&self) {\n        println!(\"🔴 Dibujando círculo de radio {}\", self.radio);\n    }\n}\n\nimpl Dibujable for Rectangulo {\n    fn dibujar(&self) {\n        println!(\"🟦 Dibujando rectángulo {}x{}\", self.ancho, self.alto);\n    }\n}\n\nfn renderizar(item: &impl Dibujable) {\n    item.dibujar();\n}\n\nfn main() {\n    let c = Circulo { radio: 5.0 };\n    let r = Rectangulo { ancho: 10.0, alto: 4.0 };\n    renderizar(&c);\n    renderizar(&r);\n}\n".to_string(),
             traits_output: Arc::new(Mutex::new(String::new())),
+            genericos_code: "fn identidad<T>(valor: T) -> T {\n    valor\n}\n\nfn main() {\n    let n = identidad(42);\n    let s = identidad(\"Hola Rust\");\n    println!(\"n: {}, s: {}\", n, s);\n}\n".to_string(),
+            genericos_output: Arc::new(Mutex::new(String::new())),
+            genericos_tab: 0,
 
             arr_elem_type: 1,
             arr_len: 5,
             arr_active_idx: 2,
             arr_action_msg: "Inspecciona métodos y accesos a elementos del arreglo".to_string(),
             compuestos_tab: 0,
+            compuestos_info_tab: 0,
             slice_start: 1,
             slice_end: 4,
             tup_t0: 1,
             tup_t1: 3,
             tup_t2: 2,
+            tup_active_idx: 0,
             structs_tab: 0,
 
             funciones_code: "fn main() {\n    let a = 15;\n    let b = 25;\n\n    // Llamada + retorno implícito (sin ';')\n    let suma = calcular_suma(a, b);\n    println!(\"La suma de {} + {} es: {}\", a, b, suma);\n\n    // Paso por referencia mutable\n    let mut contador = 0;\n    incrementar(&mut contador);\n    println!(\"Contador incrementado: {}\", contador);\n\n    // Closure: captura el entorno\n    let factor = 3;\n    let multiplicar = |x: i32| x * factor;\n    println!(\"10 * factor = {}\", multiplicar(10));\n}\n\nfn calcular_suma(x: i32, y: i32) -> i32 {\n    x + y // última expresión = retorno\n}\n\nfn incrementar(val: &mut i32) {\n    *val += 1;\n}\n".to_string(),
@@ -258,6 +286,9 @@ impl Default for PortfolioState {
             funciones_step: 0,
             funciones_tab: 0,
 
+            iteradores_tab: 0,
+            enums_tab: 0,
+            traits_tab: 0,
             iteradores_code: "fn main() {\n    let numeros = vec![1, 2, 3, 4, 5, 6];\n\n    println!(\"--- 1. Iterar por referencia (&T) con .iter() ---\");\n    for n in numeros.iter() {\n        print!(\"{} \", n);\n    }\n    println!();\n\n    println!(\"--- 2. Pipeline Lazy: filter -> map -> collect ---\");\n    let pares_cuadrados: Vec<i32> = numeros\n        .iter()\n        .filter(|&&x| x % 2 == 0)\n        .map(|&x| x * x)\n        .collect();\n\n    println!(\"Pares al cuadrado: {:?}\", pares_cuadrados);\n}\n".to_string(),
             iteradores_output: Arc::new(Mutex::new(String::new())),
             iter_mode: 0,
@@ -277,7 +308,6 @@ impl Default for PortfolioState {
             show_commands_modal: false,
             show_macro_expansion: false,
             show_cargo_output_modal: Arc::new(AtomicBool::new(false)),
-            show_tipos_primitivos_modal: false,
             show_rustc_compilador_modal: false,
             show_terminal_modal: false,
             show_settings_modal: false,
@@ -296,14 +326,27 @@ impl Default for PortfolioState {
             controlflujo_tab: 0,
             conceptos_code: "fn main() {\n    let edad: u8 = 25;\n    println!(\"edad = {edad}\");\n}\n".to_string(),
             conceptos_output: Arc::new(Mutex::new(String::new())),
+            modulos_code: "// Módulos en Rust\nmod redes {\n    pub fn conectar() {\n        println!(\"Conectado a la red!\");\n    }\n}\n\nfn main() {\n    redes::conectar();\n}\n".to_string(),
+            modulos_output: Arc::new(Mutex::new(String::new())),
 
             term_selected_mode: 1,
             term_input: String::new(),
             term_history: Arc::new(Mutex::new(Vec::new())),
-            term_cwd: std::env::current_dir().unwrap_or_else(|_| std::path::PathBuf::from("/home/alek")),
+            term_cwd: std::env::current_dir()
+                .ok()
+                .map(|p| {
+                    if p.file_name().is_some_and(|n| n == "egui_vnc") {
+                        p.parent().unwrap_or(&p).to_path_buf()
+                    } else {
+                        p
+                    }
+                })
+                .unwrap_or_else(|| std::path::PathBuf::from("/home/alek/VNC/repos")),
             show_terminal_history: false,
             created_project_name: None,
             selected_project: None,
+            selected_file: None,
+            modulos_tab: 0,
         }
     }
 }
@@ -311,40 +354,129 @@ impl Default for PortfolioState {
 
 impl PortfolioState {
     pub fn obtener_codigo_activo(&self) -> &str {
-        match self.ruta_actual {
-            AppRoute::TutorialControlFlujo => &self.controlflujo_code,
-            AppRoute::TutorialTiposDatos => &self.datatypes_code,
-            AppRoute::TutorialStrings => &self.strings_code,
-            AppRoute::Playground => &self.playground_code,
-            _ => &self.conceptos_code,
+        if self.selected_project.is_some() {
+            &self.shared_project_code
+        } else {
+            match self.ruta_actual {
+                AppRoute::TutorialControlFlujo => &self.controlflujo_code,
+                AppRoute::TutorialTiposDatos => &self.datatypes_code,
+                AppRoute::TutorialStrings | AppRoute::TutorialOwnership | AppRoute::TutorialMemoria => &self.ownership_code,
+                AppRoute::TutorialFunciones => &self.funciones_code,
+                AppRoute::TutorialIteradores => &self.iteradores_code,
+                AppRoute::TutorialStructs => &self.structs_code,
+                AppRoute::TutorialEnums => &self.enums_code,
+                AppRoute::TutorialColecciones => &self.colecciones_code,
+                AppRoute::TutorialErrores => &self.errores_code,
+                AppRoute::TutorialTraits => &self.traits_code,
+                AppRoute::TutorialGenericos => &self.genericos_code,
+                AppRoute::TutorialModulos => &self.modulos_code,
+                AppRoute::Playground => &self.playground_code,
+                AppRoute::PlaygroundNube => &self.playground_nube_code,
+                AppRoute::Comenzando => &self.conceptos_code,
+                AppRoute::TutorialCargo | AppRoute::TutorialCompilacion => &self.estructura_code,
+                _ => &self.conceptos_code,
+            }
+        }
+    }
+
+    pub fn obtener_editor_activo_mut(&mut self) -> (&mut String, Arc<Mutex<String>>) {
+        if self.selected_project.is_some() {
+            (&mut self.shared_project_code, Arc::clone(&self.shared_project_output))
+        } else {
+            match self.ruta_actual {
+                AppRoute::TutorialControlFlujo => (&mut self.controlflujo_code, Arc::clone(&self.controlflujo_output)),
+                AppRoute::TutorialTiposDatos => (&mut self.datatypes_code, Arc::clone(&self.datatypes_output)),
+                AppRoute::TutorialStrings | AppRoute::TutorialOwnership | AppRoute::TutorialMemoria => (&mut self.ownership_code, Arc::clone(&self.ownership_output)),
+                AppRoute::TutorialFunciones => (&mut self.funciones_code, Arc::clone(&self.funciones_output)),
+                AppRoute::TutorialIteradores => (&mut self.iteradores_code, Arc::clone(&self.iteradores_output)),
+                AppRoute::TutorialStructs => (&mut self.structs_code, Arc::clone(&self.structs_output)),
+                AppRoute::TutorialEnums => (&mut self.enums_code, Arc::clone(&self.enums_output)),
+                AppRoute::TutorialColecciones => (&mut self.colecciones_code, Arc::clone(&self.colecciones_output)),
+                AppRoute::TutorialErrores => (&mut self.errores_code, Arc::clone(&self.errores_output)),
+                AppRoute::TutorialTraits => (&mut self.traits_code, Arc::clone(&self.traits_output)),
+                AppRoute::TutorialGenericos => (&mut self.genericos_code, Arc::clone(&self.genericos_output)),
+                AppRoute::TutorialModulos => (&mut self.modulos_code, Arc::clone(&self.modulos_output)),
+                AppRoute::Playground => (&mut self.playground_code, Arc::clone(&self.playground_output)),
+                AppRoute::PlaygroundNube => (&mut self.playground_nube_code, Arc::clone(&self.playground_nube_output)),
+                AppRoute::Comenzando => (&mut self.conceptos_code, Arc::clone(&self.conceptos_output)),
+                AppRoute::TutorialCargo | AppRoute::TutorialCompilacion => (&mut self.estructura_code, Arc::clone(&self.estructura_output)),
+                _ => (&mut self.conceptos_code, Arc::clone(&self.conceptos_output)),
+            }
+        }
+    }
+
+    #[allow(dead_code)]
+    pub fn cargar_archivo_proyecto_activo(&mut self) {
+        if let Some(ref proj) = self.selected_project.clone() {
+            let proj_dir = buscar_ruta_proyecto(&self.term_cwd, proj);
+            let target_file = if let Some(ref rel) = self.selected_file {
+                proj_dir.join(rel)
+            } else {
+                let main_rs = proj_dir.join("src/main.rs");
+                let lib_rs = proj_dir.join("src/lib.rs");
+                if main_rs.exists() {
+                    main_rs
+                } else if lib_rs.exists() {
+                    lib_rs
+                } else {
+                    main_rs
+                }
+            };
+            if let Ok(content) = std::fs::read_to_string(&target_file) {
+                let (code_ref, _) = self.obtener_editor_activo_mut();
+                *code_ref = content;
+            }
         }
     }
 
     pub fn obtener_output_activo(&self) -> Arc<Mutex<String>> {
-        match self.ruta_actual {
-            AppRoute::TutorialControlFlujo => Arc::clone(&self.controlflujo_output),
-            AppRoute::TutorialTiposDatos => Arc::clone(&self.datatypes_output),
-            AppRoute::TutorialStrings => Arc::clone(&self.strings_output),
-            AppRoute::Playground => Arc::clone(&self.playground_output),
-            _ => Arc::clone(&self.conceptos_output),
+        if self.selected_project.is_some() {
+            Arc::clone(&self.shared_project_output)
+        } else {
+            match self.ruta_actual {
+                AppRoute::TutorialControlFlujo => Arc::clone(&self.controlflujo_output),
+                AppRoute::TutorialTiposDatos => Arc::clone(&self.datatypes_output),
+                AppRoute::TutorialStrings | AppRoute::TutorialOwnership | AppRoute::TutorialMemoria => Arc::clone(&self.ownership_output),
+                AppRoute::TutorialFunciones => Arc::clone(&self.funciones_output),
+                AppRoute::TutorialIteradores => Arc::clone(&self.iteradores_output),
+                AppRoute::TutorialStructs => Arc::clone(&self.structs_output),
+                AppRoute::TutorialEnums => Arc::clone(&self.enums_output),
+                AppRoute::TutorialColecciones => Arc::clone(&self.colecciones_output),
+                AppRoute::TutorialErrores => Arc::clone(&self.errores_output),
+                AppRoute::TutorialTraits => Arc::clone(&self.traits_output),
+                AppRoute::TutorialGenericos => Arc::clone(&self.genericos_output),
+                AppRoute::TutorialModulos => Arc::clone(&self.modulos_output),
+                AppRoute::Playground => Arc::clone(&self.playground_output),
+                AppRoute::PlaygroundNube => Arc::clone(&self.playground_nube_output),
+                AppRoute::Comenzando => Arc::clone(&self.conceptos_output),
+                AppRoute::TutorialCargo | AppRoute::TutorialCompilacion => Arc::clone(&self.estructura_output),
+                _ => Arc::clone(&self.conceptos_output),
+            }
         }
     }
 
     pub fn guardar_proyecto_activo(&self) {
         if let Some(ref proj) = self.selected_project {
             let proj_dir = buscar_ruta_proyecto(&self.term_cwd, proj);
-            let main_rs = proj_dir.join("src/main.rs");
-            let lib_rs = proj_dir.join("src/lib.rs");
-            let target_file = if main_rs.exists() {
-                main_rs
-            } else if lib_rs.exists() {
-                lib_rs
+            let target_file = if let Some(ref rel_file) = self.selected_file {
+                proj_dir.join(rel_file)
             } else {
-                main_rs.clone()
+                let main_rs = proj_dir.join("src/main.rs");
+                let lib_rs = proj_dir.join("src/lib.rs");
+                if main_rs.exists() {
+                    main_rs
+                } else if lib_rs.exists() {
+                    lib_rs
+                } else {
+                    main_rs
+                }
             };
-            if target_file.parent().is_some_and(|p| p.exists()) {
-                let _ = std::fs::write(target_file, self.obtener_codigo_activo());
+            if let Some(parent) = target_file.parent() {
+                if !parent.exists() {
+                    let _ = std::fs::create_dir_all(parent);
+                }
             }
+            let _ = std::fs::write(target_file, self.obtener_codigo_activo());
         }
     }
 }
@@ -382,20 +514,21 @@ impl eframe::App for PortfolioState {
                 AppRoute::Portafolio => mostrar_portafolio(ui),
                 AppRoute::TutorialCargo => mostrar_tutorial_cargo(ui, self),
                 AppRoute::Comenzando => mostrar_comenzando(ui, self),
-                AppRoute::TutorialCompilacion => mostrar_tutorial_compilacion(ui, self),
-                AppRoute::TutorialTiposDatos => mostrar_tutorial_tipos_datos(ui, self),
+                AppRoute::TutorialCompilacion => crate::views::pilares::pipeline::mostrar_tutorial_compilacion(ui, self),
+                AppRoute::TutorialTiposDatos => crate::views::tipos_compuestos::mostrar_tutorial_tipos_compuestos(ui, self),
                 AppRoute::TutorialControlFlujo => mostrar_tutorial_control_flujo(ui, self),
                 AppRoute::TutorialFunciones => mostrar_tutorial_funciones(ui, self),
                 AppRoute::TutorialIteradores => mostrar_tutorial_iteradores(ui, self),
-                AppRoute::TutorialOwnership | AppRoute::TutorialStrings => {
+                AppRoute::TutorialOwnership | AppRoute::TutorialStrings | AppRoute::TutorialMemoria => {
                     mostrar_tutorial_strings_ownership(ui, self)
                 }
+                AppRoute::TutorialModulos => crate::views::modulos::mostrar_tutorial_modulos(ui, self),
                 AppRoute::TutorialStructs => mostrar_tutorial_structs(ui, self),
                 AppRoute::TutorialEnums => mostrar_tutorial_enums(ui, self),
                 AppRoute::TutorialColecciones => mostrar_tutorial_colecciones(ui, self),
                 AppRoute::TutorialErrores => mostrar_tutorial_errores(ui, self),
                 AppRoute::TutorialTraits => mostrar_tutorial_traits(ui, self),
-                AppRoute::TutorialMemoria => mostrar_tutorial_memoria(ui, self),
+                AppRoute::TutorialGenericos => mostrar_tutorial_genericos(ui, self),
                 AppRoute::DashboardGraficos => mostrar_graficos(ui, self),
                 AppRoute::Playground => mostrar_editor(ui, self),
                 AppRoute::PlaygroundNube => mostrar_editor_nube(ui, self),
@@ -446,7 +579,6 @@ impl eframe::App for PortfolioState {
                 self.show_terminal_modal = false;
                 self.show_cargo_output_modal.store(false, Ordering::Relaxed);
                 self.show_settings_modal = false;
-                self.show_tipos_primitivos_modal = false;
                 self.show_railroad_modal = None;
                 self.created_project_name = None;
             }
@@ -472,6 +604,7 @@ impl eframe::App for PortfolioState {
         });
 
         if ejecutar_cargo_run_flag {
+            self.guardar_proyecto_activo();
             ejecutar_cargo_run_proyecto(self, ui.ctx());
         }
 
@@ -481,6 +614,7 @@ impl eframe::App for PortfolioState {
         mostrar_modal_settings(ui.ctx(), self);
         mostrar_modal_template_creado(ui.ctx(), self);
         mostrar_modal_railroad_let(ui.ctx(), self);
+        crate::components::modals::mostrar_modal_codigo(ui.ctx(), self);
 
         // Request continuous repaint for animations
         ui.ctx().request_repaint();

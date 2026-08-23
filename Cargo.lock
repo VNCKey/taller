@@ -1189,26 +1189,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "egui_vnc"
-version = "0.1.0"
-dependencies = [
- "eframe",
- "egui",
- "egui_extras",
- "egui_plot",
- "env_logger",
- "image",
- "log",
- "macro_railroad",
- "railroad",
- "rand 0.8.7",
- "resvg 0.48.1",
- "serde_json",
- "syntect",
- "usvg 0.48.1",
-]
-
-[[package]]
 name = "ehttp"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1452,6 +1432,26 @@ name = "fearless_simd"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b97b65636e5b9ef369943878ac74335ba1c55c1cb6adbf1e2c293c624248d693"
+
+[[package]]
+name = "ferrikey"
+version = "0.1.0"
+dependencies = [
+ "eframe",
+ "egui",
+ "egui_extras",
+ "egui_plot",
+ "env_logger",
+ "image",
+ "log",
+ "macro_railroad",
+ "railroad",
+ "rand 0.8.7",
+ "resvg 0.48.1",
+ "serde_json",
+ "syntect",
+ "usvg 0.48.1",
+]
 
 [[package]]
 name = "find-msvc-tools"

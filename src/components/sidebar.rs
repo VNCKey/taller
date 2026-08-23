@@ -67,6 +67,7 @@ pub fn mostrar_sidebar(ui: &mut egui::Ui, state: &mut PortfolioState) {
                 ui.add_space(10.0);
 
                 // 1. Pilares
+                // 1. Pilares
                 if ui
                     .selectable_label(
                         state.ruta_actual == AppRoute::TutorialCargo,
@@ -77,30 +78,63 @@ pub fn mostrar_sidebar(ui: &mut egui::Ui, state: &mut PortfolioState) {
                     state.ruta_actual = AppRoute::TutorialCargo;
                 }
 
-                // 2. Comenzando
+                // 2. Conceptos
                 if ui
                     .selectable_label(
                         state.ruta_actual == AppRoute::Comenzando,
-                        "Comenzando",
+                        "Conceptos",
                     )
                     .clicked()
                 {
                     state.ruta_actual = AppRoute::Comenzando;
                 }
 
-                // 3. Memoria & Ownership (reglas de memoria + String/&str)
+                // 3. Memoria (reglas de memoria + String/&str)
                 if ui
                     .selectable_label(
                         state.ruta_actual == AppRoute::TutorialOwnership
                             || state.ruta_actual == AppRoute::TutorialStrings,
-                        "Memoria & Ownership",
+                        "Memoria",
                     )
                     .clicked()
                 {
                     state.ruta_actual = AppRoute::TutorialOwnership;
                 }
 
-                // 4. Control de Flujo
+                // 4. Módulos
+                if ui
+                    .selectable_label(
+                        state.ruta_actual == AppRoute::TutorialModulos,
+                        "Módulos",
+                    )
+                    .clicked()
+                {
+                    state.ruta_actual = AppRoute::TutorialModulos;
+                }
+
+                // 5. Tipos Compuestos
+                if ui
+                    .selectable_label(
+                        state.ruta_actual == AppRoute::TutorialTiposDatos,
+                        "Tipos Compuestos",
+                    )
+                    .clicked()
+                {
+                    state.ruta_actual = AppRoute::TutorialTiposDatos;
+                }
+
+                // 6. Colecciones
+                if ui
+                    .selectable_label(
+                        state.ruta_actual == AppRoute::TutorialColecciones,
+                        "Colecciones",
+                    )
+                    .clicked()
+                {
+                    state.ruta_actual = AppRoute::TutorialColecciones;
+                }
+
+                // 6. Control de Flujo
                 if ui
                     .selectable_label(
                         state.ruta_actual == AppRoute::TutorialControlFlujo,
@@ -111,51 +145,18 @@ pub fn mostrar_sidebar(ui: &mut egui::Ui, state: &mut PortfolioState) {
                     state.ruta_actual = AppRoute::TutorialControlFlujo;
                 }
 
-                // 5. Funciones & Closures
+                // 7. Funciones & Closures
                 if ui
                     .selectable_label(
                         state.ruta_actual == AppRoute::TutorialFunciones,
-                        "Funciones & Closures",
+                        "Closures",
                     )
                     .clicked()
                 {
                     state.ruta_actual = AppRoute::TutorialFunciones;
                 }
 
-                // 6. Tipos compuestos
-                if ui
-                    .selectable_label(
-                        state.ruta_actual == AppRoute::TutorialTiposDatos,
-                        "Tipos compuestos",
-                    )
-                    .clicked()
-                {
-                    state.ruta_actual = AppRoute::TutorialTiposDatos;
-                }
-
-                // 7. Structs & impl
-                if ui
-                    .selectable_label(
-                        state.ruta_actual == AppRoute::TutorialStructs,
-                        "Structs & impl",
-                    )
-                    .clicked()
-                {
-                    state.ruta_actual = AppRoute::TutorialStructs;
-                }
-
-                // 8. Proceso de Compilación
-                if ui
-                    .selectable_label(
-                        state.ruta_actual == AppRoute::TutorialCompilacion,
-                        "Proceso de Compilación",
-                    )
-                    .clicked()
-                {
-                    state.ruta_actual = AppRoute::TutorialCompilacion;
-                }
-
-                // 9. Iteradores
+                // 8. Iteradores
                 if ui
                     .selectable_label(
                         state.ruta_actual == AppRoute::TutorialIteradores,
@@ -166,44 +167,45 @@ pub fn mostrar_sidebar(ui: &mut egui::Ui, state: &mut PortfolioState) {
                     state.ruta_actual = AppRoute::TutorialIteradores;
                 }
 
-                // 10. Enums, Option & Result
+                // 9. Structs & impl
+                if ui
+                    .selectable_label(
+                        state.ruta_actual == AppRoute::TutorialStructs,
+                        "Custom Types",
+                    )
+                    .clicked()
+                {
+                    state.ruta_actual = AppRoute::TutorialStructs;
+                }
+
+                // 10. Error Handling
                 if ui
                     .selectable_label(
                         state.ruta_actual == AppRoute::TutorialEnums,
-                        "Enums, Option & Result",
+                        "Error Handling",
                     )
                     .clicked()
                 {
                     state.ruta_actual = AppRoute::TutorialEnums;
                 }
 
-                // 11. Colecciones
+                // 11. Generics
                 if ui
                     .selectable_label(
-                        state.ruta_actual == AppRoute::TutorialColecciones,
-                        "Colecciones (Vec/HashMap)",
+                        state.ruta_actual == AppRoute::TutorialGenericos,
+                        "Generics",
                     )
                     .clicked()
                 {
-                    state.ruta_actual = AppRoute::TutorialColecciones;
+                    state.ruta_actual = AppRoute::TutorialGenericos;
                 }
 
-                // 12. Manejo de Errores
-                if ui
-                    .selectable_label(
-                        state.ruta_actual == AppRoute::TutorialErrores,
-                        "Manejo de Errores (?)",
-                    )
-                    .clicked()
-                {
-                    state.ruta_actual = AppRoute::TutorialErrores;
-                }
 
                 // 13. Traits & Genéricos
                 if ui
                     .selectable_label(
                         state.ruta_actual == AppRoute::TutorialTraits,
-                        "Traits & Genéricos",
+                        "Traits",
                     )
                     .clicked()
                 {

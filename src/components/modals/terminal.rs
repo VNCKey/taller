@@ -1,6 +1,6 @@
 use eframe::egui;
 use crate::app::PortfolioState;
-use crate::views::comenzando::mostrar_componente_terminal_3_modos;
+use crate::views::conceptos::mostrar_componente_terminal_3_modos;
 
 pub fn mostrar_modal_terminal(ctx: &egui::Context, state: &mut PortfolioState) {
     let mut abierto = state.show_terminal_modal;

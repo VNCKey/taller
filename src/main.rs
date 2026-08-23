@@ -39,7 +39,7 @@ fn main() -> eframe::Result {
             egui_extras::install_image_loaders(&cc.egui_ctx);
             // 2. Instalar loader SVG con soporte completo para fuentes del sistema Linux
             svg_loader::SystemFontSvgLoader::install(&cc.egui_ctx);
-            log::info!("✅ Loaders de imágenes y SVG con fuentes de Linux cargados exitosamente.");
+            log::info!("Loaders de imágenes y SVG con fuentes de Linux cargados exitosamente.");
             Ok(Box::new(PortfolioState::default()))
         }),
     )
