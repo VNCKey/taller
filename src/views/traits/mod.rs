@@ -1,6 +1,6 @@
-pub mod definicion;
 pub mod estandar;
 pub mod info;
+pub mod polimorfismo;
 
 use crate::app::PortfolioState;
 use crate::components::code_editor::mostrar_editor_interactivo;
@@ -35,8 +35,8 @@ pub fn mostrar_tutorial_traits(ui: &mut egui::Ui, state: &mut PortfolioState) {
         );
 
         let tabs_izq = [
-            (0, "Definición & impl"),
-            (1, "Traits Estándar & derive"),
+            (0, "Traits Estándar & derive"),
+            (1, "Polimorfismo (dyn Trait)"),
         ];
         for (indice, label) in tabs_izq {
             let activo = state.traits_tab == indice;
@@ -118,8 +118,8 @@ pub fn mostrar_tutorial_traits(ui: &mut egui::Ui, state: &mut PortfolioState) {
             }
 
             match state.traits_tab {
-                0 => definicion::mostrar_tab_definicion(ui, state, naranja, cyan, texto),
-                1 => estandar::mostrar_tab_estandar(ui, state, naranja, cyan, texto),
+                0 => estandar::mostrar_tab_estandar(ui, state, naranja, cyan, texto),
+                1 => polimorfismo::mostrar_tab_polimorfismo(ui, state, naranja, cyan, texto),
                 _ => info::mostrar_traits_info(ui, state, naranja, cyan, texto),
             }
         });

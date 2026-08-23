@@ -1,14 +1,14 @@
-# Ferrikey (v0.1.0-alpha)
+# FerrisKey (v0.1.0-alpha)
 
 > **Plataforma Educativa Interactiva para Aprender Rust de forma Visual e Intuitiva.**
 
-Ferrikey es una aplicación de escritorio desarrollada en Rust con `egui`/`eframe` diseñada para enseñar los conceptos fundamentales e intermedios del lenguaje Rust mediante explicaciones conceptuales, tablas interactivas, visores de código y un editor ejecutable integrado en tiempo real.
+FerrisKey es una aplicación de escritorio desarrollada en Rust con `egui`/`eframe` diseñada para enseñar los conceptos fundamentales e intermedios del lenguaje Rust mediante explicaciones conceptuales, tablas interactivas, visores de código y un editor ejecutable integrado en tiempo real.
 
 ---
 
 ## Plan de Estudios Integrado
 
-Ferrikey incluye un currículo estructurado progresivamente sin tecnicismos redundantes:
+FerrisKey incluye un currículo estructurado progresivamente sin tecnicismos redundantes:
 
 1. **Pilares & Entorno**: Cargo, Estructura del proyecto, Tiempos de compilación y perfiles (`dev` vs `release`).
 2. **Conceptos**: Variables, Mutabilidad, Tipos Primitivos, Scopes y Expresiones.
@@ -28,7 +28,7 @@ Ferrikey incluye un currículo estructurado progresivamente sin tecnicismos redu
 
 ## Requisitos Previos
 
-Para compilar y ejecutar Ferrikey necesitas tener instalado Rust y Cargo en tu sistema.
+Para compilar y ejecutar FerrisKey necesitas tener instalado Rust y Cargo en tu sistema.
 
 ### 1. Instalar Rust Toolchain
 Si aún no tienes Rust instalado, ejecuta el instalador oficial:
@@ -53,8 +53,8 @@ Sigue estos sencillos pasos para clonar y correr la aplicación localmente:
 
 ### 1. Clonar el Repositorio
 ```bash
-git clone https://github.com/VNCKey/taller.git ferrikey
-cd ferrikey
+git clone https://github.com/VNCKey/taller.git ferriskey
+cd ferriskey
 ```
 
 ### 2. Ejecutar en Modo Desarrollo

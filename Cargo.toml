@@ -1,8 +1,8 @@
 [package]
-name = "ferrikey"
+name = "ferriskey"
 version = "0.1.0"
 edition = "2024"
-default-run = "ferrikey"
+default-run = "ferriskey"
 description = "Plataforma educativa interactiva para aprender Rust de forma visual"
 
 [dependencies]
