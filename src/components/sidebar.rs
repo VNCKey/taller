@@ -228,24 +228,6 @@ pub fn mostrar_sidebar(ui: &mut egui::Ui, state: &mut PortfolioState) {
                 {
                     state.ruta_actual = AppRoute::DashboardGraficos;
                 }
-                if ui
-                    .selectable_label(
-                        state.ruta_actual == AppRoute::Playground,
-                        "Editor Local",
-                    )
-                    .clicked()
-                {
-                    state.ruta_actual = AppRoute::Playground;
-                }
-                if ui
-                    .selectable_label(
-                        state.ruta_actual == AppRoute::PlaygroundNube,
-                        "Playground API",
-                    )
-                    .clicked()
-                {
-                    state.ruta_actual = AppRoute::PlaygroundNube;
-                }
 
                 ui.add_space(20.0);
                 ui.separator();

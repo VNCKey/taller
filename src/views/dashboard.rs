@@ -6,7 +6,7 @@ pub fn mostrar_graficos(ui: &mut egui::Ui, state: &mut PortfolioState) {
     ui.add_space(10.0);
     ui.vertical_centered(|ui| {
         ui.heading(
-            egui::RichText::new("📊 Dashboard Analítico (Estilo Plotly / Power BI)")
+            egui::RichText::new("Dashboard Analítico")
                 .size(28.0)
                 .strong()
                 .color(egui::Color32::from_rgb(100, 200, 255)),
@@ -23,12 +23,12 @@ pub fn mostrar_graficos(ui: &mut egui::Ui, state: &mut PortfolioState) {
 
     // Barra de Navegación de Pestañas (Tabs)
     ui.horizontal(|ui| {
-        ui.selectable_value(&mut state.dash_tab, 0, "📊 Power BI Overview");
-        ui.selectable_value(&mut state.dash_tab, 1, "🏎️ Bar Chart Race");
-        ui.selectable_value(&mut state.dash_tab, 2, "🥧 Pie & Donut Chart");
-        ui.selectable_value(&mut state.dash_tab, 3, "📈 Index Chart");
-        ui.selectable_value(&mut state.dash_tab, 4, "🔀 Sankey Diagram");
-        ui.selectable_value(&mut state.dash_tab, 5, "📉 Time Series Subplots");
+        ui.selectable_value(&mut state.dash_tab, 0, "Power BI Overview");
+        ui.selectable_value(&mut state.dash_tab, 1, "Bar Chart Race");
+        ui.selectable_value(&mut state.dash_tab, 2, "Pie & Donut Chart");
+        ui.selectable_value(&mut state.dash_tab, 3, "Index Chart");
+        ui.selectable_value(&mut state.dash_tab, 4, "Sankey Diagram");
+        ui.selectable_value(&mut state.dash_tab, 5, "Time Series Subplots");
     });
 
     ui.add_space(15.0);
@@ -55,25 +55,25 @@ pub fn mostrar_dashboard_power_bi(ui: &mut egui::Ui, state: &mut PortfolioState)
 
         let kpis = [
             (
-                "💰 Ingresos Totales",
+                "Ingresos Totales",
                 "$1,248,500",
                 "+18.4% YoY",
                 egui::Color32::from_rgb(60, 200, 120),
             ),
             (
-                "📉 Gastos Operativos",
+                "Gastos Operativos",
                 "$684,200",
                 "-4.2% Eficiencia",
                 egui::Color32::from_rgb(240, 90, 90),
             ),
             (
-                "📈 Margen Neto",
+                "Margen Neto",
                 "45.2%",
                 "+5.1% YoY",
                 egui::Color32::from_rgb(160, 100, 250),
             ),
             (
-                "⚡ Throughput Rust",
+                "Throughput Rust",
                 "14,250 ops/s",
                 "Nativo",
                 egui::Color32::from_rgb(255, 180, 50),
@@ -122,7 +122,7 @@ pub fn mostrar_dashboard_power_bi(ui: &mut egui::Ui, state: &mut PortfolioState)
         ui.set_width(avail_w - 24.0);
         ui.horizontal(|ui| {
             ui.heading(
-                egui::RichText::new("🎛️ Filtros Power BI:")
+                egui::RichText::new("Filtros Power BI:")
                     .size(15.0)
                     .color(egui::Color32::from_rgb(100, 200, 255)),
             );
@@ -201,15 +201,15 @@ pub fn mostrar_bar_chart_race(ui: &mut egui::Ui, state: &mut PortfolioState) {
     ui.horizontal(|ui| {
         if ui
             .button(if state.bcr_playing {
-                "⏸ Pausar"
+                "Pausar"
             } else {
-                "▶ Iniciar Carrera"
+                "Iniciar Carrera"
             })
             .clicked()
         {
             state.bcr_playing = !state.bcr_playing;
         }
-        if ui.button("🔄 Reiniciar (2015)").clicked() {
+        if ui.button("Reiniciar (2015)").clicked() {
             state.bcr_year = 2015.0;
         }
         ui.add_space(10.0);
@@ -236,7 +236,7 @@ pub fn mostrar_bar_chart_race(ui: &mut egui::Ui, state: &mut PortfolioState) {
 
     let languages = [
         (
-            "🦀 Rust",
+            "Rust",
             egui::Color32::from_rgb(240, 100, 40),
             [
                 (2015.0, 8.0),
@@ -247,7 +247,7 @@ pub fn mostrar_bar_chart_race(ui: &mut egui::Ui, state: &mut PortfolioState) {
             ],
         ),
         (
-            "🐍 Python",
+            "Python",
             egui::Color32::from_rgb(60, 140, 230),
             [
                 (2015.0, 65.0),
@@ -258,7 +258,7 @@ pub fn mostrar_bar_chart_race(ui: &mut egui::Ui, state: &mut PortfolioState) {
             ],
         ),
         (
-            "🟨 JavaScript",
+            "JavaScript",
             egui::Color32::from_rgb(240, 210, 50),
             [
                 (2015.0, 88.0),
@@ -269,7 +269,7 @@ pub fn mostrar_bar_chart_race(ui: &mut egui::Ui, state: &mut PortfolioState) {
             ],
         ),
         (
-            "🔷 TypeScript",
+            "TypeScript",
             egui::Color32::from_rgb(40, 160, 240),
             [
                 (2015.0, 12.0),
@@ -280,7 +280,7 @@ pub fn mostrar_bar_chart_race(ui: &mut egui::Ui, state: &mut PortfolioState) {
             ],
         ),
         (
-            "🐹 Go",
+            "Go",
             egui::Color32::from_rgb(50, 210, 210),
             [
                 (2015.0, 20.0),
@@ -291,7 +291,7 @@ pub fn mostrar_bar_chart_race(ui: &mut egui::Ui, state: &mut PortfolioState) {
             ],
         ),
         (
-            "⚡ C++",
+            "C++",
             egui::Color32::from_rgb(100, 120, 200),
             [
                 (2015.0, 75.0),
@@ -302,7 +302,7 @@ pub fn mostrar_bar_chart_race(ui: &mut egui::Ui, state: &mut PortfolioState) {
             ],
         ),
         (
-            "☕ Java",
+            "Java",
             egui::Color32::from_rgb(220, 70, 70),
             [
                 (2015.0, 82.0),
@@ -406,27 +406,27 @@ pub fn mostrar_pie_donut_chart(ui: &mut egui::Ui, state: &mut PortfolioState) {
 
     let slices = [
         (
-            "☁️ Infraestructura Cloud",
+            "Infraestructura Cloud",
             1897000.0,
             egui::Color32::from_rgb(60, 140, 240),
         ),
         (
-            "🦀 I+D & Rust Core",
+            "I+D & Rust Core",
             1355000.0,
             egui::Color32::from_rgb(240, 100, 40),
         ),
         (
-            "🛡️ Ciberseguridad",
+            "Ciberseguridad",
             975000.0,
             egui::Color32::from_rgb(160, 80, 220),
         ),
         (
-            "🔑 Licencias & SaaS",
+            "Licencias & SaaS",
             650000.0,
             egui::Color32::from_rgb(40, 190, 110),
         ),
         (
-            "🎓 Capacitación & Equipo",
+            "Capacitación & Equipo",
             542000.0,
             egui::Color32::from_rgb(240, 190, 50),
         ),
@@ -618,7 +618,7 @@ pub fn mostrar_pie_donut_chart(ui: &mut egui::Ui, state: &mut PortfolioState) {
 
 pub fn mostrar_index_chart(ui: &mut egui::Ui, state: &mut PortfolioState) {
     ui.horizontal(|ui| {
-        ui.label(egui::RichText::new("🎯 Año Base (Punto 100%):").strong());
+        ui.label(egui::RichText::new("Año Base (Punto 100%):").strong());
         ui.add(egui::Slider::new(&mut state.index_baseline_year, 2015.0..=2025.0).text("Año Base"));
         ui.label(
             egui::RichText::new("*(Todos los gráficos se re-escalan a 100% en esta fecha)*")
@@ -633,7 +633,7 @@ pub fn mostrar_index_chart(ui: &mut egui::Ui, state: &mut PortfolioState) {
 
     let series_raw = [
         (
-            "🦀 Rust Repositories",
+            "Rust Repositories",
             egui::Color32::from_rgb(240, 100, 40),
             vec![
                 (2015.0, 50.0),
@@ -645,7 +645,7 @@ pub fn mostrar_index_chart(ui: &mut egui::Ui, state: &mut PortfolioState) {
             ],
         ),
         (
-            "🐍 Python AI Packages",
+            "Python AI Packages",
             egui::Color32::from_rgb(60, 140, 230),
             vec![
                 (2015.0, 2000.0),
@@ -657,7 +657,7 @@ pub fn mostrar_index_chart(ui: &mut egui::Ui, state: &mut PortfolioState) {
             ],
         ),
         (
-            "🟨 JS/TS Web Frameworks",
+            "JS/TS Web Frameworks",
             egui::Color32::from_rgb(240, 210, 50),
             vec![
                 (2015.0, 5000.0),
@@ -669,7 +669,7 @@ pub fn mostrar_index_chart(ui: &mut egui::Ui, state: &mut PortfolioState) {
             ],
         ),
         (
-            "🐹 Go Microservices",
+            "Go Microservices",
             egui::Color32::from_rgb(50, 210, 210),
             vec![
                 (2015.0, 300.0),
@@ -738,7 +738,7 @@ pub fn mostrar_index_chart(ui: &mut egui::Ui, state: &mut PortfolioState) {
 
 pub fn mostrar_sankey_diagram(ui: &mut egui::Ui, _state: &mut PortfolioState) {
     ui.label(
-        egui::RichText::new("🔀 Diagrama de Flujo de Recursos y Asignación Financiera")
+        egui::RichText::new("Diagrama de Flujo de Recursos y Asignación Financiera")
             .size(15.0)
             .italics(),
     );
@@ -977,7 +977,7 @@ pub fn mostrar_time_series_subplots(ui: &mut egui::Ui, state: &mut PortfolioStat
         rsi_pts.push([x, rsi.clamp(10.0, 90.0)]);
     }
 
-    ui.label(egui::RichText::new("📈 Panel 1: Precio de Cotización & Indicadores").strong());
+    ui.label(egui::RichText::new("Panel 1: Precio de Cotización & Indicadores").strong());
     Plot::new("subplot_price")
         .height(200.0)
         .legend(Legend::default().position(Corner::LeftTop))
@@ -1014,7 +1014,7 @@ pub fn mostrar_time_series_subplots(ui: &mut egui::Ui, state: &mut PortfolioStat
     ui.add_space(10.0);
 
     if state.ts_show_volume {
-        ui.label(egui::RichText::new("📊 Panel 2: Volumen Operado Diario").strong());
+        ui.label(egui::RichText::new("Panel 2: Volumen Operado Diario").strong());
         Plot::new("subplot_volume")
             .height(100.0)
             .show(ui, |plot_ui| {
@@ -1024,7 +1024,7 @@ pub fn mostrar_time_series_subplots(ui: &mut egui::Ui, state: &mut PortfolioStat
     }
 
     if state.ts_show_rsi {
-        ui.label(egui::RichText::new("📉 Panel 3: Índice de Fuerza Relativa (RSI)").strong());
+        ui.label(egui::RichText::new("Panel 3: Índice de Fuerza Relativa (RSI)").strong());
         Plot::new("subplot_rsi").height(100.0).show(ui, |plot_ui| {
             plot_ui.hline(
                 HLine::new("Límite Sobrecompra (70)", 70.0)
@@ -1044,4 +1044,3 @@ pub fn mostrar_time_series_subplots(ui: &mut egui::Ui, state: &mut PortfolioStat
         });
     }
 }
-
