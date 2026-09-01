@@ -17,6 +17,67 @@ pub fn mostrar_structs_info(
     );
     ui.add_space(12.0);
 
+    ui.label(
+        egui::RichText::new("¿Qué hace diferente a Rust?")
+            .strong()
+            .size(16.0)
+            .color(naranja),
+    );
+    ui.add_space(6.0);
+    ui.label(
+        egui::RichText::new(
+            "Rust es un lenguaje de programación de sistemas, multiparadigma y orientado a la composición. No utiliza un modelo clásico basado en clases y herencia; combina rendimiento de bajo nivel con abstracciones seguras.",
+        )
+        .color(texto),
+    );
+    ui.add_space(10.0);
+
+    card_frame_tutorial().show(ui, |ui| {
+        egui::Grid::new("tabla_info_influencias_rust")
+            .striped(true)
+            .spacing([18.0, 10.0])
+            .show(ui, |ui| {
+                for encabezado in ["Lenguaje / fuente", "Ideas que influyeron en Rust"] {
+                    ui.label(
+                        egui::RichText::new(encabezado)
+                            .strong()
+                            .color(egui::Color32::WHITE),
+                    );
+                }
+                ui.end_row();
+
+                let influencias = [
+                    ("C y C++", "Rendimiento, referencias, movimiento y control cercano al hardware."),
+                    ("SML y OCaml", "Enums, pattern matching e inferencia de tipos."),
+                    ("Haskell", "Traits y abstracciones de tipos."),
+                    ("Cyclone y ML Kit", "Ideas relacionadas con la gestión segura de memoria."),
+                    ("Erlang", "Concurrencia y comunicación entre procesos."),
+                    ("Scheme", "Macros higiénicas."),
+                    ("C# y Ruby", "Atributos y una sintaxis cómoda para closures."),
+                ];
+
+                for (fuente, ideas) in influencias {
+                    ui.label(
+                        egui::RichText::new(fuente)
+                            .strong()
+                            .color(cyan),
+                    );
+                    ui.label(ideas);
+                    ui.end_row();
+                }
+            });
+    });
+
+    ui.add_space(10.0);
+    ui.label(
+        egui::RichText::new(
+            "Rust no inventó todos estos conceptos; los combinó con ownership, borrowing y comprobaciones en compile time para crear un lenguaje de sistemas con un enfoque propio.",
+        )
+        .italics()
+        .color(texto),
+    );
+    ui.add_space(18.0);
+
     // 1. Representación en Memoria de Structs vs Enums
     ui.label(
         egui::RichText::new("Disposición de Tipos Personalizados en Memoria")

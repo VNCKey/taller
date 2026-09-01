@@ -1,8 +1,34 @@
 use crate::app::PortfolioState;
 use eframe::egui;
 
+#[allow(dead_code)]
 pub fn mostrar_pilares_entorno_trabajo(ui: &mut egui::Ui, state: &mut PortfolioState) {
     egui::ScrollArea::vertical().show(ui, |ui| {
+        mostrar_pilares_entorno_contenido(ui, state);
+    });
+}
+
+pub fn mostrar_pilares_entorno_contenido(ui: &mut egui::Ui, state: &mut PortfolioState) {
+        // --- SCROLL REVEAL ENGINE ---
+        let elapsed = ui.input(|i| i.time) - state.anim_trigger;
+        if elapsed < 2.0 {
+            ui.ctx().request_repaint(); // Forzar a redibujar hasta que terminen todas
+        }
+        
+        let mut anim_delay = 0.0f64;
+        
+        let anim_card = |ui: &mut egui::Ui, frame: &egui::Frame, delay: &mut f64, add_contents: &mut dyn FnMut(&mut egui::Ui)| {
+            let local = (elapsed - *delay).max(0.0);
+            *delay += 0.1; // 100ms delay for the next card
+            let raw_t = (local / 0.6).clamp(0.0, 1.0) as f32;
+            let t = 1.0 - (1.0 - raw_t) * (1.0 - raw_t) * (1.0 - raw_t) * (1.0 - raw_t);
+            ui.scope(|ui| {
+                ui.multiply_opacity(t);
+                ui.add_space((1.0 - t) * 40.0);
+                frame.show(ui, add_contents);
+            });
+        };
+
         // Estilo unificado de tarjetas
         let mut card_frame = egui::Frame::new();
         card_frame.fill = egui::Color32::from_rgb(14, 18, 26);
@@ -12,6 +38,42 @@ pub fn mostrar_pilares_entorno_trabajo(ui: &mut egui::Ui, state: &mut PortfolioS
 
         let title_color = egui::Color32::from_rgb(255, 180, 100);
         let text_color = egui::Color32::from_rgb(200, 210, 225);
+
+        // --- SECCIÓN: ¿QUÉ ES RUST? ---
+        anim_card(ui, &card_frame, &mut anim_delay, &mut |ui| {
+            ui.heading(
+                egui::RichText::new("¿Qué es Rust?")
+                    .size(18.0)
+                    .strong()
+                    .color(title_color),
+            );
+            ui.add_space(8.0);
+            
+            ui.label(
+                egui::RichText::new("Rust es un lenguaje de programación de sistemas moderno que empodera a todos para construir software confiable y eficiente. Sus tres grandes pilares son:")
+                    .color(text_color)
+                    .size(14.0),
+            );
+            ui.add_space(8.0);
+            
+            ui.horizontal(|ui| {
+                ui.label(egui::RichText::new("Rendimiento:").strong().color(egui::Color32::WHITE));
+                ui.label(egui::RichText::new("Velocidad extrema y bajo consumo de memoria (sin Garbage Collector), compite con C/C++.").color(text_color));
+            });
+            ui.add_space(4.0);
+            
+            ui.horizontal(|ui| {
+                ui.label(egui::RichText::new("Confiabilidad:").strong().color(egui::Color32::WHITE));
+                ui.label(egui::RichText::new("Su estricto modelo de 'Ownership' garantiza seguridad de memoria absoluta y previene data races en hilos.").color(text_color));
+            });
+            ui.add_space(4.0);
+            
+            ui.horizontal(|ui| {
+                ui.label(egui::RichText::new("Productividad:").strong().color(egui::Color32::WHITE));
+                ui.label(egui::RichText::new("El compilador más amigable del mundo (rustc) y un gestor de paquetes de primer nivel integrado (Cargo).").color(text_color));
+            });
+        });
+        ui.add_space(20.0);
 
         // --- FILA 1: NÚCLEO DE CONSTRUCCIÓN Y ECOSISTEMA ---
         ui.heading(
@@ -24,7 +86,7 @@ pub fn mostrar_pilares_entorno_trabajo(ui: &mut egui::Ui, state: &mut PortfolioS
 
         ui.columns(3, |columns| {
             // Pilar 1: rustc
-            card_frame.show(&mut columns[0], |ui| {
+            anim_card(&mut columns[0], &card_frame, &mut anim_delay, &mut |ui| {
                 ui.set_min_height(140.0);
                 ui.horizontal(|ui| {
                     ui.add(
@@ -52,7 +114,7 @@ pub fn mostrar_pilares_entorno_trabajo(ui: &mut egui::Ui, state: &mut PortfolioS
             });
 
             // Pilar 2: Cargo
-            card_frame.show(&mut columns[1], |ui| {
+            anim_card(&mut columns[1], &card_frame, &mut anim_delay, &mut |ui| {
                 ui.set_min_height(140.0);
                 ui.horizontal(|ui| {
                     ui.add(
@@ -73,7 +135,7 @@ pub fn mostrar_pilares_entorno_trabajo(ui: &mut egui::Ui, state: &mut PortfolioS
             });
 
             // Pilar 3: Crates / crates.io
-            card_frame.show(&mut columns[2], |ui| {
+            anim_card(&mut columns[2], &card_frame, &mut anim_delay, &mut |ui| {
                 ui.set_min_height(140.0);
                 ui.horizontal(|ui| {
                     ui.add(
@@ -107,7 +169,7 @@ pub fn mostrar_pilares_entorno_trabajo(ui: &mut egui::Ui, state: &mut PortfolioS
 
         ui.columns(3, |cols| {
             // 1. Clippy
-            card_frame.show(&mut cols[0], |ui| {
+            anim_card(&mut cols[0], &card_frame, &mut anim_delay, &mut |ui| {
                 ui.set_min_height(140.0);
                 ui.horizontal(|ui| {
                     ui.add(
@@ -128,7 +190,7 @@ pub fn mostrar_pilares_entorno_trabajo(ui: &mut egui::Ui, state: &mut PortfolioS
             });
 
             // 2. Rustfmt
-            card_frame.show(&mut cols[1], |ui| {
+            anim_card(&mut cols[1], &card_frame, &mut anim_delay, &mut |ui| {
                 ui.set_min_height(140.0);
                 ui.horizontal(|ui| {
                     ui.add(
@@ -149,7 +211,7 @@ pub fn mostrar_pilares_entorno_trabajo(ui: &mut egui::Ui, state: &mut PortfolioS
             });
 
             // 3. Error Index
-            card_frame.show(&mut cols[2], |ui| {
+            anim_card(&mut cols[2], &card_frame, &mut anim_delay, &mut |ui| {
                 ui.set_min_height(140.0);
                 ui.horizontal(|ui| {
                     ui.add(
@@ -183,7 +245,7 @@ pub fn mostrar_pilares_entorno_trabajo(ui: &mut egui::Ui, state: &mut PortfolioS
 
         ui.columns(3, |cols| {
             // 1. rustup
-            card_frame.show(&mut cols[0], |ui| {
+            anim_card(&mut cols[0], &card_frame, &mut anim_delay, &mut |ui| {
                 ui.set_min_height(140.0);
                 ui.horizontal(|ui| {
                     ui.add(
@@ -204,7 +266,7 @@ pub fn mostrar_pilares_entorno_trabajo(ui: &mut egui::Ui, state: &mut PortfolioS
             });
 
             // 2. rust-analyzer
-            card_frame.show(&mut cols[1], |ui| {
+            anim_card(&mut cols[1], &card_frame, &mut anim_delay, &mut |ui| {
                 ui.set_min_height(140.0);
                 ui.horizontal(|ui| {
                     ui.add(
@@ -225,7 +287,7 @@ pub fn mostrar_pilares_entorno_trabajo(ui: &mut egui::Ui, state: &mut PortfolioS
             });
 
             // 3. rustdoc
-            card_frame.show(&mut cols[2], |ui| {
+            anim_card(&mut cols[2], &card_frame, &mut anim_delay, &mut |ui| {
                 ui.set_min_height(140.0);
                 ui.horizontal(|ui| {
                     ui.add(
@@ -245,5 +307,4 @@ pub fn mostrar_pilares_entorno_trabajo(ui: &mut egui::Ui, state: &mut PortfolioS
                 ui.label(egui::RichText::new("• Ejecuta doctests automáticamente para garantizar que la documentación funcione.").color(text_color));
             });
         });
-    });
 }

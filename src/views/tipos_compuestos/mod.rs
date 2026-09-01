@@ -7,6 +7,8 @@ pub mod tuplas;
 use crate::app::PortfolioState;
 use crate::components::code_editor::mostrar_editor_interactivo;
 use crate::execution::ejecutar_codigo_rust;
+use crate::views::colecciones::mostrar_contenido_colecciones;
+use crate::views::colecciones::info::mostrar_coleccion_info;
 use crate::views::conceptos::mostrar_selector_proyectos_estandar_con_archivos;
 use eframe::egui;
 #[allow(unused_imports)]
@@ -38,8 +40,10 @@ pub fn mostrar_tutorial_tipos_compuestos(ui: &mut egui::Ui, state: &mut Portfoli
                 .color(egui::Color32::from_rgb(140, 150, 165)),
         );
         let tabs_practica = [
-            (0, "Array & Slice"),
+            (0, "Arrays"),
             (1, "Tupla"),
+            (2, "Colecciones"),
+            (3, "Slices"),
         ];
         for (indice, label) in tabs_practica {
             let activo = state.compuestos_tab == indice;
@@ -57,7 +61,7 @@ pub fn mostrar_tutorial_tipos_compuestos(ui: &mut egui::Ui, state: &mut Portfoli
         }
 
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-            let activo = state.compuestos_tab == 2;
+            let activo = state.compuestos_tab == 4;
             let color = if activo { naranja } else { gris_tab };
             if ui
                 .add(
@@ -66,7 +70,7 @@ pub fn mostrar_tutorial_tipos_compuestos(ui: &mut egui::Ui, state: &mut Portfoli
                 )
                 .clicked()
             {
-                state.compuestos_tab = 2;
+                state.compuestos_tab = 4;
             }
             ui.add_space(4.0);
             ui.label(
@@ -84,7 +88,7 @@ pub fn mostrar_tutorial_tipos_compuestos(ui: &mut egui::Ui, state: &mut Portfoli
     egui::ScrollArea::vertical()
         .auto_shrink([false, false])
         .show(ui, |ui| {
-            if state.compuestos_tab < 2 {
+            if state.compuestos_tab < 4 && state.compuestos_tab != 2 {
                 let code_target = if state.selected_project.is_some() {
                     &mut state.shared_project_code
                 } else {
@@ -123,7 +127,15 @@ pub fn mostrar_tutorial_tipos_compuestos(ui: &mut egui::Ui, state: &mut Portfoli
             match state.compuestos_tab {
                 0 => arrays::mostrar_compuesto_array(ui, state, naranja, cyan, texto),
                 1 => tuplas::mostrar_compuesto_tupla(ui, state, naranja, cyan, texto),
-                _ => info::mostrar_compuesto_info(ui, state, naranja, cyan, texto),
+                2 => mostrar_contenido_colecciones(ui, state),
+                3 => slices::mostrar_compuesto_slice(ui, state, naranja, cyan, texto),
+                _ => {
+                    info::mostrar_compuesto_info(ui, state, naranja, cyan, texto);
+                    ui.add_space(24.0);
+                    ui.separator();
+                    ui.add_space(16.0);
+                    mostrar_coleccion_info(ui, state, naranja, cyan, texto);
+                }
             }
         });
 }

@@ -51,9 +51,10 @@ pub fn mostrar_editor_interactivo<F>(
     F: Fn(&str) -> String + Send + 'static,
 {
     let mut editor_frame = egui::Frame::new();
-    editor_frame.fill = egui::Color32::from_rgb(13, 17, 23);
+    editor_frame.fill = egui::Color32::from_rgb(10, 14, 22);
     editor_frame.inner_margin = egui::Margin::same(14);
     editor_frame.corner_radius = egui::CornerRadius::same(8);
+    editor_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 65, 95)); // Borde estilo LeetCode / Exercism
 
     editor_frame.show(ui, |ui| {
         ui.set_width(ui.available_width());
@@ -66,14 +67,38 @@ pub fn mostrar_editor_interactivo<F>(
             .max_height(260.0)
             .auto_shrink([false, false])
             .show(ui, |ui| {
-                ui.add(
-                    egui::TextEdit::multiline(code)
-                        .frame(egui::Frame::NONE)
-                        .layouter(&mut layouter)
-                        .code_editor()
-                        .desired_width(f32::INFINITY)
-                        .lock_focus(true),
-                );
+                ui.with_layout(egui::Layout::left_to_right(egui::Align::Min), |ui| {
+                    // Generación dinámica de la columna de números de línea
+                    let num_lines = code.split('\n').count().max(1);
+                    let mut line_numbers = String::new();
+                    for i in 1..=num_lines {
+                        use std::fmt::Write;
+                        let _ = writeln!(line_numbers, "{:>2}", i);
+                    }
+
+                    // Columna de numeración (Gutter)
+                    ui.add(
+                        egui::Label::new(
+                            egui::RichText::new(line_numbers.trim_end())
+                                .font(egui::FontId::monospace(14.0))
+                                .color(egui::Color32::from_rgb(85, 105, 135)),
+                        )
+                        .selectable(false),
+                    );
+
+                    ui.add_space(4.0);
+                    ui.separator();
+                    ui.add_space(4.0);
+
+                    ui.add(
+                        egui::TextEdit::multiline(code)
+                            .frame(egui::Frame::NONE)
+                            .layouter(&mut layouter)
+                            .code_editor()
+                            .desired_width(f32::INFINITY)
+                            .lock_focus(true),
+                    );
+                });
             });
     });
 
@@ -104,9 +129,10 @@ pub fn mostrar_editor_interactivo<F>(
         if !output_text.is_empty() {
             ui.add_space(10.0);
             let mut out_frame = egui::Frame::new();
-            out_frame.fill = egui::Color32::from_rgb(10, 10, 10);
-            out_frame.inner_margin = egui::Margin::same(10);
-            out_frame.corner_radius = egui::CornerRadius::same(5);
+            out_frame.fill = egui::Color32::from_rgb(8, 11, 16);
+            out_frame.inner_margin = egui::Margin::same(12);
+            out_frame.corner_radius = egui::CornerRadius::same(6);
+            out_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(35, 50, 75));
             out_frame.show(ui, |ui| {
                 ui.set_min_width(ui.available_width());
 

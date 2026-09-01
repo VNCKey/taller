@@ -37,20 +37,19 @@ pub fn mostrar_componente_terminal_3_modos(
         // --- CABECERA DE LA TERMINAL LINUX ---
         ui.horizontal(|ui| {
             let history_len = state.term_history.lock().map(|h| h.len()).unwrap_or(0);
-            let label = if state.show_terminal_history {
-                format!("▼ Historial ({})", history_len)
-            } else {
-                format!("▶ Historial ({})", history_len)
-            };
 
             if ui
-                .button(
-                    egui::RichText::new(label)
-                        .strong()
-                        .size(12.0)
-                        .color(egui::Color32::from_rgb(100, 200, 255)),
+                .add(
+                    egui::Button::new(
+                        egui::RichText::new("👁️").size(13.0),
+                    )
+                    .frame(false),
                 )
-                .on_hover_text("Mostrar u ocultar el historial de comandos ejecutados")
+                .on_hover_text(format!(
+                    "{} historial de comandos ({})",
+                    if state.show_terminal_history { "Ocultar" } else { "Mostrar" },
+                    history_len
+                ))
                 .clicked()
             {
                 state.show_terminal_history = !state.show_terminal_history;
@@ -108,9 +107,11 @@ pub fn mostrar_componente_terminal_3_modos(
             {
                 egui::ScrollArea::vertical()
                     .max_height(160.0)
+                    .auto_shrink([false, false])
                     .id_salt("scroll_terminal_history")
                     .stick_to_bottom(true)
                     .show(ui, |ui| {
+                        ui.set_min_width(ui.available_width());
                         for (idx, line) in history.iter().enumerate() {
                             ui.push_id(idx, |ui| {
                                 ui.label(
@@ -163,7 +164,6 @@ pub fn mostrar_componente_terminal_3_modos(
                             for part in parts.iter().skip(2) {
                                 if !part.starts_with('-') {
                                     let proj_name = (*part).to_string();
-                                    state.created_project_name = Some(proj_name.clone());
                                     state.selected_project = Some(proj_name);
                                     if is_lib {
                                         state.estructura_tab = 2;
@@ -211,14 +211,14 @@ pub fn mostrar_componente_terminal_3_modos(
                     } else {
                         // Ejecución en hilo secundario asíncrono (evita congelar el GUI)
                         let history_arc = Arc::clone(&state.term_history);
-                        let output_arc = Arc::clone(&state.conceptos_output);
+                        let output_arc = state.obtener_output_activo();
                         let modal_arc = Arc::clone(&state.show_cargo_output_modal);
                         let cwd = state.term_cwd.clone();
                         let cmd = cmd_str.clone();
                         let ctx = ui.ctx().clone();
 
                         if cmd.starts_with("cargo ") {
-                            if let Ok(mut out) = state.conceptos_output.lock() {
+                            if let Ok(mut out) = output_arc.lock() {
                                 *out = "Compilando con Cargo...".to_string();
                             }
                         }
@@ -271,8 +271,8 @@ pub fn mostrar_componente_terminal_3_modos(
                                         if let Ok(mut out_lock) = output_arc.lock() {
                                             *out_lock = combined;
                                         }
-                                        // Abrir la ventana modal de Salida recién al terminar (para cargo new se abrirá al cerrar el modal de Template)
-                                        if !cmd.starts_with("cargo new ") && !cmd.starts_with("cargo  new ") {
+                                        // Mostrar siempre la salida real del comando, incluido cargo new.
+                                        if debe_mostrar_modal_cargo(&cmd) {
                                             modal_arc.store(true, Ordering::Relaxed);
                                         }
                                     }
@@ -303,6 +303,35 @@ pub fn mostrar_componente_terminal_3_modos(
         // std::thread::spawn(move || { ... portable_pty::NativePtySystem ... });
          */
     });
+}
+
+fn debe_mostrar_modal_cargo(command: &str) -> bool {
+    let mut parts = command.split_whitespace();
+    if parts.next() != Some("cargo") {
+        return false;
+    }
+
+    let subcommand = match parts.next() {
+        Some("+stable" | "+beta" | "+nightly") => parts.next(),
+        other => other,
+    };
+
+    matches!(
+        subcommand,
+        Some(
+            "new"
+                | "init"
+                | "check"
+                | "build"
+                | "run"
+                | "test"
+                | "clippy"
+                | "doc"
+                | "bench"
+                | "clean"
+                | "expand"
+        )
+    )
 }
 
 fn obtener_repos_base_dir(term_cwd: &std::path::Path) -> std::path::PathBuf {
@@ -409,26 +438,176 @@ pub fn listar_proyectos_cargo(base_path: &std::path::Path) -> Vec<String> {
     proyectos
 }
 
-pub fn listar_archivos_rs_proyecto(proj_dir: &std::path::Path) -> Vec<String> {
+pub fn listar_archivos_proyecto(proj_dir: &std::path::Path) -> Vec<String> {
     let mut archivos = Vec::new();
-    let src_dir = proj_dir.join("src");
-    if src_dir.exists() && src_dir.is_dir() {
-        scan_rs_dir_recursive(&src_dir, &src_dir, &mut archivos);
-    }
+    scan_project_files(proj_dir, proj_dir, &mut archivos);
     archivos.sort();
     archivos
 }
 
-fn scan_rs_dir_recursive(base_src: &std::path::Path, current_dir: &std::path::Path, results: &mut Vec<String>) {
+fn scan_project_files(
+    root: &std::path::Path,
+    current_dir: &std::path::Path,
+    results: &mut Vec<String>,
+) {
     if let Ok(entries) = std::fs::read_dir(current_dir) {
         for entry in entries.flatten() {
             let path = entry.path();
+            let name = path.file_name().and_then(|name| name.to_str()).unwrap_or_default();
+            if name == ".git" || name == "target" || name == "Cargo.lock" {
+                continue;
+            }
+
             if path.is_dir() {
-                scan_rs_dir_recursive(base_src, &path, results);
-            } else if path.extension().is_some_and(|ext| ext == "rs") {
-                if let Ok(rel) = path.strip_prefix(base_src.parent().unwrap_or(base_src)) {
-                    results.push(rel.to_string_lossy().to_string());
+                scan_project_files(root, &path, results);
+            } else if let Ok(relative) = path.strip_prefix(root) {
+                results.push(relative.to_string_lossy().replace('\\', "/"));
+            }
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub enum FileTreeNode {
+    Directory {
+        name: String,
+        children: Vec<FileTreeNode>,
+    },
+    File {
+        name: String,
+        rel_path: String,
+    },
+}
+
+pub fn build_file_tree(paths: &[String]) -> Vec<FileTreeNode> {
+    let mut root_children: Vec<FileTreeNode> = Vec::new();
+
+    for path_str in paths {
+        let parts: Vec<&str> = path_str.split('/').collect();
+        insert_into_file_tree(&mut root_children, &parts, path_str);
+    }
+
+    sort_file_tree(&mut root_children);
+    root_children
+}
+
+fn insert_into_file_tree(nodes: &mut Vec<FileTreeNode>, parts: &[&str], full_path: &str) {
+    if parts.is_empty() {
+        return;
+    }
+    if parts.len() == 1 {
+        nodes.push(FileTreeNode::File {
+            name: parts[0].to_string(),
+            rel_path: full_path.to_string(),
+        });
+    } else {
+        let dir_name = parts[0];
+        let rest = &parts[1..];
+        if let Some(existing) = nodes.iter_mut().find(|n| match n {
+            FileTreeNode::Directory { name, .. } => name == dir_name,
+            _ => false,
+        }) {
+            if let FileTreeNode::Directory { children, .. } = existing {
+                insert_into_file_tree(children, rest, full_path);
+            }
+        } else {
+            let mut children = Vec::new();
+            insert_into_file_tree(&mut children, rest, full_path);
+            nodes.push(FileTreeNode::Directory {
+                name: dir_name.to_string(),
+                children,
+            });
+        }
+    }
+}
+
+fn sort_file_tree(nodes: &mut [FileTreeNode]) {
+    nodes.sort_by(|a, b| {
+        match (a, b) {
+            (FileTreeNode::Directory { name: na, .. }, FileTreeNode::Directory { name: nb, .. }) => na.cmp(nb),
+            (FileTreeNode::Directory { .. }, FileTreeNode::File { .. }) => std::cmp::Ordering::Less,
+            (FileTreeNode::File { .. }, FileTreeNode::Directory { .. }) => std::cmp::Ordering::Greater,
+            (FileTreeNode::File { name: na, .. }, FileTreeNode::File { name: nb, .. }) => na.cmp(nb),
+        }
+    });
+    for node in nodes.iter_mut() {
+        if let FileTreeNode::Directory { children, .. } = node {
+            sort_file_tree(children);
+        }
+    }
+}
+
+fn render_file_tree(
+    ui: &mut egui::Ui,
+    nodes: &[FileTreeNode],
+    selected_file: &mut Option<String>,
+    proj_dir_opt: Option<&std::path::PathBuf>,
+    code_target: &mut String,
+    close_popup: &mut bool,
+    alpha: u8,
+    depth: usize,
+    combo_id: &str,
+) {
+    for node in nodes {
+        match node {
+            FileTreeNode::Directory { name, children } => {
+                let dir_id = ui.make_persistent_id(format!("{}_tree_dir_{}_{}", combo_id, depth, name));
+                let mut is_open = ui.data_mut(|d| d.get_temp::<bool>(dir_id).unwrap_or(true));
+
+                ui.horizontal(|ui| {
+                    if depth > 0 {
+                        ui.add_space((depth as f32) * 12.0);
+                    }
+                    let arrow = if is_open { "▾" } else { "▸" };
+                    let btn_text = egui::RichText::new(format!("{} {}/", arrow, name))
+                        .size(11.0)
+                        .strong()
+                        .color(egui::Color32::from_rgba_unmultiplied(140, 180, 220, alpha));
+
+                    if ui.add(egui::Button::new(btn_text).frame(false)).clicked() {
+                        is_open = !is_open;
+                        ui.data_mut(|d| d.insert_temp(dir_id, is_open));
+                    }
+                });
+
+                if is_open {
+                    render_file_tree(
+                        ui,
+                        children,
+                        selected_file,
+                        proj_dir_opt,
+                        code_target,
+                        close_popup,
+                        alpha,
+                        depth + 1,
+                        combo_id,
+                    );
                 }
+            }
+            FileTreeNode::File { name, rel_path } => {
+                let is_sel = selected_file.as_ref() == Some(rel_path);
+                ui.horizontal(|ui| {
+                    if depth > 0 {
+                        ui.add_space((depth as f32) * 12.0);
+                    }
+                    let txt_color = if is_sel {
+                        egui::Color32::from_rgba_unmultiplied(100, 200, 255, alpha)
+                    } else {
+                        egui::Color32::from_rgba_unmultiplied(190, 205, 225, alpha)
+                    };
+                    let txt_file = egui::RichText::new(name).size(11.0).color(txt_color);
+
+                    if ui.selectable_label(is_sel, txt_file).clicked() {
+                        *selected_file = Some(rel_path.clone());
+                        if let Some(proj_dir) = proj_dir_opt {
+                            let target_file = proj_dir.join(rel_path);
+                            if let Ok(content) = std::fs::read_to_string(&target_file) {
+                                *code_target = content;
+                            }
+                        }
+                        *close_popup = true;
+                    }
+                });
             }
         }
     }
@@ -446,6 +625,51 @@ pub fn mostrar_selector_proyectos_estandar(
     mostrar_selector_proyectos_estandar_con_archivos(ui, selected_project, &mut dummy_file, term_cwd, combo_id, code_target);
 }
 
+fn pintar_icono_badge_tile(
+    ui: &mut egui::Ui,
+    img: egui::Image,
+    activo: bool,
+    color_hover: egui::Color32,
+    tooltip: &str,
+) -> egui::Response {
+    let (rect, response) = ui.allocate_exact_size(egui::vec2(32.0, 26.0), egui::Sense::click());
+    let is_hovered = response.hovered();
+    let is_down = response.is_pointer_button_down_on();
+
+    // Fondo interactivo idéntico al resto de botones
+    let bg_color = if is_down {
+        egui::Color32::from_rgb(34, 46, 68)
+    } else if activo {
+        egui::Color32::from_rgb(26, 36, 54)
+    } else if is_hovered {
+        egui::Color32::from_rgb(24, 32, 48)
+    } else {
+        egui::Color32::from_rgb(16, 22, 32)
+    };
+
+    // Borde interactivo idéntico al resto de botones
+    let border_stroke = if activo {
+        egui::Stroke::new(1.0, color_hover)
+    } else if is_hovered {
+        egui::Stroke::new(1.0, egui::Color32::from_rgb(70, 95, 135))
+    } else {
+        egui::Stroke::new(1.0, egui::Color32::from_rgb(38, 54, 80))
+    };
+
+    // Color del icono SVG (tenue en reposo, se ilumina en Cyan con hover o activo)
+    let icon_tint = if activo || is_hovered {
+        color_hover
+    } else {
+        egui::Color32::from_rgb(160, 180, 205)
+    };
+
+    ui.painter().rect(rect, egui::CornerRadius::same(4), bg_color, border_stroke, egui::StrokeKind::Inside);
+    let icon_rect = egui::Rect::from_center_size(rect.center(), egui::vec2(15.0, 15.0));
+    img.tint(icon_tint).paint_at(ui, icon_rect);
+
+    response.on_hover_text(tooltip)
+}
+
 pub fn mostrar_selector_proyectos_estandar_con_archivos(
     ui: &mut egui::Ui,
     selected_project: &mut Option<String>,
@@ -461,7 +685,7 @@ pub fn mostrar_selector_proyectos_estandar_con_archivos(
 
     if let Some(proj) = selected_project.as_ref() {
         let proj_dir = buscar_ruta_proyecto(term_cwd, proj);
-        archivos_disponibles = listar_archivos_rs_proyecto(&proj_dir);
+        archivos_disponibles = listar_archivos_proyecto(&proj_dir);
         proj_dir_opt = Some(proj_dir);
     }
 
@@ -488,89 +712,247 @@ pub fn mostrar_selector_proyectos_estandar_con_archivos(
     }
 
     ui.horizontal(|ui| {
-        ui.label(
-            egui::RichText::new("Selecciona un proyecto:")
-                .strong()
-                .color(egui::Color32::WHITE),
+        let cyan = egui::Color32::from_rgb(100, 200, 255);
+
+        // 1. Botón Tile de Proyecto (Icono puro)
+        let proj_popup_id = ui.make_persistent_id(format!("{}_proj_popup_menu", combo_id));
+        let mut proj_popup_open = ui.data_mut(|d| d.get_temp::<bool>(proj_popup_id).unwrap_or(false));
+        let proj_anim = ui.ctx().animate_bool(proj_popup_id, proj_popup_open);
+
+        let img_folder = egui::Image::new(egui::include_image!("../../../assets/icons/folder-off-svgrepo-com.svg"))
+            .fit_to_exact_size(egui::Vec2::new(15.0, 15.0));
+        let btn_proj = pintar_icono_badge_tile(
+            ui,
+            img_folder,
+            proj_popup_open,
+            cyan,
+            "Seleccionar Proyecto Cargo",
         );
 
-        let label_seleccionado = match selected_project {
-            Some(p) => p.as_str(),
-            None => " Selecciona un proyecto ",
-        };
+        if btn_proj.clicked() {
+            proj_popup_open = !proj_popup_open;
+            ui.data_mut(|d| d.insert_temp(proj_popup_id, proj_popup_open));
+        }
 
-        egui::ComboBox::from_id_salt(combo_id)
-            .selected_text(
-                egui::RichText::new(label_seleccionado)
-                    .strong()
-                    .color(egui::Color32::from_rgb(100, 200, 255)),
-            )
-            .show_ui(ui, |ui| {
-                if ui
-                    .selectable_label(selected_project.is_none(), " Ninguno ")
-                    .clicked()
-                {
-                    *selected_project = None;
-                    *selected_file = None;
-                }
-                ui.separator();
-                for proj in &proyectos_disponibles {
-                    let es_sel = selected_project.as_ref() == Some(proj);
-                    if ui.selectable_label(es_sel, proj).clicked() {
-                        *selected_project = Some(proj.clone());
-                        let proj_dir = buscar_ruta_proyecto(term_cwd, proj);
-                        *term_cwd = proj_dir.clone();
-                        let nuevos_archivos = listar_archivos_rs_proyecto(&proj_dir);
-                        let main_rel = "src/main.rs".to_string();
-                        if nuevos_archivos.contains(&main_rel) {
-                            *selected_file = Some(main_rel);
-                        } else if !nuevos_archivos.is_empty() {
-                            *selected_file = Some(nuevos_archivos[0].clone());
-                        }
-
-                        let target = if let Some(rel) = selected_file.as_ref() {
-                            proj_dir.join(rel)
-                        } else {
-                            proj_dir.join("src/main.rs")
-                        };
-                        if let Ok(content) = std::fs::read_to_string(target) {
-                            *code_target = content;
-                        }
+        // Cierre al hacer clic fuera o presionar Escape
+        let proj_rect_id = proj_popup_id.with("rect");
+        let last_proj_rect = ui.data_mut(|d| d.get_temp::<egui::Rect>(proj_rect_id).unwrap_or(egui::Rect::NOTHING));
+        if proj_popup_open {
+            let escape = ui.input(|i| i.key_pressed(egui::Key::Escape));
+            let click_outside = ui.input(|i| {
+                if i.pointer.any_click() {
+                    if let Some(pos) = i.pointer.interact_pos() {
+                        !btn_proj.rect.contains(pos) && !last_proj_rect.contains(pos)
+                    } else {
+                        false
                     }
+                } else {
+                    false
                 }
             });
+            if escape || click_outside {
+                ui.data_mut(|d| d.insert_temp(proj_popup_id, false));
+            }
+        }
 
-        // Segundo selector: Archivos dentro de src/
+        // Popup Dropdown de Proyectos animado con Area
+        if proj_anim > 0.001 {
+            let slide_y = (1.0 - proj_anim) * -6.0;
+            let popup_pos = btn_proj.rect.left_bottom() + egui::vec2(0.0, 4.0 + slide_y);
+            let mut close_popup = false;
+
+            let alpha = (proj_anim * 255.0).clamp(0.0, 255.0) as u8;
+            let bg_color = egui::Color32::from_rgba_unmultiplied(16, 22, 32, alpha);
+            let border_color = egui::Color32::from_rgba_unmultiplied(45, 65, 95, alpha);
+
+            egui::Area::new(proj_popup_id)
+                .fixed_pos(popup_pos)
+                .order(egui::Order::Foreground)
+                .show(ui.ctx(), |ui| {
+                    // Sincronizar opacidad en todos los estilos visuales (textos, hovers, separadores)
+                    ui.style_mut().visuals.widgets.inactive.fg_stroke.color = egui::Color32::from_rgba_unmultiplied(190, 205, 225, alpha);
+                    ui.style_mut().visuals.widgets.hovered.fg_stroke.color = egui::Color32::from_rgba_unmultiplied(100, 200, 255, alpha);
+                    ui.style_mut().visuals.widgets.hovered.bg_fill = egui::Color32::from_rgba_unmultiplied(30, 42, 60, alpha);
+                    ui.style_mut().visuals.widgets.active.fg_stroke.color = egui::Color32::from_rgba_unmultiplied(255, 255, 255, alpha);
+                    ui.style_mut().visuals.widgets.active.bg_fill = egui::Color32::from_rgba_unmultiplied(40, 58, 85, alpha);
+                    ui.style_mut().visuals.widgets.noninteractive.bg_stroke.color = egui::Color32::from_rgba_unmultiplied(38, 54, 80, alpha);
+                    ui.style_mut().visuals.selection.bg_fill = egui::Color32::from_rgba_unmultiplied(30, 46, 70, alpha);
+                    ui.style_mut().visuals.selection.stroke.color = egui::Color32::from_rgba_unmultiplied(100, 200, 255, alpha);
+
+                    egui::Frame::popup(ui.style())
+                        .fill(bg_color)
+                        .stroke(egui::Stroke::new(1.0, border_color))
+                        .corner_radius(egui::CornerRadius::same(6))
+                        .inner_margin(egui::Margin::same(6))
+                        .show(ui, |ui| {
+                            ui.data_mut(|d| d.insert_temp(proj_rect_id, ui.min_rect()));
+                            ui.set_width(256.0);
+                            ui.label(egui::RichText::new("PROYECTOS CARGO").size(9.5).strong().color(egui::Color32::from_rgba_unmultiplied(120, 145, 175, alpha)));
+                            ui.separator();
+
+                            egui::ScrollArea::vertical()
+                                .max_height(150.0)
+                                .auto_shrink([false, true])
+                                .show(ui, |ui| {
+                                    ui.style_mut().spacing.item_spacing.y = 2.0;
+
+                                    let txt_libre = egui::RichText::new("Libre").color(if selected_project.is_none() {
+                                        egui::Color32::from_rgba_unmultiplied(100, 200, 255, alpha)
+                                    } else {
+                                        egui::Color32::from_rgba_unmultiplied(190, 205, 225, alpha)
+                                    });
+
+                                    if ui.selectable_label(selected_project.is_none(), txt_libre).clicked() {
+                                        *selected_project = None;
+                                        *selected_file = None;
+                                        close_popup = true;
+                                    }
+
+                                    for proj in &proyectos_disponibles {
+                                        let es_sel = selected_project.as_ref() == Some(proj);
+                                        let txt_proj = egui::RichText::new(proj).color(if es_sel {
+                                            egui::Color32::from_rgba_unmultiplied(100, 200, 255, alpha)
+                                        } else {
+                                            egui::Color32::from_rgba_unmultiplied(190, 205, 225, alpha)
+                                        });
+
+                                        if ui.selectable_label(es_sel, txt_proj).clicked() {
+                                            *selected_project = Some(proj.clone());
+                                            let proj_dir = buscar_ruta_proyecto(term_cwd, proj);
+                                            *term_cwd = proj_dir.clone();
+                                            let nuevos_archivos = listar_archivos_proyecto(&proj_dir);
+                                            let main_rel = "src/main.rs".to_string();
+                                            if nuevos_archivos.contains(&main_rel) {
+                                                *selected_file = Some(main_rel);
+                                            } else if !nuevos_archivos.is_empty() {
+                                                *selected_file = Some(nuevos_archivos[0].clone());
+                                            }
+
+                                            let target = if let Some(rel) = selected_file.as_ref() {
+                                                proj_dir.join(rel)
+                                            } else {
+                                                proj_dir.join("src/main.rs")
+                                            };
+                                            if let Ok(content) = std::fs::read_to_string(target) {
+                                                *code_target = content;
+                                            }
+                                            close_popup = true;
+                                        }
+                                    }
+                                });
+                        });
+                });
+
+            if close_popup {
+                ui.data_mut(|d| d.insert_temp(proj_popup_id, false));
+            }
+        }
+
+        // 2. Botón Tile de Archivo (Icono puro al lado del proyecto)
         if selected_project.is_some() && !archivos_disponibles.is_empty() {
-            ui.add_space(15.0);
-            ui.label(
-                egui::RichText::new("Archivo:")
-                    .strong()
-                    .color(egui::Color32::WHITE),
+            ui.add_space(2.0);
+
+            let file_popup_id = ui.make_persistent_id(format!("{}_file_popup_menu", combo_id));
+            let mut file_popup_open = ui.data_mut(|d| d.get_temp::<bool>(file_popup_id).unwrap_or(false));
+            let file_anim = ui.ctx().animate_bool(file_popup_id, file_popup_open);
+
+            let img_file = egui::Image::new(egui::include_image!("../../../assets/icons/file-svgrepo-com.svg"))
+                .fit_to_exact_size(egui::Vec2::new(15.0, 15.0));
+            let btn_file = pintar_icono_badge_tile(
+                ui,
+                img_file,
+                file_popup_open,
+                cyan,
+                "Seleccionar Archivo del Proyecto",
             );
 
-            let label_archivo = selected_file.as_deref().unwrap_or("src/main.rs");
+            if btn_file.clicked() {
+                file_popup_open = !file_popup_open;
+                ui.data_mut(|d| d.insert_temp(file_popup_id, file_popup_open));
+            }
 
-            egui::ComboBox::from_id_salt(format!("{}_archivos_combo", combo_id))
-                .selected_text(
-                    egui::RichText::new(label_archivo)
-                        .strong()
-                        .color(egui::Color32::from_rgb(255, 160, 50)),
-                )
-                .show_ui(ui, |ui| {
-                    for rel_file in &archivos_disponibles {
-                        let es_sel = selected_file.as_ref() == Some(rel_file);
-                        if ui.selectable_label(es_sel, rel_file).clicked() {
-                            *selected_file = Some(rel_file.clone());
-                            if let Some(proj_dir) = proj_dir_opt.as_ref() {
-                                let target_file = proj_dir.join(rel_file);
-                                if let Ok(content) = std::fs::read_to_string(&target_file) {
-                                    *code_target = content;
-                                }
-                            }
+            // Cierre al hacer clic fuera o presionar Escape
+            let file_rect_id = file_popup_id.with("rect");
+            let last_file_rect = ui.data_mut(|d| d.get_temp::<egui::Rect>(file_rect_id).unwrap_or(egui::Rect::NOTHING));
+            if file_popup_open {
+                let escape = ui.input(|i| i.key_pressed(egui::Key::Escape));
+                let click_outside = ui.input(|i| {
+                    if i.pointer.any_click() {
+                        if let Some(pos) = i.pointer.interact_pos() {
+                            !btn_file.rect.contains(pos) && !last_file_rect.contains(pos)
+                        } else {
+                            false
                         }
+                    } else {
+                        false
                     }
                 });
+                if escape || click_outside {
+                    ui.data_mut(|d| d.insert_temp(file_popup_id, false));
+                }
+            }
+
+            // Popup Dropdown de Archivos animado con Area
+            if file_anim > 0.001 {
+                let slide_y = (1.0 - file_anim) * -6.0;
+                let popup_pos = btn_file.rect.left_bottom() + egui::vec2(0.0, 4.0 + slide_y);
+                let mut close_file_popup = false;
+
+                let alpha = (file_anim * 255.0).clamp(0.0, 255.0) as u8;
+                let bg_color = egui::Color32::from_rgba_unmultiplied(16, 22, 32, alpha);
+                let border_color = egui::Color32::from_rgba_unmultiplied(45, 65, 95, alpha);
+
+                egui::Area::new(file_popup_id)
+                    .fixed_pos(popup_pos)
+                    .order(egui::Order::Foreground)
+                    .show(ui.ctx(), |ui| {
+                        // Sincronizar opacidad en todos los estilos visuales (textos, hovers, separadores)
+                        ui.style_mut().visuals.widgets.inactive.fg_stroke.color = egui::Color32::from_rgba_unmultiplied(190, 205, 225, alpha);
+                        ui.style_mut().visuals.widgets.hovered.fg_stroke.color = egui::Color32::from_rgba_unmultiplied(100, 200, 255, alpha);
+                        ui.style_mut().visuals.widgets.hovered.bg_fill = egui::Color32::from_rgba_unmultiplied(30, 42, 60, alpha);
+                        ui.style_mut().visuals.widgets.active.fg_stroke.color = egui::Color32::from_rgba_unmultiplied(255, 255, 255, alpha);
+                        ui.style_mut().visuals.widgets.active.bg_fill = egui::Color32::from_rgba_unmultiplied(40, 58, 85, alpha);
+                        ui.style_mut().visuals.widgets.noninteractive.bg_stroke.color = egui::Color32::from_rgba_unmultiplied(38, 54, 80, alpha);
+                        ui.style_mut().visuals.selection.bg_fill = egui::Color32::from_rgba_unmultiplied(30, 46, 70, alpha);
+                        ui.style_mut().visuals.selection.stroke.color = egui::Color32::from_rgba_unmultiplied(100, 200, 255, alpha);
+
+                        egui::Frame::popup(ui.style())
+                            .fill(bg_color)
+                            .stroke(egui::Stroke::new(1.0, border_color))
+                            .corner_radius(egui::CornerRadius::same(6))
+                            .inner_margin(egui::Margin::same(6))
+                            .show(ui, |ui| {
+                                ui.data_mut(|d| d.insert_temp(file_rect_id, ui.min_rect()));
+                                ui.set_width(256.0);
+                                ui.label(egui::RichText::new("ARCHIVOS DEL PROYECTO").size(9.5).strong().color(egui::Color32::from_rgba_unmultiplied(120, 145, 175, alpha)));
+                                ui.separator();
+
+                                egui::ScrollArea::vertical()
+                                    .max_height(150.0)
+                                    .auto_shrink([false, true])
+                                    .show(ui, |ui| {
+                                        ui.style_mut().spacing.item_spacing.y = 2.0;
+
+                                        let tree = build_file_tree(&archivos_disponibles);
+                                        render_file_tree(
+                                            ui,
+                                            &tree,
+                                            selected_file,
+                                            proj_dir_opt.as_ref(),
+                                            code_target,
+                                            &mut close_file_popup,
+                                            alpha,
+                                            0,
+                                            combo_id,
+                                        );
+                                    });
+                            });
+                    });
+
+                if close_file_popup {
+                    ui.data_mut(|d| d.insert_temp(file_popup_id, false));
+                }
+            }
         }
     });
 }
@@ -593,7 +975,11 @@ pub fn ejecutar_cargo_run_proyecto(state: &mut PortfolioState, ctx: &egui::Conte
     };
 
     // Obtener el código y el búfer de salida de la lección activa
-    let codigo_activo = state.obtener_codigo_activo().to_string();
+    let codigo_activo = if state.project_editor_path.as_deref() == Some("src/main.rs") {
+        state.project_editor_code.clone()
+    } else {
+        state.obtener_codigo_activo().to_string()
+    };
     let output_arc = state.obtener_output_activo();
 
     if state.selected_project.is_some() && target_file.parent().is_some_and(|p| p.exists()) {
@@ -1151,6 +1537,55 @@ pub fn mostrar_contenido_macros(ui: &mut egui::Ui) {
                 .color(egui::Color32::from_rgb(200, 230, 255)),
         );
     });
+
+    ui.add_space(20.0);
+    ui.heading(
+        egui::RichText::new("Macros y atributos: cómo se relacionan")
+            .size(18.0)
+            .strong()
+            .color(egui::Color32::WHITE),
+    );
+    ui.add_space(6.0);
+    ui.label("La sintaxis y la implementación son conceptos distintos: ! indica una invocación, mientras que #[...] indica un atributo. Algunos atributos activan macros procedurales.");
+    ui.add_space(10.0);
+
+    let mut mapa_frame = egui::Frame::new();
+    mapa_frame.fill = egui::Color32::from_rgb(14, 18, 26);
+    mapa_frame.inner_margin = egui::Margin::same(12);
+    mapa_frame.corner_radius = egui::CornerRadius::same(8);
+    mapa_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 60, 90));
+
+    mapa_frame.show(ui, |ui| {
+        egui::Grid::new("mapa_macros_atributos_rust")
+            .striped(true)
+            .spacing([20.0, 10.0])
+            .show(ui, |ui| {
+                for (forma, categoria, ejemplo, explicacion) in [
+                    ("!", "Macro declarativa", "println!(\"Hola\");", "macro_rules! usa patrones para generar código."),
+                    ("!", "Macro procedural function-like", "mi_macro!(dato);", "recibe tokens y genera código durante la compilación."),
+                    ("#[derive(...)]", "Macro procedural derive", "#[derive(Debug, Clone)]", "cada trait, como Debug o Clone, puede ser una macro derive."),
+                    ("#[atributo]", "Macro procedural attribute", "#[tokio::main]", "transforma la función, struct o módulo al que se aplica."),
+                    ("#[atributo]", "Atributo del compilador", "#[cfg(test)]", "configura la compilación; no todos los atributos son macros."),
+                ] {
+                    ui.label(egui::RichText::new(forma).monospace().strong().color(egui::Color32::from_rgb(255, 160, 50)));
+                    ui.label(egui::RichText::new(categoria).strong().color(egui::Color32::WHITE));
+                    ui.label(egui::RichText::new(ejemplo).monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                    ui.label(explicacion);
+                    ui.end_row();
+                }
+            });
+    });
+
+    ui.add_space(14.0);
+    let mut nota_frame = egui::Frame::new();
+    nota_frame.fill = egui::Color32::from_rgb(20, 28, 42);
+    nota_frame.inner_margin = egui::Margin::same(14);
+    nota_frame.corner_radius = egui::CornerRadius::same(8);
+    nota_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(60, 90, 140));
+    nota_frame.show(ui, |ui| {
+        ui.label(egui::RichText::new("Regla rápida").strong().color(egui::Color32::from_rgb(255, 160, 50)));
+        ui.label("println!() es una macro declarativa invocada con !. #[derive(Debug)] usa una macro derive mediante sintaxis de atributo. #[tokio::main] sí es una macro procedural de atributo. #[allow(...)] y #[cfg(...)] son atributos integrados del compilador.");
+    });
 }
 
 #[allow(dead_code)]
@@ -1511,94 +1946,75 @@ pub fn mostrar_seccion_documentacion(ui: &mut egui::Ui) {
     });
 }
 
-pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut PortfolioState) {
-    ui.add_space(15.0);
-    ui.vertical_centered(|ui| {
-        ui.heading(
-            egui::RichText::new("Conceptos de Rust")
-                .size(28.0)
-                .strong()
-                .color(egui::Color32::from_rgb(255, 160, 50)),
-        );
-    });
+pub fn mostrar_nav_superior(ui: &mut egui::Ui, state: &mut PortfolioState) {
+    let mut is_expanded = state.mostrar_nav_superior;
 
-    ui.add_space(15.0);
+    let color_header = egui::Color32::from_rgb(13, 15, 19);
 
-    // Barra de navegación con el mismo patrón unificado que Pilares
-    ui.horizontal(|ui| {
-        ui.add_space(10.0);
-        ui.label(
-            egui::RichText::new("Práctica:")
-                .small()
-                .color(egui::Color32::from_rgb(140, 150, 165)),
-        );
+    egui::Panel::top("nav_top_global")
+        .frame(egui::Frame::default().fill(color_header).inner_margin(4.0))
+        .resizable(false)
+        .show_collapsible(ui, &mut is_expanded, |ui| {
+            ui.add_space(6.0);
+            ui.horizontal(|ui| {
+                ui.add_space(5.0);
+                
+                // --- LADO IZQUIERDO: Título y Teoría ---
+                ui.label(
+                    egui::RichText::new("Conceptos de Rust")
+                        .size(16.0)
+                        .strong()
+                        .color(egui::Color32::from_rgb(255, 160, 50)),
+                );
+                
+                ui.separator();
 
-        let tabs_practica = [
-            (0, "Mutabilidad & Declaraciones"),
-            (1, "Blocks & Scopes"),
-            (2, "Statements & Expressions"),
-            (3, "Funciones Básicas"),
-        ];
-        for (indice, texto) in tabs_practica {
-            let es_activo = state.conceptos_tab == indice;
-            let text_color = if es_activo {
-                egui::Color32::from_rgb(255, 160, 50)
-            } else {
-                egui::Color32::from_rgb(180, 190, 205)
-            };
-            if ui
-                .add(
-                    egui::Button::new(egui::RichText::new(texto).strong().color(text_color))
-                        .frame(es_activo),
-                )
-                .clicked()
-            {
-                state.conceptos_tab = indice;
-            }
-            ui.add_space(4.0);
-        }
-
-        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-            let tabs_teoria = [
-                (6, "Doc & Comentarios"),
-                (5, "Macro & Format"),
-                (4, "Data Types"),
-            ];
-            for (indice, texto) in tabs_teoria {
-                let es_activo = state.conceptos_tab == indice;
-                let text_color = if es_activo {
-                    egui::Color32::from_rgb(255, 160, 50)
-                } else {
-                    egui::Color32::from_rgb(180, 190, 205)
-                };
-                if ui
-                    .add(
-                        egui::Button::new(egui::RichText::new(texto).strong().color(text_color))
-                            .frame(es_activo),
-                    )
-                    .clicked()
-                {
-                    state.conceptos_tab = indice;
+                let img_book = egui::Image::new(egui::include_image!("../../../assets/icons/book-line.svg")).fit_to_exact_size(egui::Vec2::new(24.0, 24.0));
+                ui.add(img_book);
+                let tabs_teoria = [
+                    (7, "Core Mechanics"),
+                    (4, "Data Types"),
+                    (5, "Macros y Atributos"),
+                    (6, "Doc & Comentarios"),
+                ];
+                for (indice, texto) in tabs_teoria {
+                    let es_activo = state.conceptos_tab == indice;
+                    if ui.selectable_label(es_activo, texto).clicked() {
+                        state.conceptos_tab = indice;
+                    }
                 }
-                ui.add_space(4.0);
-            }
-            ui.label(
-                egui::RichText::new("Teórico:")
-                    .small()
-                    .color(egui::Color32::from_rgb(140, 150, 165)),
-            );
+
+                // --- LADO DERECHO: Práctica ---
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                    ui.add_space(5.0);
+                    
+                    let tabs_practica = [
+                        (0, "Code Lab"),
+                    ];
+                    // Iteramos al revés por el right_to_left
+                    for (indice, texto) in tabs_practica.iter().rev() {
+                        let es_activo = state.conceptos_tab == *indice;
+                        if ui.selectable_label(es_activo, *texto).clicked() {
+                            state.conceptos_tab = *indice;
+                        }
+                    }
+
+                    let img_code = egui::Image::new(egui::include_image!("../../../assets/icons/monitor-code-line.svg")).fit_to_exact_size(egui::Vec2::new(24.0, 24.0));
+                    ui.add(img_code);
+
+                    ui.separator();
+                });
+            });
+            ui.add_space(6.0);
         });
-    });
 
-    ui.add_space(6.0);
-    ui.separator();
-    ui.add_space(10.0);
+    state.mostrar_nav_superior = is_expanded;
+}
 
-    egui::ScrollArea::vertical()
-        .auto_shrink([false, false])
-        .show(ui, |ui| {
-            // El selector de proyectos y el editor de código interactivo en primera posición para las pestañas prácticas
-            if state.conceptos_tab < 4 {
+pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut PortfolioState) {
+    // El selector de proyectos y el editor de código interactivo solo para "Funciones Básicas" (y futuros tabs prácticos si los agregamos)
+    // El índice 0 es el único práctico que queda actualmente.
+    if state.conceptos_tab == 0 {
         let code_target = if state.selected_project.is_some() {
             &mut state.shared_project_code
         } else {
@@ -1635,19 +2051,34 @@ pub fn mostrar_tutorial_conceptos_basicos(ui: &mut egui::Ui, state: &mut Portfol
     }
 
     match state.conceptos_tab {
-        0 => mutabilidad::mostrar(ui, state),
-        1 => scopes::mostrar(ui, state),
-        2 => statements::mostrar(ui, state),
-        3 => funciones::mostrar(ui, state),
-        4 => {
-            mostrar_contenido_tipos_primitivos(ui, state);
+        0 => funciones::mostrar(ui, state),
+        4 => mostrar_contenido_tipos_primitivos(ui, state),
+        5 => mostrar_contenido_macros(ui),
+        6 => mostrar_seccion_documentacion(ui),
+        7 => {
+            ui.heading(
+                egui::RichText::new("Mecánicas Centrales de Rust")
+                    .size(24.0)
+                    .strong()
+                    .color(egui::Color32::from_rgb(100, 200, 255)),
+            );
+            ui.add_space(20.0);
+            
+            // Fusión de las 3 vistas teóricas
+            mutabilidad::mostrar(ui, state);
+            
+            ui.add_space(30.0);
+            ui.separator();
+            ui.add_space(30.0);
+            
+            scopes::mostrar(ui, state);
+            
+            ui.add_space(30.0);
+            ui.separator();
+            ui.add_space(30.0);
+            
+            statements::mostrar(ui, state);
         }
-        5 => {
-            mostrar_contenido_macros(ui);
-        }
-        _ => {
-            mostrar_seccion_documentacion(ui);
-        }
+        _ => {}
     }
-    });
 }

@@ -1,6 +1,7 @@
 use crate::app::PortfolioState;
 use eframe::egui;
 
+#[allow(dead_code)]
 pub fn mostrar_pilares_conceptos(ui: &mut egui::Ui, state: &mut PortfolioState) {
     egui::ScrollArea::vertical().show(ui, |ui| {
         mostrar_pilares_proyecto(ui, state);
@@ -15,6 +16,7 @@ pub fn mostrar_pilares_conceptos(ui: &mut egui::Ui, state: &mut PortfolioState) 
     });
 }
 
+#[allow(dead_code)]
 pub fn mostrar_pilares_proyecto(ui: &mut egui::Ui, state: &mut PortfolioState) {
     ui.heading(
         egui::RichText::new("Estructura de Proyectos en Rust")
@@ -230,6 +232,7 @@ pub fn mostrar_desglose_template_con_imagen(ui: &mut egui::Ui, state: &mut Portf
     });
 }
 
+#[allow(dead_code)]
 pub fn mostrar_pilares_tiempo(ui: &mut egui::Ui, state: &mut PortfolioState) {
     ui.heading(
         egui::RichText::new("Fases de Vida del Código: Compile Time vs Run Time")
@@ -352,9 +355,19 @@ pub fn mostrar_pilares_tiempo(ui: &mut egui::Ui, state: &mut PortfolioState) {
     });
 }
 
+pub fn mostrar_build_execution(ui: &mut egui::Ui, state: &mut PortfolioState) {
+    egui::ScrollArea::vertical().show(ui, |ui| {
+        mostrar_pilares_tiempo(ui, state);
+        ui.add_space(20.0);
+        ui.separator();
+        ui.add_space(20.0);
+        mostrar_pilares_debug_vs_release(ui, state);
+    });
+}
+
 pub fn mostrar_pilares_debug_vs_release(ui: &mut egui::Ui, _state: &mut PortfolioState) {
     ui.heading(
-        egui::RichText::new("Perfiles de Compilación: Debug vs Release")
+        egui::RichText::new("Perfiles de Compilación: Dev vs Release")
             .size(20.0)
             .strong()
             .color(egui::Color32::WHITE),
@@ -377,7 +390,7 @@ pub fn mostrar_pilares_debug_vs_release(ui: &mut egui::Ui, _state: &mut Portfoli
             .spacing([25.0, 10.0])
             .show(ui, |ui| {
                 ui.label(egui::RichText::new("Característica").strong().color(egui::Color32::WHITE));
-                ui.label(egui::RichText::new("Perfil Debug (Desarrollo)").strong().color(egui::Color32::WHITE));
+                ui.label(egui::RichText::new("Perfil Dev (Desarrollo)").strong().color(egui::Color32::WHITE));
                 ui.label(egui::RichText::new("Perfil Release (Producción)").strong().color(egui::Color32::WHITE));
                 ui.end_row();
 
@@ -408,8 +421,56 @@ pub fn mostrar_pilares_debug_vs_release(ui: &mut egui::Ui, _state: &mut Portfoli
 
                 ui.label(egui::RichText::new("Chequeo Overflow Enteros").strong().color(egui::Color32::from_rgb(255, 160, 50)));
                 ui.label("Activo (panics en desbordamientos)");
-                ui.label("Inactivo (wrap automático en complemento a 2)");
+                ui.label("Normalmente inactivo (la operación puede envolver el valor)");
                 ui.end_row();
             });
     });
+
+    ui.add_space(20.0);
+    ui.heading(
+        egui::RichText::new("Perfiles para pruebas y rendimiento")
+            .size(20.0)
+            .strong()
+            .color(egui::Color32::WHITE),
+    );
+    ui.add_space(8.0);
+    ui.label("Estos perfiles tienen objetivos diferentes: uno comprueba el comportamiento y el otro mide el rendimiento.");
+    ui.add_space(12.0);
+
+    let mut verification_frame = egui::Frame::new();
+    verification_frame.fill = egui::Color32::from_rgb(14, 18, 26);
+    verification_frame.inner_margin = egui::Margin::same(14);
+    verification_frame.corner_radius = egui::CornerRadius::same(8);
+    verification_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 60, 90));
+
+    verification_frame.show(ui, |ui| {
+        egui::Grid::new("tabla_test_vs_bench_pilares")
+            .striped(true)
+            .spacing([25.0, 10.0])
+            .show(ui, |ui| {
+                ui.label(egui::RichText::new("Perfil").strong().color(egui::Color32::WHITE));
+                ui.label(egui::RichText::new("Comando").strong().color(egui::Color32::WHITE));
+                ui.label(egui::RichText::new("Objetivo").strong().color(egui::Color32::WHITE));
+                ui.label(egui::RichText::new("Uso típico").strong().color(egui::Color32::WHITE));
+                ui.end_row();
+
+                ui.label(egui::RichText::new("test").monospace().strong().color(egui::Color32::from_rgb(255, 160, 50)));
+                ui.label(egui::RichText::new("cargo test").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.label("Comprobar que el código produce los resultados esperados.");
+                ui.label("Tests unitarios e integración.");
+                ui.end_row();
+
+                ui.label(egui::RichText::new("bench").monospace().strong().color(egui::Color32::from_rgb(255, 160, 50)));
+                ui.label(egui::RichText::new("cargo bench").monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+                ui.label("Medir cuánto tarda una operación o comparar implementaciones.");
+                ui.label("Benchmarks y optimización.");
+                ui.end_row();
+            });
+    });
+
+    ui.add_space(10.0);
+    ui.label(
+        egui::RichText::new("Resumen: dev desarrolla, release publica, test verifica y bench mide rendimiento.")
+            .color(egui::Color32::from_rgb(200, 230, 255)),
+    );
 }

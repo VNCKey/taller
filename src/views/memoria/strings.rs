@@ -126,7 +126,7 @@ pub fn mostrar_teoria_string_y_str(ui: &mut egui::Ui, state: &mut PortfolioState
 
     ui.add_space(14.0);
 
-    // Tabla 2: Métodos y Operaciones Esenciales de String
+    // Tabla 2: El Arsenal Completo de String
     let mut table_methods = egui::Frame::new();
     table_methods.fill = egui::Color32::from_rgb(14, 18, 26);
     table_methods.inner_margin = egui::Margin::same(12);
@@ -135,145 +135,64 @@ pub fn mostrar_teoria_string_y_str(ui: &mut egui::Ui, state: &mut PortfolioState
 
     table_methods.show(ui, |ui| {
         ui.label(
-            egui::RichText::new("Métodos y Operaciones Esenciales de String")
+            egui::RichText::new("El Arsenal Completo de Métodos Directos de String")
                 .strong()
-                .size(14.0)
+                .size(16.0)
                 .color(egui::Color32::from_rgb(255, 160, 50)),
         );
-        ui.add_space(8.0);
+        ui.label(egui::RichText::new("Todo lo que puedes hacer con texto sin necesidad de usar Iteradores.").color(egui::Color32::from_rgb(180,180,180)));
+        ui.add_space(10.0);
 
-        egui::Grid::new("tabla_string_metodos_operaciones")
-            .striped(true)
-            .spacing([20.0, 8.0])
-            .show(ui, |ui| {
-                ui.label(
-                    egui::RichText::new("Operación")
-                        .strong()
-                        .color(egui::Color32::WHITE),
-                );
-                ui.label(
-                    egui::RichText::new("Sintaxis")
-                        .strong()
-                        .color(egui::Color32::WHITE),
-                );
-                ui.label(
-                    egui::RichText::new("Mutabilidad")
-                        .strong()
-                        .color(egui::Color32::WHITE),
-                );
-                ui.label(
-                    egui::RichText::new("Descripción Técnica")
-                        .strong()
-                        .color(egui::Color32::WHITE),
-                );
-                ui.label(
-                    egui::RichText::new("Resultado")
-                        .strong()
-                        .color(egui::Color32::WHITE),
-                );
-                ui.end_row();
+        let draw_row = |ui: &mut egui::Ui, metodo: &str, hace: &str, ejemplo: &str| {
+            ui.label(egui::RichText::new(metodo).monospace().color(egui::Color32::from_rgb(100, 200, 255)));
+            ui.label(hace);
+            ui.label(egui::RichText::new(ejemplo).monospace().color(egui::Color32::from_rgb(180, 220, 180)));
+            ui.end_row();
+        };
 
-                // Creación
-                ui.label("Crear vacío");
-                ui.label(
-                    egui::RichText::new("String::new()")
-                        .monospace()
-                        .color(egui::Color32::from_rgb(100, 200, 255)),
-                );
-                ui.label("Inmutable / mut");
-                ui.label("Crea un String vacío sin reservar Heap inicial.");
-                ui.label("len: 0, cap: 0");
-                ui.end_row();
+        // 1. INSPECCION Y BUSQUEDA
+        ui.label(egui::RichText::new("1. Inspección y Búsqueda (Solo leen)").strong().color(egui::Color32::WHITE));
+        ui.end_row();
+        egui::Grid::new("grid_inspeccion_string").striped(true).spacing([20.0, 8.0]).show(ui, |ui| {
+            draw_row(ui, ".len()", "Devuelve el tamaño del texto en bytes (no en letras).", "texto.len() // usize");
+            draw_row(ui, ".capacity()", "Memoria RAM (en bytes) reservada actualmente en el Heap.", "texto.capacity()");
+            draw_row(ui, ".is_empty()", "Devuelve true si la longitud es 0 (\"\").", "\"\".is_empty() // true");
+            draw_row(ui, ".contains(str)", "Busca si una palabra o letra existe dentro.", "texto.contains(\"Rust\")");
+            draw_row(ui, ".starts_with(str)", "Verifica si empieza exactamente con ese texto.", "texto.starts_with(\"Al\")");
+            draw_row(ui, ".ends_with(str)", "Verifica si termina exactamente con ese texto.", "texto.ends_with(\".\")");
+            draw_row(ui, ".find(str)", "Busca el texto y devuelve la posición (byte) inicial.", "texto.find(\"a\") // Option");
+            draw_row(ui, ".rfind(str)", "Igual que find, pero busca desde el final hacia atrás.", "texto.rfind(\"a\")");
+        });
 
-                ui.label("Desde literal");
-                ui.label(
-                    egui::RichText::new("String::from(\"Hola\")")
-                        .monospace()
-                        .color(egui::Color32::from_rgb(100, 200, 255)),
-                );
-                ui.label("Inmutable / mut");
-                ui.label("Reserva memoria en Heap y copia el literal &str.");
-                ui.label("\"Hola\"");
-                ui.end_row();
+        ui.add_space(15.0);
 
-                ui.label("to_string()");
-                ui.label(
-                    egui::RichText::new("\"Hola\".to_string()")
-                        .monospace()
-                        .color(egui::Color32::from_rgb(100, 200, 255)),
-                );
-                ui.label("Inmutable / mut");
-                ui.label("Convierte cualquier tipo con trait Display a String.");
-                ui.label("\"Hola\"");
-                ui.end_row();
+        // 2. MODIFICACION
+        ui.label(egui::RichText::new("2. Modificación (Requieren let mut)").strong().color(egui::Color32::from_rgb(255, 100, 100)));
+        ui.label(egui::RichText::new("Alteran la memoria original. Cuidado con los índices (¡son en bytes!).").small().color(egui::Color32::GRAY));
+        ui.end_row();
+        egui::Grid::new("grid_modificacion_string").striped(true).spacing([20.0, 8.0]).show(ui, |ui| {
+            draw_row(ui, ".push(char)", "Añade un solo carácter al final del texto.", "texto.push('!')");
+            draw_row(ui, ".push_str(&str)", "Añade una frase/texto al final del texto.", "texto.push_str(\" Hola\")");
+            draw_row(ui, ".insert(idx, char)", "Inserta un carácter en una posición (byte) específica.", "texto.insert(0, '¡')");
+            draw_row(ui, ".insert_str(idx, &str)", "Inserta una frase en una posición (byte) específica.", "texto.insert_str(5, \"amigo\")");
+            draw_row(ui, ".remove(idx)", "Borra el carácter en esa posición exacta y te lo devuelve.", "texto.remove(0) // char");
+            draw_row(ui, ".pop()", "Borra el último carácter del final y te lo devuelve.", "texto.pop() // Option");
+            draw_row(ui, ".truncate(N)", "Corta el texto, dejando solo los primeros N bytes.", "texto.truncate(4)");
+            draw_row(ui, ".clear()", "Vacía todo el texto (lo deja con longitud 0).", "texto.clear()");
+        });
 
-                // Mutación
-                ui.label("Añadir &str");
-                ui.label(
-                    egui::RichText::new("s.push_str(\" mundo\")")
-                        .monospace()
-                        .color(egui::Color32::from_rgb(100, 200, 255)),
-                );
-                ui.label("Requiere mut");
-                ui.label("Concatena un slice de texto al final del buffer.");
-                ui.label("\"Hola mundo\"");
-                ui.end_row();
+        ui.add_space(15.0);
 
-                ui.label("Añadir char");
-                ui.label(
-                    egui::RichText::new("s.push('!')")
-                        .monospace()
-                        .color(egui::Color32::from_rgb(100, 200, 255)),
-                );
-                ui.label("Requiere mut");
-                ui.label("Añade un único carácter Unicode al final.");
-                ui.label("\"Hola mundo!\"");
-                ui.end_row();
-
-                ui.label("Eliminar último");
-                ui.label(
-                    egui::RichText::new("s.pop()")
-                        .monospace()
-                        .color(egui::Color32::from_rgb(100, 200, 255)),
-                );
-                ui.label("Requiere mut");
-                ui.label("Extrae y devuelve el último carácter (Option<char>).");
-                ui.label("Some('!')");
-                ui.end_row();
-
-                // Capacidad e Inspección
-                ui.label("Longitud en bytes");
-                ui.label(
-                    egui::RichText::new("s.len()")
-                        .monospace()
-                        .color(egui::Color32::from_rgb(100, 200, 255)),
-                );
-                ui.label("Solo Lectura");
-                ui.label("Devuelve la cantidad de bytes que ocupa el texto.");
-                ui.label("usize");
-                ui.end_row();
-
-                ui.label("Capacidad en Heap");
-                ui.label(
-                    egui::RichText::new("s.capacity()")
-                        .monospace()
-                        .color(egui::Color32::from_rgb(100, 200, 255)),
-                );
-                ui.label("Solo Lectura");
-                ui.label("Bytes totales asignados en el buffer del Heap.");
-                ui.label("usize");
-                ui.end_row();
-
-                ui.label("Vaciar buffer");
-                ui.label(
-                    egui::RichText::new("s.clear()")
-                        .monospace()
-                        .color(egui::Color32::from_rgb(100, 200, 255)),
-                );
-                ui.label("Requiere mut");
-                ui.label("Elimina todo el contenido pero mantiene la capacidad en Heap.");
-                ui.label("len: 0");
-                ui.end_row();
-            });
+        // 3. TRANSFORMACION
+        ui.label(egui::RichText::new("3. Transformación (Devuelven un texto nuevo)").strong().color(egui::Color32::from_rgb(100, 255, 100)));
+        ui.end_row();
+        egui::Grid::new("grid_transformacion_string").striped(true).spacing([20.0, 8.0]).show(ui, |ui| {
+            draw_row(ui, ".trim()", "Elimina espacios en blanco y saltos de línea en los extremos.", "texto.trim() // &str");
+            draw_row(ui, ".to_uppercase()", "Convierte todo el texto a MAYÚSCULAS.", "texto.to_uppercase() // String");
+            draw_row(ui, ".to_lowercase()", "Convierte todo el texto a minúsculas.", "texto.to_lowercase() // String");
+            draw_row(ui, ".replace(A, B)", "Busca A y reemplaza TODAS sus apariciones por B.", "texto.replace(\"key\", \"kay\")");
+            draw_row(ui, ".replacen(A, B, n)", "Igual que replace, pero solo las primeras n veces.", "texto.replacen(\"o\", \"a\", 2)");
+            draw_row(ui, ".repeat(n)", "Copia el texto n veces seguidas.", "\"Ja\".repeat(3) // \"JaJaJa\"");
+        });
     });
 }

@@ -3,7 +3,6 @@
 pub enum AppRoute {
     #[default]
     LandingPage,
-    Portafolio,
     TutorialCargo,
     Comenzando,
     TutorialCompilacion,

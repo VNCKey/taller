@@ -6,6 +6,105 @@ use crate::execution::ejecutar_codigo_rust;
 use crate::views::conceptos::mostrar_selector_proyectos_estandar_con_archivos;
 use crate::views::control_flujo::card_frame_tutorial;
 
+fn mostrar_tabla_metodos(
+    ui: &mut egui::Ui,
+    id: &str,
+    titulo: &str,
+    introduccion: &str,
+    filas: &[(&str, &str, &str)],
+) {
+    ui.add_space(18.0);
+    ui.heading(
+        egui::RichText::new(titulo)
+            .strong()
+            .color(egui::Color32::from_rgb(255, 160, 50)),
+    );
+    ui.label(introduccion);
+    ui.add_space(8.0);
+
+    let mut frame = egui::Frame::new();
+    frame.fill = egui::Color32::from_rgb(14, 18, 26);
+    frame.inner_margin = egui::Margin::same(12);
+    frame.corner_radius = egui::CornerRadius::same(8);
+    frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 60, 90));
+
+    frame.show(ui, |ui| {
+        egui::Grid::new(id)
+            .striped(true)
+            .spacing([18.0, 8.0])
+            .show(ui, |ui| {
+                for encabezado in ["Método / operación", "Qué hace", "Ejemplo"] {
+                    ui.label(
+                        egui::RichText::new(encabezado)
+                            .strong()
+                            .color(egui::Color32::WHITE),
+                    );
+                }
+                ui.end_row();
+
+                for (metodo, descripcion, ejemplo) in filas {
+                    ui.label(
+                        egui::RichText::new(*metodo)
+                            .monospace()
+                            .strong()
+                            .color(egui::Color32::from_rgb(255, 160, 50)),
+                    );
+                    ui.label(*descripcion);
+                    ui.label(
+                        egui::RichText::new(*ejemplo)
+                            .monospace()
+                            .color(egui::Color32::from_rgb(100, 200, 255)),
+                    );
+                    ui.end_row();
+                }
+            });
+    });
+}
+
+fn mostrar_tabla_constantes(
+    ui: &mut egui::Ui,
+    id: &str,
+    filas: &[(&str, &str, &str)],
+) {
+    let mut frame = egui::Frame::new();
+    frame.fill = egui::Color32::from_rgb(14, 18, 26);
+    frame.inner_margin = egui::Margin::same(12);
+    frame.corner_radius = egui::CornerRadius::same(8);
+    frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 60, 90));
+
+    frame.show(ui, |ui| {
+        egui::Grid::new(id)
+            .striped(true)
+            .spacing([20.0, 8.0])
+            .show(ui, |ui| {
+                for encabezado in ["Constante", "Qué representa", "Ejemplo"] {
+                    ui.label(
+                        egui::RichText::new(encabezado)
+                            .strong()
+                            .color(egui::Color32::WHITE),
+                    );
+                }
+                ui.end_row();
+
+                for (constante, descripcion, ejemplo) in filas {
+                    ui.label(
+                        egui::RichText::new(*constante)
+                            .monospace()
+                            .strong()
+                            .color(egui::Color32::from_rgb(255, 160, 50)),
+                    );
+                    ui.label(*descripcion);
+                    ui.label(
+                        egui::RichText::new(*ejemplo)
+                            .monospace()
+                            .color(egui::Color32::from_rgb(100, 200, 255)),
+                    );
+                    ui.end_row();
+                }
+            });
+    });
+}
+
 pub fn mostrar_categoria_enteros(ui: &mut egui::Ui) {
     ui.label("En Rust, los enteros se dividen según si admiten números negativos (signed `i`) o solo positivos y cero (unsigned `u`).");
     ui.add_space(10.0);
@@ -150,6 +249,134 @@ pub fn mostrar_categoria_enteros(ui: &mut egui::Ui) {
                 }
             });
     });
+
+    ui.add_space(18.0);
+    ui.heading(
+        egui::RichText::new("Métodos útiles de los enteros")
+            .strong()
+            .color(egui::Color32::from_rgb(255, 160, 50)),
+    );
+    ui.label(
+        "Además de almacenar números, los tipos enteros ofrecen métodos para realizar cálculos, comparar valores, trabajar con bits y convertir números en bytes.",
+    );
+    ui.add_space(8.0);
+
+    let mut methods_frame = egui::Frame::new();
+    methods_frame.fill = egui::Color32::from_rgb(14, 18, 26);
+    methods_frame.inner_margin = egui::Margin::same(12);
+    methods_frame.corner_radius = egui::CornerRadius::same(8);
+    methods_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 60, 90));
+
+    methods_frame.show(ui, |ui| {
+        egui::Grid::new("grid_metodos_enteros")
+            .striped(true)
+            .spacing([18.0, 8.0])
+            .show(ui, |ui| {
+                for encabezado in ["Categoría", "Método", "Qué hace", "Ejemplo"] {
+                    ui.label(
+                        egui::RichText::new(encabezado)
+                            .strong()
+                            .color(egui::Color32::WHITE),
+                    );
+                }
+                ui.end_row();
+
+                let metodos = [
+                    ("Matemáticas", "pow", "Calcula una potencia con un exponente entero.", "3u32.pow(4) // 81"),
+                    ("Matemáticas", "abs", "Obtiene el valor absoluto de un entero con signo.", "(-8i32).abs() // 8"),
+                    ("Matemáticas", "signum", "Devuelve -1, 0 o 1 según el signo del entero.", "(-8i32).signum() // -1"),
+                    ("Matemáticas", "min / max", "Devuelve el menor o el mayor entre dos valores.", "10u8.max(20) // 20"),
+                    ("Matemáticas", "clamp", "Limita un valor dentro de un mínimo y un máximo.", "50u8.clamp(0, 10) // 10"),
+                    ("Matemáticas", "div_euclid", "Realiza una división euclidiana, útil con negativos.", "(-7i32).div_euclid(3) // -3"),
+                    ("Matemáticas", "rem_euclid", "Obtiene el resto euclidiano no negativo.", "(-7i32).rem_euclid(3) // 2"),
+                    ("Matemáticas", "is_power_of_two", "Indica si el entero es una potencia de dos.", "16u32.is_power_of_two() // true"),
+                    ("Matemáticas", "next_power_of_two", "Obtiene la siguiente potencia de dos igual o mayor.", "10u32.next_power_of_two() // 16"),
+                    ("Matemáticas", "ilog2 / ilog10", "Calcula el logaritmo entero en base 2 o 10.", "100u32.ilog10() // 2"),
+                    ("Comparaciones", "is_positive", "Indica si el entero es positivo.", "8i32.is_positive() // true"),
+                    ("Comparaciones", "is_negative", "Indica si el entero es negativo.", "(-8i32).is_negative() // true"),
+                    ("Bits", "count_ones", "Cuenta cuántos bits están en 1.", "0b1011u8.count_ones() // 3"),
+                    ("Bits", "leading_zeros", "Cuenta los ceros al comienzo de la representación binaria.", "8u8.leading_zeros()"),
+                    ("Bytes", "to_le_bytes", "Convierte el entero en bytes little-endian.", "0x1234u16.to_le_bytes()"),
+                ];
+
+                for (categoria, metodo, descripcion, ejemplo) in metodos {
+                    ui.label(egui::RichText::new(categoria).color(egui::Color32::from_rgb(180, 190, 205)));
+                    ui.label(
+                        egui::RichText::new(metodo)
+                            .monospace()
+                            .strong()
+                            .color(egui::Color32::from_rgb(255, 160, 50)),
+                    );
+                    ui.label(descripcion);
+                    ui.label(
+                        egui::RichText::new(ejemplo)
+                            .monospace()
+                            .color(egui::Color32::from_rgb(100, 200, 255)),
+                    );
+                    ui.end_row();
+                }
+            });
+    });
+
+    ui.add_space(10.0);
+    ui.label(
+        egui::RichText::new("En esta primera tabla no aparecen los métodos checked_*; se estudiarán junto con Option porque pueden devolver Some(valor) o None.")
+            .italics()
+            .color(egui::Color32::from_rgb(180, 190, 205)),
+    );
+
+    ui.add_space(18.0);
+    ui.heading(
+        egui::RichText::new("Constantes asociadas a los enteros")
+            .strong()
+            .color(egui::Color32::from_rgb(255, 160, 50)),
+    );
+    ui.label("Cada tipo entero conoce sus propios límites y características:");
+    ui.add_space(8.0);
+
+    let mut constants_frame = egui::Frame::new();
+    constants_frame.fill = egui::Color32::from_rgb(14, 18, 26);
+    constants_frame.inner_margin = egui::Margin::same(12);
+    constants_frame.corner_radius = egui::CornerRadius::same(8);
+    constants_frame.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 60, 90));
+
+    constants_frame.show(ui, |ui| {
+        egui::Grid::new("grid_constantes_enteros")
+            .striped(true)
+            .spacing([20.0, 8.0])
+            .show(ui, |ui| {
+                for encabezado in ["Constante", "Qué representa", "Ejemplo"] {
+                    ui.label(
+                        egui::RichText::new(encabezado)
+                            .strong()
+                            .color(egui::Color32::WHITE),
+                    );
+                }
+                ui.end_row();
+
+                let constantes = [
+                    ("MIN", "El valor mínimo que puede representar el tipo.", "i8::MIN // -128"),
+                    ("MAX", "El valor máximo que puede representar el tipo.", "u8::MAX // 255"),
+                    ("BITS", "Cantidad de bits utilizados por el tipo.", "u32::BITS // 32"),
+                ];
+
+                for (constante, descripcion, ejemplo) in constantes {
+                    ui.label(
+                        egui::RichText::new(constante)
+                            .monospace()
+                            .strong()
+                            .color(egui::Color32::from_rgb(255, 160, 50)),
+                    );
+                    ui.label(descripcion);
+                    ui.label(
+                        egui::RichText::new(ejemplo)
+                            .monospace()
+                            .color(egui::Color32::from_rgb(100, 200, 255)),
+                    );
+                    ui.end_row();
+                }
+            });
+    });
 }
 
 
@@ -249,6 +476,42 @@ pub fn mostrar_categoria_flotantes(ui: &mut egui::Ui) {
         ui.label("• División flotante: 5.0 / 2.0 da como resultado 2.5.");
         ui.label("• Rust prohíbe operar enteros con flotantes directamente; requiere casting explícito: (5 as f64 / 2.0).");
     });
+
+    mostrar_tabla_metodos(
+        ui,
+        "grid_metodos_flotantes",
+        "Métodos útiles de los flotantes",
+        "Estos métodos ayudan a redondear, calcular y comprobar propiedades de f32 y f64.",
+        &[
+            ("abs", "Obtiene el valor absoluto.", "(-3.5f64).abs() // 3.5"),
+            ("floor", "Redondea hacia abajo.", "3.8f64.floor() // 3.0"),
+            ("ceil", "Redondea hacia arriba.", "3.2f64.ceil() // 4.0"),
+            ("round", "Redondea al entero más cercano.", "3.5f64.round() // 4.0"),
+            ("trunc", "Elimina la parte fraccionaria.", "3.8f64.trunc() // 3.0"),
+            ("fract", "Obtiene la parte fraccionaria.", "3.8f64.fract() // 0.8"),
+            ("sqrt", "Calcula la raíz cuadrada.", "16.0f64.sqrt() // 4.0"),
+            ("powi / powf", "Calcula potencias enteras o flotantes.", "2.0f64.powi(3) // 8.0"),
+            ("min / max", "Devuelve el menor o el mayor valor.", "2.0f64.max(5.0) // 5.0"),
+            ("clamp", "Limita el valor entre mínimo y máximo.", "10.0f64.clamp(0.0, 5.0) // 5.0"),
+            ("is_nan", "Indica si el valor es NaN.", "(0.0f64 / 0.0).is_nan() // true"),
+            ("is_finite", "Indica si no es infinito ni NaN.", "3.0f64.is_finite() // true"),
+            ("to_degrees / to_radians", "Convierte entre grados y radianes.", "180.0f64.to_radians()"),
+        ],
+    );
+
+    ui.add_space(10.0);
+    ui.label("Constantes frecuentes de f32 y f64:");
+    mostrar_tabla_constantes(
+        ui,
+        "grid_constantes_flotantes",
+        &[
+            ("MIN / MAX", "Límites de valores finitos representables.", "f64::MAX"),
+            ("MIN_POSITIVE", "Menor valor positivo normalizado.", "f32::MIN_POSITIVE"),
+            ("EPSILON", "Diferencia entre 1.0 y el siguiente valor representable.", "f64::EPSILON"),
+            ("INFINITY / NEG_INFINITY", "Valores de infinito positivo y negativo.", "f32::INFINITY"),
+            ("NAN", "Valor que representa un resultado no numérico.", "f64::NAN"),
+        ],
+    );
 }
 
 
@@ -354,6 +617,19 @@ pub fn mostrar_categoria_booleanos(ui: &mut egui::Ui, state: &mut PortfolioState
                 }
             });
     });
+
+    mostrar_tabla_metodos(
+        ui,
+        "grid_metodos_booleanos",
+        "Operaciones útiles de bool",
+        "bool tiene pocos métodos propios; normalmente se trabaja con operadores lógicos y condiciones.",
+        &[
+            ("!valor", "Invierte true a false y false a true.", "!true // false"),
+            ("a && b", "Devuelve true si ambos valores son true.", "true && false // false"),
+            ("a || b", "Devuelve true si al menos uno es true.", "true || false // true"),
+            ("a ^ b", "Devuelve true si los valores son diferentes.", "true ^ false // true"),
+        ],
+    );
 
     ui.add_space(30.0);
 
@@ -493,6 +769,79 @@ pub fn mostrar_categoria_caracteres(ui: &mut egui::Ui) {
                 ui.label("Soporta ASCII, acentos, Emojis y caracteres de todo el mundo.");
                 ui.end_row();
             });
+    });
+
+    mostrar_tabla_metodos(
+        ui,
+        "grid_metodos_char",
+        "Métodos útiles de char",
+        "Los métodos de char ayudan a clasificar caracteres Unicode y trabajar con ASCII.",
+        &[
+            ("is_alphabetic", "Indica si es una letra.", "'ñ'.is_alphabetic() // true"),
+            ("is_numeric", "Indica si representa un número Unicode.", "'7'.is_numeric() // true"),
+            ("is_alphanumeric", "Indica si es letra o número.", "'A'.is_alphanumeric() // true"),
+            ("is_whitespace", "Indica si es un espacio o separación.", "' '.is_whitespace() // true"),
+            ("is_uppercase / is_lowercase", "Comprueba el uso de mayúsculas o minúsculas.", "'A'.is_uppercase() // true"),
+            ("is_ascii", "Indica si pertenece al conjunto ASCII.", "'A'.is_ascii() // true"),
+            ("to_ascii_uppercase", "Convierte un carácter ASCII a mayúscula.", "'a'.to_ascii_uppercase() // 'A'"),
+            ("to_ascii_lowercase", "Convierte un carácter ASCII a minúscula.", "'A'.to_ascii_lowercase() // 'a'"),
+            ("len_utf8 / len_utf16", "Indica cuántos bytes o unidades UTF utiliza.", "'ñ'.len_utf8() // 2"),
+        ],
+    );
+
+    ui.add_space(10.0);
+    ui.label("Constantes frecuentes de char:");
+    mostrar_tabla_constantes(
+        ui,
+        "grid_constantes_char",
+        &[
+            ("MIN", "Primer valor Unicode válido.", "char::MIN // '\\0'"),
+            ("MAX", "Último valor Unicode válido.", "char::MAX"),
+            ("REPLACEMENT_CHARACTER", "Carácter usado para reemplazar texto inválido.", "char::REPLACEMENT_CHARACTER // '�'"),
+        ],
+    );
+
+    ui.add_space(20.0);
+    ui.label(
+        egui::RichText::new("🔬 Experimentando con char (Bajo el Capó)")
+            .strong()
+            .size(16.0)
+            .color(egui::Color32::from_rgb(100, 200, 255)),
+    );
+    ui.label("Como un char es un valor escalar Unicode de 32 bits, podemos convertirlo explícitamente a un u32 o formato Hexadecimal para ver exactamente cómo se almacena en la memoria de la computadora:");
+    
+    let mut frame_code = egui::Frame::new();
+    frame_code.fill = egui::Color32::from_rgb(20, 22, 27);
+    frame_code.inner_margin = egui::Margin::same(12);
+    frame_code.corner_radius = egui::CornerRadius::same(6);
+    frame_code.stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(60, 80, 110));
+    
+    frame_code.show(ui, |ui| {
+        ui.label(
+            egui::RichText::new(
+"fn main() {
+    let letra: char = '🦀';
+    let numero_crudo = letra as u32; // Casting a entero de 32 bits
+
+    // Convertimos de u32 a char de nuevo (devuelve Option porque podría no ser un Unicode válido)
+    let volver = char::from_u32(numero_crudo).unwrap();
+
+    println!(\"Unicode de caracter '🦀': {} y convertido denuevo a caracter {}\", 
+        numero_crudo, volver
+    );
+
+    println!(\"Para buscar en internet: [U+{:X}]\", numero_crudo);
+
+    let valor_hex = format!(\"U+{:X}\", numero_crudo);
+    println!(\"{}\", valor_hex);
+
+    // Escapando Unicode directamente en un string
+    println!(\"Hola amigo \\u{1F980}\");
+}"
+            )
+            .monospace()
+            .color(egui::Color32::from_rgb(180, 220, 180))
+        );
     });
 }
 

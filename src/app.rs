@@ -6,10 +6,9 @@ use syntect::parsing::SyntaxSet;
 
 use crate::components::modals::{
     mostrar_modal_comparacion_compiladores, mostrar_modal_railroad_let, mostrar_modal_salida_cargo,
-    mostrar_modal_settings, mostrar_modal_template_creado, mostrar_modal_terminal,
+    mostrar_modal_settings, mostrar_modal_terminal,
 };
 use crate::routes::AppRoute;
-use crate::views::colecciones::mostrar_tutorial_colecciones;
 use crate::views::conceptos::{
     buscar_ruta_proyecto, ejecutar_cargo_run_proyecto, mostrar_comenzando,
 };
@@ -19,7 +18,7 @@ use crate::views::enums::mostrar_tutorial_enums;
 use crate::views::errores::mostrar_tutorial_errores;
 use crate::views::funciones::mostrar_tutorial_funciones;
 use crate::views::iteradores::mostrar_tutorial_iteradores;
-use crate::views::landing::{mostrar_landing_page, mostrar_portafolio};
+use crate::views::landing::mostrar_landing_page;
 use crate::views::pilares::mostrar_tutorial_cargo;
 use crate::views::playground::{mostrar_editor, mostrar_editor_nube};
 use crate::views::memoria::mostrar_tutorial_strings_ownership;
@@ -30,6 +29,9 @@ use crate::views::traits::mostrar_tutorial_traits;
 #[allow(dead_code)]
 pub struct PortfolioState {
     pub ruta_actual: AppRoute,
+    pub mostrar_sidebar: bool,
+    pub mostrar_nav_superior: bool,
+    pub mostrar_status_bar: bool,
 
     pub show_ingresos: bool,
     pub show_gastos: bool,
@@ -38,6 +40,7 @@ pub struct PortfolioState {
 
     pub tutorial_step: usize,
     pub tutorial_time: f64,
+    pub anim_trigger: f64,
 
     pub playground_code: String,
     pub playground_output: Arc<Mutex<String>>,
@@ -157,6 +160,9 @@ pub struct PortfolioState {
     // State para Estructura de Proyecto y Conceptos Básicos
     pub comenzando_step: usize,
     pub pilares_step: usize,
+    pub anatomy_step: usize,
+    pub mostrar_explorer_drawer: bool,
+    pub mostrar_console_drawer: bool,
     pub show_commands_modal: bool,
     pub show_macro_expansion: bool,
     pub show_cargo_output_modal: Arc<AtomicBool>,
@@ -176,6 +182,7 @@ pub struct PortfolioState {
     pub conceptos_tab: usize,
     pub show_railroad_modal: Option<usize>,
     pub controlflujo_tab: usize,
+    pub controlflujo_is_practica: bool,
     pub conceptos_code: String,
     pub conceptos_output: Arc<Mutex<String>>,
     pub modulos_code: String,
@@ -191,6 +198,10 @@ pub struct PortfolioState {
     pub created_project_name: Option<String>,
     pub selected_project: Option<String>,
     pub selected_file: Option<String>,
+    pub project_editor_path: Option<String>,
+    pub project_editor_code: String,
+    pub project_editor_status: String,
+    pub project_editor_dirty: bool,
 }
 
 
@@ -199,12 +210,16 @@ impl Default for PortfolioState {
     fn default() -> Self {
         Self {
             ruta_actual: AppRoute::LandingPage,
+            mostrar_sidebar: true,
+            mostrar_nav_superior: true,
+            mostrar_status_bar: true,
             show_ingresos: true,
             show_gastos: true,
             show_beneficios: true,
             year: 2025,
             tutorial_step: 0,
             tutorial_time: 0.0,
+            anim_trigger: 0.0,
             show_code_modal: None,
             shared_project_code: String::new(),
             shared_project_output: Arc::new(Mutex::new(String::new())),
@@ -305,6 +320,9 @@ impl Default for PortfolioState {
 
             comenzando_step: 0,
             pilares_step: 0,
+            anatomy_step: 0,
+            mostrar_explorer_drawer: false,
+            mostrar_console_drawer: false,
             show_commands_modal: false,
             show_macro_expansion: false,
             show_cargo_output_modal: Arc::new(AtomicBool::new(false)),
@@ -324,6 +342,7 @@ impl Default for PortfolioState {
             conceptos_tab: 0,
             show_railroad_modal: None,
             controlflujo_tab: 0,
+            controlflujo_is_practica: false,
             conceptos_code: "fn main() {\n    let edad: u8 = 25;\n    println!(\"edad = {edad}\");\n}\n".to_string(),
             conceptos_output: Arc::new(Mutex::new(String::new())),
             modulos_code: "// Módulos en Rust\nmod redes {\n    pub fn conectar() {\n        println!(\"Conectado a la red!\");\n    }\n}\n\nfn main() {\n    redes::conectar();\n}\n".to_string(),
@@ -346,6 +365,10 @@ impl Default for PortfolioState {
             created_project_name: None,
             selected_project: None,
             selected_file: None,
+            project_editor_path: None,
+            project_editor_code: String::new(),
+            project_editor_status: String::new(),
+            project_editor_dirty: false,
             modulos_tab: 0,
         }
     }
@@ -455,9 +478,19 @@ impl PortfolioState {
         }
     }
 
-    pub fn guardar_proyecto_activo(&self) {
+    pub fn guardar_proyecto_activo(&mut self) {
         if let Some(ref proj) = self.selected_project {
             let proj_dir = buscar_ruta_proyecto(&self.term_cwd, proj);
+            if self.project_editor_path.as_deref() == self.selected_file.as_deref() {
+                if let Some(ref relative_file) = self.project_editor_path {
+                    let target_file = proj_dir.join(relative_file);
+                    if std::fs::write(target_file, &self.project_editor_code).is_ok() {
+                        self.project_editor_dirty = false;
+                        self.project_editor_status = "Cambios guardados correctamente.".to_string();
+                    }
+                    return;
+                }
+            }
             let target_file = if let Some(ref rel_file) = self.selected_file {
                 proj_dir.join(rel_file)
             } else {
@@ -484,6 +517,22 @@ impl PortfolioState {
 
 impl eframe::App for PortfolioState {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+        // FORZAR desactivación GLOBAL de CUALQUIER modo debug (bordes rojos, etc.)
+        ui.style_mut().debug.debug_on_hover = false;
+        ui.style_mut().debug.show_expand_width = false;
+        ui.style_mut().debug.show_expand_height = false;
+        ui.style_mut().debug.show_resize = false;
+        ui.style_mut().debug.show_interactive_widgets = false;
+        for theme in [egui::Theme::Dark, egui::Theme::Light] {
+            ui.ctx().style_mut_of(theme, |style| {
+                style.debug.debug_on_hover = false;
+                style.debug.show_expand_width = false;
+                style.debug.show_expand_height = false;
+                style.debug.show_resize = false;
+                style.debug.show_interactive_widgets = false;
+            });
+        }
+
         // Alternar pantalla completa con F11 o salir con la tecla Escape
         let is_fullscreen = ui.ctx().input(|i| i.viewport().fullscreen.unwrap_or(false));
         if ui.ctx().input(|i| i.key_pressed(egui::Key::F11)) {
@@ -497,23 +546,115 @@ impl eframe::App for PortfolioState {
         // Actualizar tiempo de animación (dt)
         self.tutorial_time += ui.ctx().input(|i| i.stable_dt) as f64;
 
+        // --- COLORES PRINCIPALES DEL ENTORNO ---
+        // Aquí puedes "jugar" con los colores (R, G, B)
+        let color_fondo_principal = egui::Color32::from_rgb(20, 22, 27); // Gris azulado oscuro (Main)
+        let color_footer = egui::Color32::from_rgb(13, 15, 19); // Mismo color oscuro que la Barra Lateral
+
+        // --- 0. STATUS BAR GLOBAL (FOOTER) ---
+        if self.ruta_actual != AppRoute::LandingPage {
+            let mut is_expanded = self.mostrar_status_bar;
+            egui::Panel::bottom("status_bar")
+                .frame(egui::Frame::default().fill(color_footer).inner_margin(4.0))
+                .show_collapsible(ui, &mut is_expanded, |ui| {
+                ui.horizontal(|ui| {
+                    ui.add_space(5.0);
+                    
+                    // Toggle Sidebar Izquierda
+                    let img_sidebar = egui::Image::new(egui::include_image!("../assets/icons/sidebar-left.svg")).fit_to_exact_size(egui::Vec2::new(16.0, 16.0));
+                    let mut btn_sidebar = egui::Button::image(img_sidebar);
+                    if self.mostrar_sidebar {
+                        btn_sidebar = btn_sidebar.fill(egui::Color32::from_rgb(50, 60, 80));
+                    }
+                    if ui.add(btn_sidebar)
+                        .on_hover_text("Mostrar/Ocultar Menú Lateral (Ctrl+B)")
+                        .clicked() 
+                    {
+                        self.mostrar_sidebar = !self.mostrar_sidebar;
+                    }
+                    
+                    // Toggle Header
+                    let has_top_nav = self.ruta_actual == AppRoute::Comenzando || self.ruta_actual == AppRoute::TutorialCargo;
+                    if has_top_nav {
+                        let img_top = egui::Image::new(egui::include_image!("../assets/icons/layout-top.svg")).fit_to_exact_size(egui::Vec2::new(16.0, 16.0));
+                        let mut btn_top = egui::Button::image(img_top);
+                        if self.mostrar_nav_superior {
+                            btn_top = btn_top.fill(egui::Color32::from_rgb(50, 60, 80));
+                        }
+                        if ui.add(btn_top)
+                            .on_hover_text("Mostrar/Ocultar Header (Ctrl+H)")
+                            .clicked()
+                        {
+                            self.mostrar_nav_superior = !self.mostrar_nav_superior;
+                        }
+                    }
+
+                    // Elementos a la derecha (estilo VS Code / Zed)
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        ui.add_space(8.0);
+                        ui.label(egui::RichText::new("FerrisKey v0.1").small().color(egui::Color32::from_rgb(130, 140, 155)));
+                        ui.add_space(12.0);
+
+                        if let Some(ref proj) = self.selected_project {
+                            if let Some(ref file) = self.selected_file {
+                                ui.label(
+                                    egui::RichText::new(file)
+                                        .size(11.5)
+                                        .color(egui::Color32::from_rgb(255, 180, 50)),
+                                );
+                                ui.label(
+                                    egui::RichText::new("/")
+                                        .size(11.5)
+                                        .color(egui::Color32::from_rgb(70, 90, 120)),
+                                );
+                            }
+                            ui.label(
+                                egui::RichText::new(proj)
+                                    .size(11.5)
+                                    .color(egui::Color32::from_rgb(100, 200, 255)),
+                            );
+                        } else {
+                            ui.label(
+                                egui::RichText::new("Libre")
+                                    .size(11.5)
+                                    .color(egui::Color32::from_rgb(120, 145, 175)),
+                            );
+                        }
+                    });
+                });
+            });
+            self.mostrar_status_bar = is_expanded;
+        }
+
         // --- 1. PANEL DE NAVEGACIÓN (SIDEBAR - Solo si no está en LandingPage) ---
         if self.ruta_actual != AppRoute::LandingPage {
             crate::components::sidebar::mostrar_sidebar(ui, self);
         }
 
+        // --- 1.5 PANEL DERECHO (Inspector - Solo en Conceptos y Rust Foundations) ---
+        if self.ruta_actual == AppRoute::Comenzando {
+            crate::views::conceptos::mostrar_nav_superior(ui, self);
+        } else if self.ruta_actual == AppRoute::TutorialCargo {
+            crate::views::pilares::mostrar_nav_superior(ui, self);
+        }
+
         // --- 2. PANEL CENTRAL ---
+        let is_code_lab = self.ruta_actual == AppRoute::TutorialCargo && self.pilares_step == 1;
         let central_panel = if self.ruta_actual == AppRoute::LandingPage {
             egui::CentralPanel::default().frame(egui::Frame::new().fill(egui::Color32::BLACK))
+        } else if is_code_lab {
+            egui::CentralPanel::default().frame(egui::Frame::default().fill(egui::Color32::from_rgb(10, 14, 22)).inner_margin(0.0))
         } else {
-            egui::CentralPanel::default()
+            egui::CentralPanel::default().frame(egui::Frame::default().fill(color_fondo_principal).inner_margin(8.0))
         };
         central_panel.show(ui, |ui| {
-            egui::ScrollArea::vertical().show(ui, |ui| match self.ruta_actual {
+
+            match self.ruta_actual {
                 AppRoute::LandingPage => mostrar_landing_page(ui, self),
-                AppRoute::Portafolio => mostrar_portafolio(ui),
                 AppRoute::TutorialCargo => mostrar_tutorial_cargo(ui, self),
-                AppRoute::Comenzando => mostrar_comenzando(ui, self),
+                AppRoute::Comenzando => {
+                    egui::ScrollArea::vertical().show(ui, |ui| mostrar_comenzando(ui, self));
+                }
                 AppRoute::TutorialCompilacion => crate::views::pilares::pipeline::mostrar_tutorial_compilacion(ui, self),
                 AppRoute::TutorialTiposDatos => crate::views::tipos_compuestos::mostrar_tutorial_tipos_compuestos(ui, self),
                 AppRoute::TutorialControlFlujo => mostrar_tutorial_control_flujo(ui, self),
@@ -525,14 +666,16 @@ impl eframe::App for PortfolioState {
                 AppRoute::TutorialModulos => crate::views::modulos::mostrar_tutorial_modulos(ui, self),
                 AppRoute::TutorialStructs => mostrar_tutorial_structs(ui, self),
                 AppRoute::TutorialEnums => mostrar_tutorial_enums(ui, self),
-                AppRoute::TutorialColecciones => mostrar_tutorial_colecciones(ui, self),
+                AppRoute::TutorialColecciones => {
+                    crate::views::tipos_compuestos::mostrar_tutorial_tipos_compuestos(ui, self)
+                }
                 AppRoute::TutorialErrores => mostrar_tutorial_errores(ui, self),
                 AppRoute::TutorialTraits => mostrar_tutorial_traits(ui, self),
                 AppRoute::TutorialGenericos => mostrar_tutorial_genericos(ui, self),
                 AppRoute::DashboardGraficos => mostrar_graficos(ui, self),
                 AppRoute::Playground => mostrar_editor(ui, self),
                 AppRoute::PlaygroundNube => mostrar_editor_nube(ui, self),
-            });
+            }
         });
 
         // --- PROCESAR ATAJOS DE TECLADO GLOBALES ---
@@ -549,6 +692,30 @@ impl eframe::App for PortfolioState {
                     }
                 )
             });
+
+            // Ctrl + B -> Toggle Sidebar Izquierdo
+            if i.consume_shortcut(&egui::KeyboardShortcut::new(
+                egui::Modifiers::CTRL,
+                egui::Key::B,
+            )) {
+                self.mostrar_sidebar = !self.mostrar_sidebar;
+            }
+
+            // Ctrl + H -> Toggle Top Nav
+            if i.consume_shortcut(&egui::KeyboardShortcut::new(
+                egui::Modifiers::CTRL,
+                egui::Key::H,
+            )) {
+                self.mostrar_nav_superior = !self.mostrar_nav_superior;
+            }
+
+            // Ctrl + J -> Toggle Status Bar (Footer)
+            if i.consume_shortcut(&egui::KeyboardShortcut::new(
+                egui::Modifiers::CTRL,
+                egui::Key::J,
+            )) {
+                self.mostrar_status_bar = !self.mostrar_status_bar;
+            }
 
             // Ctrl + T -> Toggle Terminal
             if i.consume_shortcut(&egui::KeyboardShortcut::new(
@@ -612,7 +779,6 @@ impl eframe::App for PortfolioState {
         mostrar_modal_salida_cargo(ui.ctx(), self);
         mostrar_modal_terminal(ui.ctx(), self);
         mostrar_modal_settings(ui.ctx(), self);
-        mostrar_modal_template_creado(ui.ctx(), self);
         mostrar_modal_railroad_let(ui.ctx(), self);
         crate::components::modals::mostrar_modal_codigo(ui.ctx(), self);
 
@@ -620,4 +786,3 @@ impl eframe::App for PortfolioState {
         ui.ctx().request_repaint();
     }
 }
-

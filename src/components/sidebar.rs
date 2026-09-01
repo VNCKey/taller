@@ -4,12 +4,17 @@ use crate::app::PortfolioState;
 use crate::routes::AppRoute;
 
 pub fn mostrar_sidebar(ui: &mut egui::Ui, state: &mut PortfolioState) {
+    let mut is_expanded = state.mostrar_sidebar;
+
+    let color_sidebar = egui::Color32::from_rgb(13, 15, 19); // Aún más oscuro para dar profundidad
+
     egui::Panel::left("sidebar")
+        .frame(egui::Frame::default().fill(color_sidebar).inner_margin(4.0))
         .resizable(false)
-        .show(ui, |ui| {
+        .show_collapsible(ui, &mut is_expanded, |ui| {
             ui.set_min_width(220.0);
             egui::ScrollArea::vertical().show(ui, |ui| {
-                ui.add_space(20.0);
+                ui.add_space(10.0);
 
                 ui.vertical_centered(|ui| {
                     let mut job = egui::text::LayoutJob::default();
@@ -66,16 +71,15 @@ pub fn mostrar_sidebar(ui: &mut egui::Ui, state: &mut PortfolioState) {
                 );
                 ui.add_space(10.0);
 
-                // 1. Pilares
-                // 1. Pilares
+                // 1. Rust Foundations
                 if ui
                     .selectable_label(
                         state.ruta_actual == AppRoute::TutorialCargo,
-                        "Pilares",
+                        "Rust Foundations",
                     )
                     .clicked()
                 {
-                    state.ruta_actual = AppRoute::TutorialCargo;
+                    state.ruta_actual = AppRoute::TutorialCargo; state.anim_trigger = ui.input(|i| i.time);
                 }
 
                 // 2. Conceptos
@@ -86,7 +90,7 @@ pub fn mostrar_sidebar(ui: &mut egui::Ui, state: &mut PortfolioState) {
                     )
                     .clicked()
                 {
-                    state.ruta_actual = AppRoute::Comenzando;
+                    state.ruta_actual = AppRoute::Comenzando; state.anim_trigger = ui.input(|i| i.time);
                 }
 
                 // 3. Memoria (reglas de memoria + String/&str)
@@ -121,17 +125,6 @@ pub fn mostrar_sidebar(ui: &mut egui::Ui, state: &mut PortfolioState) {
                     .clicked()
                 {
                     state.ruta_actual = AppRoute::TutorialTiposDatos;
-                }
-
-                // 6. Colecciones
-                if ui
-                    .selectable_label(
-                        state.ruta_actual == AppRoute::TutorialColecciones,
-                        "Colecciones",
-                    )
-                    .clicked()
-                {
-                    state.ruta_actual = AppRoute::TutorialColecciones;
                 }
 
                 // 6. Control de Flujo
@@ -295,4 +288,6 @@ pub fn mostrar_sidebar(ui: &mut egui::Ui, state: &mut PortfolioState) {
                 });
             });
         });
+
+    state.mostrar_sidebar = is_expanded;
 }
